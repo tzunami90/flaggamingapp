@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn = "navigation_view">
+    <group
+        android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/nav_home"
+            android:icon="@drawable/nav_home"
+            android:title="Home"/>
+
+        <item
+            android:id="@+id/nav_registro_tiendas"
+            android:icon="@drawable/nav_registrotienda"
+            android:title="Registro de Tienda"/>
+
+        <item
+            android:id="@+id/nav_about_us"
+            android:icon="@drawable/nav_aboutus"
+            android:title="Sobre Nosotros"/>
+
+    </group>
+
+    <item
+        android:title="">
+
+        <menu>
+            <item
+                android:id="@+id/nav_logout"
+                android:icon="@drawable/sign_out"
+                android:title="Cerrar Sesión"/>
+        </menu>
+    </item>
+
+
+</menu>

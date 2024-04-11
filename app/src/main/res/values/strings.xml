@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">FLAGG</string>
+    <string name="register_link">¿No tienes una cuenta? <font color="#0000FF"><u>Regístrate</u></font></string>
+    <string name="login_link">¿Ya tienes una cuenta? <font color="#0000FF"><u>Ingresa</u></font></string>
+    <string name="open_nav">Abrir menu</string>
+    <string name="close_nav">Cerrar menu</string>
+</resources>

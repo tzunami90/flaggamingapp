@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Base.Theme.FLAGGgaming.Dark" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Otros estilos de tu aplicación aquí -->
+        <item name="windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="colorPrimary">@color/flagg</item>
+        <item name="colorPrimaryVariant">@color/flagg</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+</resources>
