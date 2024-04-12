@@ -22,6 +22,7 @@ import com.beone.flagggaming.steamapi.ListaJuegosSteam;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -146,11 +147,22 @@ public class RegisterActivity extends AppCompatActivity {
                 pst.setString(4,editTextPassword.getText().toString());
                 pst.executeUpdate();
                 Toast.makeText(this, "¡Registro exitoso!", Toast.LENGTH_SHORT).show();
+
+                //Obtengo el ID y el rol
+                PreparedStatement pst2 = conDB().prepareStatement("SELECT * FROM USUARIOS WHERE eMail = '" + editTextEmail.getText() + "' AND password ='" + editTextPassword.getText()+"';");
+                pst2.executeQuery();
+                ResultSet rs2 = pst.getResultSet();
+
                 String name = editTextFirstName.getText().toString() + " " + editTextLastName.getText().toString();
                 String mail = editTextEmail.getText().toString();
+                int id = rs2.getInt(1);
+                int rol = rs2.getInt(6);
+
                 Intent intent = new Intent(this, HomeAcitivity.class);
                 intent.putExtra("name", name);
                 intent.putExtra("mail", mail);
+                intent.putExtra("id", id);
+                intent.putExtra("rol", rol);
                 startActivity(intent);
             }
 

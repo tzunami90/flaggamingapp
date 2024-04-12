@@ -2,99 +2,95 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/login"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".LoginActivity">
+    tools:context=".navbar.PanelTiendaFragment">
 
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:src="@drawable/logonobg"
-        app:layout_constraintBottom_toTopOf="@+id/editTextEmail"
         app:layout_constraintDimensionRatio="3:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0"
-        android:layout_marginTop="32dp"/>
+        android:layout_marginTop="50dp"/>
 
     <TextView
-        android:id="@+id/textViewLoginTitle"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Login"
-        android:textSize="24sp"
+        android:id="@+id/txNombreTienda"
+        android:text="NOMBRE TIENDA"
         android:textStyle="bold"
+        android:textSize="25dp"
+        android:textAlignment="center"
+        android:gravity="center"
+        android:layout_marginTop="32dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView"
-        android:layout_marginTop="32dp" />
-
-    <EditText
-        android:id="@+id/editTextEmail"
+        app:layout_constraintTop_toBottomOf="@+id/imageView"/>
+    <TextView
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="32dp"
-        android:hint="Correo electrónico"
-        android:inputType="textEmailAddress"
+        android:id="@+id/txNroTienda"
+        android:text="Nro TIENDA"
+        android:textStyle="italic"
+        android:textSize="15dp"
+        android:textAlignment="center"
+        android:gravity="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewLoginTitle"
-        app:layout_constraintVertical_bias="0.1" />
-
-    <EditText
-        android:id="@+id/editTextPassword"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="32dp"
-        android:layout_marginEnd="32dp"
-        android:hint="Contraseña"
-        android:inputType="textPassword"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextEmail"
-        app:layout_constraintVertical_bias="0.1" />
+        app:layout_constraintTop_toBottomOf="@+id/txNombreTienda"/>
 
     <Button
-        android:id="@+id/buttonLogin"
+        android:id="@+id/btnPerfilTienda"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginTop="32dp"
         android:layout_marginEnd="32dp"
-        android:onClick="loginButtonClicked"
-        android:text="Iniciar sesión"
+        android:text="EDITAR DATOS TIENDA"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/progressLogin" />
-
-    <TextView
-        android:id="@+id/textViewRegister"
+        app:layout_constraintTop_toBottomOf="@+id/txNroTienda" />
+    <Button
+        android:id="@+id/btnNuevoProducto"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:onClick="openRegisterActivity"
-        android:text="@string/register_link"
-        android:textColor="@android:color/darker_gray"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="32dp"
+        android:text="NUEVO PRODUCTO"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buttonLogin" />
+        app:layout_constraintTop_toBottomOf="@+id/btnPerfilTienda" />
 
-    <ProgressBar
-        android:id="@+id/progressLogin"
-        style="?android:attr/progressBarStyle"
-        android:layout_width="wrap_content"
+    <Button
+        android:id="@+id/btnListaProductos"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/buttonLogin"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="32dp"
+        android:text="LISTA DE PRODUCTOS"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextPassword" />
+        app:layout_constraintTop_toBottomOf="@+id/btnNuevoProducto" />
+
+    <Button
+        android:id="@+id/btnBaja"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="32dp"
+        android:text="SOLICITAR BAJA"
+        android:backgroundTint="@color/flagg"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnListaProductos" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

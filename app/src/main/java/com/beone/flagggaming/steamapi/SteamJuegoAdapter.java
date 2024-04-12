@@ -15,7 +15,9 @@ import java.util.List;
 
 public class SteamJuegoAdapter extends RecyclerView.Adapter<SteamJuegoAdapter.ViewHolder> {
     private List<Juegos> juegos;
+    private List<Response> response;
     private Context context;
+
 
     public SteamJuegoAdapter(List<Juegos> juegos, Context context) {
         this.juegos = juegos;

@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.beone.flagggaming.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -58,8 +59,6 @@ public class ListaJuegosSteam extends AppCompatActivity {
         SteamApiService steamApiService = retrofit.create(SteamApiService.class);
 
         Call<List<Juegos>> call = steamApiService.getJuego();
-
-        
         call.enqueue(new Callback<List<Juegos>>() {
             @Override
             public void onResponse(Call<List<Juegos>> call, Response<List<Juegos>> response) {
@@ -77,7 +76,7 @@ public class ListaJuegosSteam extends AppCompatActivity {
             @Override
             public void onFailure(Call<List<Juegos>> call, Throwable t) {
 
-                Toast.makeText(ListaJuegosSteam.this, "ERROR DE CONEXIÓN CON API STEAM", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ListaJuegosSteam.this, "ERROR CON API STEAM", Toast.LENGTH_SHORT).show();
 
             }
         });

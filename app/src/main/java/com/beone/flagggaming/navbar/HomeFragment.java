@@ -7,9 +7,9 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.beone.flagggaming.R;
-
 
 public class HomeFragment extends Fragment {
 
@@ -17,6 +17,12 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_home, container, false);
+        View root = inflater.inflate(R.layout.fragment_home, container, false);
+
+        //AGREGO COMPORTAMIENTOS DEL FRGMENT
+
+           // Toast.makeText(getContext(),"PROBANDO",Toast.LENGTH_SHORT).show();
+        return root;
     }
+
 }

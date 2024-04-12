@@ -110,12 +110,16 @@ public class LoginActivity extends AppCompatActivity {
                     ResultSet rs = pst.getResultSet();
 
                     if(rs.next()){
+                        int id = rs.getInt(1);
                         name = rs.getString(2) + " " + rs.getString(3);
                         mail = rs.getString(4);
+                        int rol = rs.getInt(6);
                         Toast.makeText(this, "Inicio de sesión exitoso.", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(this, HomeAcitivity.class);
                         intent.putExtra("name", name);
                         intent.putExtra("mail", mail);
+                        intent.putExtra("id", id);
+                        intent.putExtra("rol", rol);
                         startActivity(intent);
                     } else{
                         Toast.makeText(this, "Mail y/o Contraseña incorrectos", Toast.LENGTH_SHORT).show();

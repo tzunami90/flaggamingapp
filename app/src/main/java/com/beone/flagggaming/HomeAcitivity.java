@@ -1,5 +1,6 @@
 package com.beone.flagggaming;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,6 +21,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.beone.flagggaming.navbar.AboutUsFragment;
 import com.beone.flagggaming.navbar.HomeFragment;
+import com.beone.flagggaming.navbar.PanelTiendaFragment;
 import com.beone.flagggaming.navbar.RegisterTiendaFragment;
 import com.google.android.material.navigation.NavigationView;
 
@@ -30,6 +32,8 @@ public class HomeAcitivity extends AppCompatActivity implements NavigationView.O
     NavigationView navigationView;
     TextView textUserName, textUserMail;
     Bundle bundle;
+    String name, mail;
+    int idU, rol;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,8 +47,10 @@ public class HomeAcitivity extends AppCompatActivity implements NavigationView.O
         });
 
         bundle = getIntent().getExtras();
-        String name = bundle.getString("name");
-        String mail = bundle.getString("mail");
+        name = bundle.getString("name");
+        mail = bundle.getString("mail");
+        idU = bundle.getInt("id");
+        rol = bundle.getInt("rol");
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -67,6 +73,7 @@ public class HomeAcitivity extends AppCompatActivity implements NavigationView.O
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
+        //Ingreso al home fragment
         if(savedInstanceState == null){
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new HomeFragment()).commit();
             navigationView.setCheckedItem(R.id.nav_home);
@@ -79,15 +86,39 @@ public class HomeAcitivity extends AppCompatActivity implements NavigationView.O
         int itemId = menuItem.getItemId();
         if(itemId == R.id.nav_home) {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new HomeFragment()).commit();
+            navigationView.setCheckedItem(R.id.nav_home);
         }
-        if(itemId == R.id.nav_registro_tiendas) {
+        if((itemId == R.id.nav_registro_tiendas) && (rol == 0)) {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new RegisterTiendaFragment()).commit();
+            navigationView.setCheckedItem(R.id.nav_registro_tiendas);
+        }
+        if((itemId == R.id.nav_registro_tiendas) && (rol == 1)) {
+            Toast.makeText(this,"YA TIENES UNA TIENDA REGISTRADA", Toast.LENGTH_SHORT).show();
         }
         if(itemId == R.id.nav_about_us) {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new AboutUsFragment()).commit();
+            navigationView.setCheckedItem(R.id.nav_about_us);
+        }
+        if((itemId == R.id.nav_panel_tienda) && (rol == 1)) {
+            Bundle bundleF = new Bundle();
+            bundleF.putInt("id",idU);
+            PanelTiendaFragment panelTiendaFragment = new PanelTiendaFragment();
+            panelTiendaFragment.setArguments(bundleF);
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, panelTiendaFragment).commit();
+            navigationView.setCheckedItem(R.id.nav_panel_tienda);
+        }
+        if((itemId == R.id.nav_panel_tienda) && (rol == 0)) {
+            Toast.makeText(this,"NO TIENES UNA TIENDA REGISTRADA", Toast.LENGTH_SHORT).show();
         }
         if(itemId == R.id.nav_logout) {
-            Toast.makeText(this,"CERRAR SESION", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,"Sesión Finalizada", Toast.LENGTH_SHORT).show();
+            name = null;
+            mail = null;
+            idU = 0;
+            rol = 0;
+            Intent intent = new Intent(this,LoginActivity.class);
+            startActivity(intent);
+
         }
         drawerLayout.close();
         return false;

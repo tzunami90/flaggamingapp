@@ -16,6 +16,11 @@
             android:title="Registro de Tienda"/>
 
         <item
+            android:id="@+id/nav_panel_tienda"
+            android:icon="@drawable/panel_tienda"
+            android:title="Panel de Tienda"/>
+
+        <item
             android:id="@+id/nav_about_us"
             android:icon="@drawable/nav_aboutus"
             android:title="Sobre Nosotros"/>
