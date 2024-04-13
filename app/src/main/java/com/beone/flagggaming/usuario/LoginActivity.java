@@ -1,11 +1,8 @@
-package com.beone.flagggaming;
+package com.beone.flagggaming.usuario;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 
 import android.os.StrictMode;
-import android.text.SpannableString;
-import android.text.style.ClickableSpan;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -18,14 +15,14 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.beone.flagggaming.steamapi.ListaJuegosSteam;
+import com.beone.flagggaming.HomeAcitivity;
+import com.beone.flagggaming.R;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 
 public class LoginActivity extends AppCompatActivity {

@@ -35,10 +35,10 @@
             android:name=".steamapi.ListaJuegosSteam"
             android:exported="false" />
         <activity
-            android:name=".RegisterActivity"
+            android:name=".usuario.RegisterActivity"
             android:exported="false" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".usuario.LoginActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

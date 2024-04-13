@@ -2,7 +2,6 @@ package com.beone.flagggaming;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
@@ -24,6 +23,7 @@ import com.beone.flagggaming.navbar.AboutUsFragment;
 import com.beone.flagggaming.navbar.HomeFragment;
 import com.beone.flagggaming.navbar.PanelTiendaFragment;
 import com.beone.flagggaming.navbar.RegisterTiendaFragment;
+import com.beone.flagggaming.usuario.LoginActivity;
 import com.google.android.material.navigation.NavigationView;
 
 public class HomeAcitivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -117,7 +117,7 @@ public class HomeAcitivity extends AppCompatActivity implements NavigationView.O
             mail = null;
             idU = 0;
             rol = 0;
-            Intent intent = new Intent(this,LoginActivity.class);
+            Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
 
         }

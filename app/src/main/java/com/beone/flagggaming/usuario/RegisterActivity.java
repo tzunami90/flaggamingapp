@@ -1,4 +1,4 @@
-package com.beone.flagggaming;
+package com.beone.flagggaming.usuario;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,16 +16,15 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.beone.flagggaming.db.ConnectionDB;
-import com.beone.flagggaming.steamapi.ListaJuegosSteam;
+import com.beone.flagggaming.HomeAcitivity;
+import com.beone.flagggaming.R;
+import com.beone.flagggaming.usuario.LoginActivity;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class RegisterActivity extends AppCompatActivity {
     Connection conn;

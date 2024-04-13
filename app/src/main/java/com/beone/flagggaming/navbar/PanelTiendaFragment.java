@@ -13,6 +13,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.beone.flagggaming.R;
+import com.beone.flagggaming.tiendas.EliminarTiendaFragment;
+import com.beone.flagggaming.tiendas.MisProductosFragment;
+import com.beone.flagggaming.tiendas.NewProductFragment;
+import com.beone.flagggaming.tiendas.PerfilTiendaFragment;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

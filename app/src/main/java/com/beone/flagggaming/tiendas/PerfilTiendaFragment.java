@@ -1,4 +1,4 @@
-package com.beone.flagggaming.navbar;
+package com.beone.flagggaming.tiendas;
 
 import android.os.Bundle;
 
@@ -12,10 +12,10 @@ import com.beone.flagggaming.R;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link EliminarTiendaFragment#newInstance} factory method to
+ * Use the {@link PerfilTiendaFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class EliminarTiendaFragment extends Fragment {
+public class PerfilTiendaFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -26,7 +26,7 @@ public class EliminarTiendaFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public EliminarTiendaFragment() {
+    public PerfilTiendaFragment() {
         // Required empty public constructor
     }
 
@@ -36,11 +36,11 @@ public class EliminarTiendaFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment EliminarTiendaFragment.
+     * @return A new instance of fragment PerfilTiendaFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static EliminarTiendaFragment newInstance(String param1, String param2) {
-        EliminarTiendaFragment fragment = new EliminarTiendaFragment();
+    public static PerfilTiendaFragment newInstance(String param1, String param2) {
+        PerfilTiendaFragment fragment = new PerfilTiendaFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -61,6 +61,6 @@ public class EliminarTiendaFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_eliminar_tienda, container, false);
+        return inflater.inflate(R.layout.fragment_perfil_tienda, container, false);
     }
 }
