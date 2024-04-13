@@ -1,14 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".navbar.AboutUsFragment">
 
-    <!-- TODO: Update blank fragment layout -->
+
+    <ImageView
+        android:id="@+id/imgLogoAbout"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/logonobg"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
+        android:id="@+id/txtAboutUs"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="SOBRE NOSOTROS" />
+        android:text="SOBRE NOSOTROS"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imgLogoAbout" />
 
-</RelativeLayout>
+
+    <TextView
+        android:id="@+id/txtTit1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="¿Qué es el proyecto FLAGG Gaming?"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/txtQueEsFlagg"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.108"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/txtTit2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="¿Qué significa FLAGG?"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/txtEquipo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.065"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtAboutUs"
+        app:layout_constraintVertical_bias="0.204" />
+
+    <TextView
+        android:id="@+id/txtQueEsFlagg"
+        android:layout_width="379dp"
+        android:layout_height="317dp"
+        android:layout_marginBottom="16dp"
+        android:text="FLAGG es un proyecto que iniciamos en 2023 formado por un equipo de 5 estudiantes de Escuela Davinci, en el cual con el fin de lograr cumplir con nuestra Tesis Final de Carrera, decidimos crear una solución para ayudar a los Gamers Argentinos.
+\nNuestra web y app mobile te ayudará a poder comparar precios y encontrar los videojuegos más económicos de tiendas oficiales (Steam, Epic) y a la vez facilitándote el conocer el precio aproximado REAL que pagaría incluídos los impuestos o el tipo de cambio del dólar.
+\nJunto con esto te permitiremos pronosticar el precio del videojuego a futuro mediante el IPC estimado (Índices de Precios al Consumidor), y adicionalmente, entregaremos a las tiendas y emprendedores físicas que se suscriban a nuestro sistema a que puedan publicar sus datos, productos en venta y precios para que podamos realizar la comparación y ayudarlos a tener un mayor alcance a los usuarios que requieren de sus productos.
+"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/txtEquipo"
+        android:layout_width="362dp"
+        android:layout_height="123dp"
+        android:layout_marginBottom="4dp"
+        android:text="FLAGG proviene de las iniciales de los nombres de los 5 creadores del proyecto:
+\nF-Franco Ouro
+\nL-Lucas Marenco
+\nA-Alejandro Soloujin
+\nG-Gaston Mansilla
+\nG-German Pardo"
+        app:layout_constraintBottom_toTopOf="@+id/txtTit1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.142"
+        app:layout_constraintStart_toStartOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

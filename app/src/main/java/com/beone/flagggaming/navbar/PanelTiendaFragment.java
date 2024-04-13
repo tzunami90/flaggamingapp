@@ -2,6 +2,7 @@ package com.beone.flagggaming.navbar;
 
 import android.os.Bundle;
 
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
 import android.os.StrictMode;
@@ -23,6 +24,7 @@ public class PanelTiendaFragment extends Fragment {
     Bundle bundleF;
     int idU,idT;
     TextView txNroTienda, txNombreTienda;
+    CardView cvNuevoProducto, cvPerfilTienda, cvMisProductos, cvEliminarTienda;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -37,6 +39,10 @@ public class PanelTiendaFragment extends Fragment {
 
         txNroTienda = root.findViewById(R.id.txNroTienda);
         txNombreTienda = root.findViewById(R.id.txNombreTienda);
+        cvNuevoProducto = root.findViewById(R.id.cvNuevoProducto);
+        cvPerfilTienda = root.findViewById(R.id.cvPerfilTienda);
+        cvMisProductos = root.findViewById(R.id.cvMisProductos);
+        cvEliminarTienda = root.findViewById(R.id.cvEliminarTIenda);
 
         try {
             if (conDB() == null) {
@@ -69,8 +75,63 @@ public class PanelTiendaFragment extends Fragment {
             Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
         }
 
+
+        //Habilito los click listener de los card view
+        cvNuevoProducto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goNuevoProducto();
+            }
+        });
+        cvPerfilTienda.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goPerfilTienda();
+            }
+        });
+        cvMisProductos.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goMisProductos();
+            }
+        });
+        cvEliminarTienda.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goEliminarTienda();
+            }
+        });
+
         return root;
     }
+
+
+    //Métodos de enlace cardviews
+    public void goNuevoProducto(){
+        getActivity().getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container,new NewProductFragment())
+                .addToBackStack(null)
+                .commit();
+    }
+    public void goPerfilTienda(){
+        getActivity().getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container,new PerfilTiendaFragment())
+                .addToBackStack(null)
+                .commit();
+    }
+    public void goMisProductos(){
+        getActivity().getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container,new MisProductosFragment())
+                .addToBackStack(null)
+                .commit();
+    }
+    public void goEliminarTienda(){
+        getActivity().getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container,new EliminarTiendaFragment())
+                .addToBackStack(null)
+                .commit();
+    }
+
 
     //Conexion a SQL
     public Connection conDB(){

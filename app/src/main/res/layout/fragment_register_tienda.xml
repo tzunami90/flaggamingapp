@@ -12,9 +12,9 @@
         android:id="@+id/textTituloRegistroTienda"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="15dp"
-        android:padding="35dp"
-        android:text="REGISTRO TIENDAS"
+        android:layout_margin="10dp"
+        android:padding="30dp"
+        android:text="REGISTRO DE TIENDAA"
         android:textAlignment="center"
         android:textSize="25dp"
         android:textStyle="bold"
@@ -56,21 +56,30 @@
         android:layout_height="wrap_content"
         android:hint="E-Mail Tienda"
         android:id="@+id/edtMail"
+        android:inputType="textEmailAddress"
         android:layout_marginLeft="30dp"
         android:layout_marginRight="30dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/edtName"/>
-    <EditText
-        android:layout_width="match_parent"
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layoutinput"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="Contraseña Tienda"
-        android:id="@+id/edtPass"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/edtMail"/>
+        app:layout_constraintTop_toBottomOf="@+id/edtMail"
+        app:endIconMode="password_toggle">
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/edtPass"
+            android:inputType="textPassword"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:hint="Contraseña Tienda"/>
+    </com.google.android.material.textfield.TextInputLayout>
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -80,7 +89,7 @@
         android:layout_marginRight="30dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/edtPass"/>
+        app:layout_constraintTop_toBottomOf="@id/layoutinput"/>
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
