@@ -5,17 +5,17 @@ import java.math.BigDecimal;
 public class Producto {
     private int idInternoProducto;
     private int idTienda;
-    private Categoria categoria;
+    private int idCategoria;
     private String skuTienda;
     private String descTienda;
     private String marca;
     private BigDecimal precioVta;
     private boolean estatus;
 
-    public Producto(int idInternoProducto, int idTienda, Categoria categoria, String skuTienda, String descTienda, String marca, BigDecimal precioVta, boolean estatus) {
+    public Producto(int idInternoProducto, int idTienda, int idCategoria, String skuTienda, String descTienda, String marca, BigDecimal precioVta, boolean estatus) {
         this.idInternoProducto = idInternoProducto;
         this.idTienda = idTienda;
-        this.categoria = categoria;
+        this.idCategoria = idCategoria;
         this.skuTienda = skuTienda;
         this.descTienda = descTienda;
         this.marca = marca;
@@ -26,9 +26,11 @@ public class Producto {
     public int getIdInternoProducto() {
         return idInternoProducto;
     }
+
     public void setIdInternoProducto(int idInternoProducto) {
         this.idInternoProducto = idInternoProducto;
     }
+
     public int getIdTienda() {
         return idTienda;
     }
@@ -37,9 +39,13 @@ public class Producto {
         this.idTienda = idTienda;
     }
 
-    public Categoria getCategoria() { return categoria; }
+    public int getIdCategoria() {
+        return idCategoria;
+    }
 
-    public void setCategoria(Categoria categoria) {this.categoria = categoria;}
+    public void setIdCategoria(int idCategoria) {
+        this.idCategoria = idCategoria;
+    }
 
     public String getSkuTienda() {
         return skuTienda;
@@ -81,4 +87,3 @@ public class Producto {
         this.estatus = estatus;
     }
 }
-

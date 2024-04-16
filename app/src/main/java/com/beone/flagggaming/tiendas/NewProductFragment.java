@@ -4,6 +4,8 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.os.StrictMode;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,8 +18,14 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.beone.flagggaming.R;
+import com.beone.flagggaming.producto.Producto;
 import com.beone.flagggaming.producto.Categoria;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +37,7 @@ public class NewProductFragment extends Fragment {
     Button buttonAgregarProducto;
     CheckBox checkBoxEstatus;
     private boolean estatusProducto = true; // Por defecto, producto activo
-
+    Connection conection = null;
     int idU, idT;
 
     public NewProductFragment(){
@@ -98,19 +106,111 @@ public class NewProductFragment extends Fragment {
 
     // Método simulado para obtener categorías desde la base de datos
     private List<Categoria> obtenerCategoriasDesdeBaseDeDatos() {
-        // Aquí deberías implementar la lógica real para recuperar las categorías de tu base de datos
-        // Por ahora, simularemos una lista estática de categorías
         List<Categoria> categorias = new ArrayList<>();
-        categorias.add(new Categoria(1, "Placa Video"));
-        categorias.add(new Categoria(2, "Procesador"));
-        categorias.add(new Categoria(3, "Memoria RAM"));
+        try {
+            if(conDB() == null){
+                Toast.makeText(getContext(), "ERROR DE CONEXION - Por favor reintente en unos momentos", Toast.LENGTH_SHORT).show();
+            }else {
+                String selectQuery = "SELECT id_categoria, desc_categoria FROM categorias";
+                PreparedStatement pstSelect = conDB().prepareStatement(selectQuery);
+                ResultSet resultSet = pstSelect.executeQuery();
+
+                while (resultSet.next()) {
+                    int idCategoria = resultSet.getInt("id_categoria");
+                    String descCategoria = resultSet.getString("desc_categoria");
+                    Categoria categoria = new Categoria(idCategoria, descCategoria);
+                    categorias.add(categoria);
+                }
+                pstSelect.close();
+            }
+        } catch (SQLException e) {
+            Toast.makeText(getContext(),e.getMessage(), Toast.LENGTH_SHORT).show();
+            System.out.println(e.getMessage());
+            Log.d("Error", e.getMessage());
+        }
+
         return categorias;
+    }
+
+    //Conexion a SQL
+    public Connection conDB(){
+
+        try{
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+                    .permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+            Class.forName("net.sourceforge.jtds.jdbc.Driver").newInstance();
+            conection = DriverManager.getConnection("jdbc:jtds:sqlserver://10.0.2.2:1433;instance=SQLEXPRESS;databaseName=flagg_test2;user=sa;password=Alexx2003;");
+        } catch (Exception e){
+            Toast.makeText(getContext(),e.getMessage(),Toast.LENGTH_SHORT).show();
+        }
+        return conection;
     }
 
     //Método para crear el producto en la BD
     private void crearProducto(){
-        int estatusEnBaseDeDatos = estatusProducto ? 1 : 0; // Convertir el booleano a 1 o 0
-        Toast.makeText(getContext(),"Producto Creado Exitosamente",Toast.LENGTH_SHORT).show();
+        String skuTienda = editTextSkuTienda.getText().toString().trim();
+        String descTienda = editTextDescTienda.getText().toString().trim();
+        String marca = editTextMarca.getText().toString().trim();
+        String precioVtaStr = editTextPrecioVta.getText().toString().trim();
+        Categoria categoriaSeleccionada = (Categoria) spinnerCategoria.getSelectedItem();
+
+        // Validar que no haya campos vacíos
+        if (skuTienda.isEmpty() || descTienda.isEmpty() || marca.isEmpty() || precioVtaStr.isEmpty() || categoriaSeleccionada == null) {
+            Toast.makeText(getContext(), "Todos los campos son obligatorios", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Validar el precio de venta
+        double precioVta;
+        try {
+            precioVta = Double.parseDouble(precioVtaStr);
+        } catch (NumberFormatException e) {
+            Toast.makeText(getContext(), "Precio de venta inválido", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Crear el producto en la base de datos
+        try {
+            if (conDB() == null) {
+                Toast.makeText(getContext(), "ERROR DE CONEXION - Por favor reintente en unos momentos", Toast.LENGTH_SHORT).show();
+                return;
+            } else {
+                // Consulta SQL para insertar el producto en la base de datos
+                String insertQuery = "INSERT INTO productos (id_tienda, id_categoria, sku_tienda, desc_tienda, marca, precio_vta, estatus) VALUES (?, ?, ?, ?, ?, ?, ?)";
+                PreparedStatement pstInsert = conDB().prepareStatement(insertQuery);
+                pstInsert.setInt(1, idT); // ID de la tienda
+                pstInsert.setInt(2, categoriaSeleccionada.getId_categoria()); // ID de la categoría seleccionada
+                pstInsert.setString(3, skuTienda); // SKU de la tienda
+                pstInsert.setString(4, descTienda); // Descripción de la tienda
+                pstInsert.setString(5, marca); // Marca
+                pstInsert.setDouble(6, precioVta); // Precio de venta
+                pstInsert.setBoolean(7, estatusProducto); // Estatus
+
+                // Ejecutar la consulta
+                int filasAfectadas = pstInsert.executeUpdate();
+
+                if (filasAfectadas > 0) {
+                    Toast.makeText(getContext(), "Producto creado exitosamente", Toast.LENGTH_SHORT).show();
+                    // Limpiar los campos después de agregar el producto
+                    editTextSkuTienda.setText("");
+                    editTextDescTienda.setText("");
+                    editTextMarca.setText("");
+                    editTextPrecioVta.setText("");
+                    checkBoxEstatus.setChecked(true); // Restaurar el estado del checkbox
+                } else {
+                    Toast.makeText(getContext(), "Error al crear el producto", Toast.LENGTH_SHORT).show();
+                }
+
+                pstInsert.close();
+            }
+        }catch (SQLException e) {
+            Toast.makeText(getContext(),e.getMessage(), Toast.LENGTH_SHORT).show();
+            System.out.println(e.getMessage());
+            Log.d("Error", e.getMessage());
+            }
+
+
 
     }
 }

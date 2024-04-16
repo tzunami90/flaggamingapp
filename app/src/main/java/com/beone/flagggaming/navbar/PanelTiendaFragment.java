@@ -124,8 +124,13 @@ public class PanelTiendaFragment extends Fragment {
                 .commit();
     }
     public void goMisProductos(){
+        Bundle bundleMP = new Bundle();
+        bundleMP.putInt("idU",idU);
+        bundleMP.putInt("idT",idT);
+        MisProductosFragment misProductosFragment = new MisProductosFragment();
+        misProductosFragment.setArguments(bundleMP);
         getActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container,new MisProductosFragment())
+                .replace(R.id.fragment_container,misProductosFragment)
                 .addToBackStack(null)
                 .commit();
     }
