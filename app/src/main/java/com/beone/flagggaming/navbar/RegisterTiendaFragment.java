@@ -39,7 +39,7 @@ public class RegisterTiendaFragment extends Fragment {
     int idU,idT;
     EditText edtRazonsocial, edtCuit, edtName, edtMail, edtPass, edtDir, edtHr, edtDays, edtTel, edtInsta;
     Button btnSolicitud;
-Layout mainpopup;
+    Layout mainpopup;
     Connection conection = null;
 
     @Override
@@ -216,7 +216,8 @@ Layout mainpopup;
                 pstTienda.setString(9,edtTel.getText().toString());
                 pstTienda.setString(10,edtInsta.getText().toString());
 
-               int rowsAffected = pstTienda.executeUpdate();
+                int rowsAffected = pstTienda.executeUpdate();
+                pstTienda.close();
 
                 if(rowsAffected == 1){
                     String selectQuery = "SELECT id FROM tiendas WHERE mail = ?";
@@ -233,26 +234,26 @@ Layout mainpopup;
                         pstUsuariosTiendas.executeUpdate();
                         pstUsuariosTiendas.close();
 
-                        //FALTA EN EL USUARIO ACTUALIZAR EL ROL TIENDA TAMBIEN
 
                         Toast.makeText(getContext(), "Solicitud Recibida. Número tienda: "+idT, Toast.LENGTH_SHORT).show();
+
+                        //EL usuario tendrá rol tienda cuando FLAGG active la tienda en la tabla usuarios_tienda.
+                        //Existe un TRIGGER que actualiza el rol del usuario ni bien se active la tienda en la BD:
+
+                                //Redireccion a Fragment HOME
+                                getActivity().getSupportFragmentManager().beginTransaction()
+                                        .replace(R.id.fragment_container,new HomeFragment())
+                                        .addToBackStack(null)
+                                        .commit();
+
                     }
                 }
-                // Cierra el PreparedStatement de tiendas
-                pstTienda.close();
-
-                //Redireccion a Fragment HOME
-                getActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container,new HomeFragment())
-                        .addToBackStack(null)
-                        .commit();
                 }
         } catch(SQLException e){
             Toast.makeText(getContext(),e.getMessage(), Toast.LENGTH_SHORT).show();
             System.out.println(e.getMessage());
             Log.d("Error", e.getMessage());
         }
-
     }
 
     private boolean containsSqlInjection(String input) {

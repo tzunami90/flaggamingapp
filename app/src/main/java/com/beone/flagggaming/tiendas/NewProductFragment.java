@@ -8,7 +8,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.beone.flagggaming.R;
 import com.beone.flagggaming.producto.Categoria;
@@ -20,11 +25,22 @@ public class NewProductFragment extends Fragment {
     private Spinner spinnerCategoria;
     private List<Categoria> categoriasList;
     private ArrayAdapter<Categoria> categoriaArrayAdapter;
+    EditText editTextSkuTienda, editTextDescTienda, editTextMarca,editTextPrecioVta;
+    Button buttonAgregarProducto;
+    CheckBox checkBoxEstatus;
+    private boolean estatusProducto = true; // Por defecto, producto activo
+
+    int idU, idT;
+
+    public NewProductFragment(){
+
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        idU = getArguments().getInt("idU");
+        idT = getArguments().getInt("idT");
     }
 
     @Override
@@ -34,15 +50,30 @@ public class NewProductFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_new_product, container, false);
 
         spinnerCategoria = root.findViewById(R.id.spinnerCategoria);
+        editTextSkuTienda = root.findViewById(R.id.editTextSkuTienda);
+        editTextDescTienda = root.findViewById(R.id.editTextDescTienda);
+        editTextMarca = root.findViewById(R.id.editTextMarca);
+        editTextPrecioVta = root.findViewById(R.id.editTextPrecioVta);
+        buttonAgregarProducto = root.findViewById(R.id.buttonAgregarProducto);
+        checkBoxEstatus = root.findViewById(R.id.checkBoxEstatus);
 
-        // Configurar el ArrayAdapter para el Spinner
-        categoriaArrayAdapter = new ArrayAdapter<>(root.getContext(), android.R.layout.simple_spinner_item, categoriasList);
-        categoriaArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerCategoria.setAdapter(categoriaArrayAdapter);
+        checkBoxEstatus.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                // Actualizar la variable estatusProducto basada en el estado del CheckBox
+                estatusProducto = isChecked; // True si está activo, false si está inactivo
+            }
+        });
 
         // Cargar las categorías desde la base de datos
         cargarCategoriasDesdeBaseDeDatos();
 
+        buttonAgregarProducto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                crearProducto();
+            }
+        });
         return root;
     }
 
@@ -52,11 +83,17 @@ public class NewProductFragment extends Fragment {
         // Supongamos que tienes un método obtenerCategoriasDesdeBaseDeDatos() que devuelve una lista de objetos Categoria
         // Implementa este método según tu lógica de base de datos
         categoriasList = obtenerCategoriasDesdeBaseDeDatos();
+        // Agregar un elemento adicional para "Seleccione una categoría"
+        Categoria categoriaSeleccione = new Categoria(0, "Seleccione una categoría");
+        categoriasList.add(0, categoriaSeleccione);
 
-        // Notificar al ArrayAdapter que los datos han cambiado
-        categoriaArrayAdapter.clear();
-        categoriaArrayAdapter.addAll(categoriasList);
-        categoriaArrayAdapter.notifyDataSetChanged();
+        // Configurar el ArrayAdapter para el Spinner
+        categoriaArrayAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, categoriasList);
+        categoriaArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerCategoria.setAdapter(categoriaArrayAdapter);
+
+        // Configurar "Seleccione una categoría" como el elemento seleccionado por defecto
+        spinnerCategoria.setSelection(0);
     }
 
     // Método simulado para obtener categorías desde la base de datos
@@ -68,5 +105,12 @@ public class NewProductFragment extends Fragment {
         categorias.add(new Categoria(2, "Procesador"));
         categorias.add(new Categoria(3, "Memoria RAM"));
         return categorias;
+    }
+
+    //Método para crear el producto en la BD
+    private void crearProducto(){
+        int estatusEnBaseDeDatos = estatusProducto ? 1 : 0; // Convertir el booleano a 1 o 0
+        Toast.makeText(getContext(),"Producto Creado Exitosamente",Toast.LENGTH_SHORT).show();
+
     }
 }

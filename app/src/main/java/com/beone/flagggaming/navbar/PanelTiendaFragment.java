@@ -108,13 +108,14 @@ public class PanelTiendaFragment extends Fragment {
         return root;
     }
 
-
     //Métodos de enlace cardviews
     public void goNuevoProducto(){
-        getActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container,new NewProductFragment())
-                .addToBackStack(null)
-                .commit();
+        Bundle bundleNP = new Bundle();
+        bundleNP.putInt("idU",idU);
+        bundleNP.putInt("idT",idT);
+        NewProductFragment newProductFragment = new NewProductFragment();
+        newProductFragment.setArguments(bundleNP);
+        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,newProductFragment).addToBackStack(null).commit();
     }
     public void goPerfilTienda(){
         getActivity().getSupportFragmentManager().beginTransaction()
