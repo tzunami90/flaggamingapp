@@ -52,7 +52,7 @@
         android:id="@+id/spinnerCategoria"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:prompt="Selecciona una categoría"/>
+        android:prompt="@string/prompt_categoria" />
 
     <CheckBox
         android:id="@+id/checkBoxEstatus"

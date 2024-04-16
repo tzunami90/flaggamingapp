@@ -117,6 +117,9 @@ public class LoginActivity extends AppCompatActivity {
                         intent.putExtra("mail", mail);
                         intent.putExtra("id", id);
                         intent.putExtra("rol", rol);
+                        pst.close();
+                        rs.close();
+                        conDB().close();
                         startActivity(intent);
                     } else{
                         Toast.makeText(this, "Mail y/o Contraseña incorrectos", Toast.LENGTH_SHORT).show();
@@ -166,7 +169,7 @@ public class LoginActivity extends AppCompatActivity {
                     .permitAll().build();
             StrictMode.setThreadPolicy(policy);
             Class.forName("net.sourceforge.jtds.jdbc.Driver").newInstance();
-            conection = DriverManager.getConnection("jdbc:jtds:sqlserver://10.0.2.2:1433;instance=SQLEXPRESS;databaseName=flagg_test;user=sa;password=Alexx2003;");
+            conection = DriverManager.getConnection("jdbc:jtds:sqlserver://10.0.2.2:1433;instance=SQLEXPRESS;databaseName=flagg_test2;user=sa;password=Alexx2003;");
         } catch (Exception e){
             Toast.makeText(getApplicationContext(),e.getMessage(),Toast.LENGTH_SHORT).show();
         }

@@ -12,7 +12,7 @@ public class ConnectionDB {
     String classes =  "net.sourceforge.jtds.jdbc.Driver";
     protected static String ip ="DESKTOP-LL2FGQ9";
     protected static String port ="1433";
-    protected static String db ="flagg_test";
+    protected static String db ="flagg_test2";
     protected static String un ="sa";
     protected static String password ="Alexx2003";
 

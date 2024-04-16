@@ -25,7 +25,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class PanelTiendaFragment extends Fragment {
-    Bundle bundleF;
     int idU,idT;
     TextView txNroTienda, txNombreTienda;
     CardView cvNuevoProducto, cvPerfilTienda, cvMisProductos, cvEliminarTienda;
@@ -146,7 +145,7 @@ public class PanelTiendaFragment extends Fragment {
                     .permitAll().build();
             StrictMode.setThreadPolicy(policy);
             Class.forName("net.sourceforge.jtds.jdbc.Driver").newInstance();
-            conection2 = DriverManager.getConnection("jdbc:jtds:sqlserver://10.0.2.2:1433;instance=SQLEXPRESS;databaseName=flagg_test;user=sa;password=Alexx2003;");
+            conection2 = DriverManager.getConnection("jdbc:jtds:sqlserver://10.0.2.2:1433;instance=SQLEXPRESS;databaseName=flagg_test2;user=sa;password=Alexx2003;");
         } catch (Exception e){
             Toast.makeText(getContext(),e.getMessage(),Toast.LENGTH_SHORT).show();
         }

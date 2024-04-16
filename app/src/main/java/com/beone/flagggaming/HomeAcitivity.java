@@ -85,12 +85,17 @@ public class HomeAcitivity extends AppCompatActivity implements NavigationView.O
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
 
         int itemId = menuItem.getItemId();
+
         if(itemId == R.id.nav_home) {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new HomeFragment()).commit();
             navigationView.setCheckedItem(R.id.nav_home);
         }
         if((itemId == R.id.nav_registro_tiendas) && (rol == 0)) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new RegisterTiendaFragment()).commit();
+            Bundle bundleR = new Bundle();
+            bundleR.putInt("idU",idU);
+            RegisterTiendaFragment registerTiendaFragment = new RegisterTiendaFragment();
+            registerTiendaFragment.setArguments(bundleR);
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,  registerTiendaFragment).commit();
             navigationView.setCheckedItem(R.id.nav_registro_tiendas);
         }
         if((itemId == R.id.nav_registro_tiendas) && (rol == 1)) {

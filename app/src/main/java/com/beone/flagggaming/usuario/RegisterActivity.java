@@ -139,30 +139,21 @@ public class RegisterActivity extends AppCompatActivity {
             if(conDB() == null){
                 Toast.makeText(this, "ERROR DE CONEXION - Por favor reintente en unos momentos", Toast.LENGTH_SHORT).show();
             }else{
-                PreparedStatement pst = conDB().prepareStatement("INSERT INTO usuarios values(?,?,?,?)");
+                PreparedStatement pst = conDB().prepareStatement("INSERT INTO usuarios  values(?,?,?,?,?)");
                 pst.setString(1,editTextFirstName.getText().toString());
                 pst.setString(2,editTextLastName.getText().toString());
                 pst.setString(3,editTextEmail.getText().toString());
                 pst.setString(4,editTextPassword.getText().toString());
-                pst.executeUpdate();
-                Toast.makeText(this, "¡Registro exitoso!", Toast.LENGTH_SHORT).show();
+                pst.setString(5, "0");
+                int filasAfectadas = pst.executeUpdate();
+                if(filasAfectadas>0){
+                    Toast.makeText(this, "¡Registro exitoso!", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(this, LoginActivity.class);
+                    startActivity(intent);
+                } else{
+                    Toast.makeText(this, "ERROR - Reintente", Toast.LENGTH_SHORT).show();
+                }
 
-                //Obtengo el ID y el rol
-                PreparedStatement pst2 = conDB().prepareStatement("SELECT * FROM USUARIOS WHERE eMail = '" + editTextEmail.getText() + "' AND password ='" + editTextPassword.getText()+"';");
-                pst2.executeQuery();
-                ResultSet rs2 = pst.getResultSet();
-
-                String name = editTextFirstName.getText().toString() + " " + editTextLastName.getText().toString();
-                String mail = editTextEmail.getText().toString();
-                int id = rs2.getInt(1);
-                int rol = rs2.getInt(6);
-
-                Intent intent = new Intent(this, HomeAcitivity.class);
-                intent.putExtra("name", name);
-                intent.putExtra("mail", mail);
-                intent.putExtra("id", id);
-                intent.putExtra("rol", rol);
-                startActivity(intent);
             }
 
         } catch(SQLException e){
@@ -199,7 +190,7 @@ public class RegisterActivity extends AppCompatActivity {
                     .permitAll().build();
             StrictMode.setThreadPolicy(policy);
             Class.forName("net.sourceforge.jtds.jdbc.Driver").newInstance();
-            conection = DriverManager.getConnection("jdbc:jtds:sqlserver://10.0.2.2:1433;instance=SQLEXPRESS;databaseName=flagg_test;user=sa;password=Alexx2003;");
+            conection = DriverManager.getConnection("jdbc:jtds:sqlserver://10.0.2.2:1433;instance=SQLEXPRESS;databaseName=flagg_test2;user=sa;password=Alexx2003;");
         } catch (Exception e){
             Toast.makeText(getApplicationContext(),e.getMessage(),Toast.LENGTH_SHORT).show();
         }
