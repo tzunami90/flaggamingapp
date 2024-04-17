@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.beone.flagggaming.R;
+import com.beone.flagggaming.producto.Categoria;
 import com.beone.flagggaming.producto.Producto;
 import com.beone.flagggaming.producto.ProductoAdapter;
 
@@ -58,6 +59,24 @@ public class MisProductosFragment extends Fragment {
         ProductoAdapter productosAdapter = new ProductoAdapter(productosList);
         recyclerViewProductos.setAdapter(productosAdapter);
 
+        productosAdapter.setOnItemClickListener(new ProductoAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int productId) { // Ajustamos el parámetro para que sea un entero
+                // Crear el fragmento de detalles del producto y pasar el ID del producto
+                DetallesProductoFragment detallesFragment = new DetallesProductoFragment();
+                Bundle bundle = new Bundle();
+                bundle.putInt("idP", productId); // Pasar el ID del producto al fragmento
+                bundle.putInt("idU", idU);
+                bundle.putInt("idT", idT);
+                detallesFragment.setArguments(bundle);
+
+                // Reemplazar el fragmento actual con el fragmento de detalles del producto
+                getActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container,detallesFragment)
+                        .addToBackStack(null)
+                        .commit();
+            }
+        });
         return root;
     }
 
@@ -72,7 +91,10 @@ public class MisProductosFragment extends Fragment {
             connection = conDB();
 
             // Consulta SQL para seleccionar productos
-            String query = "SELECT id_interno_producto, id_tienda, id_categoria, sku_tienda, desc_tienda, marca, precio_vta, estatus FROM productos WHERE id_tienda = ?";
+            String query = "SELECT p.id_interno_producto, p.id_tienda, p.id_categoria, p.sku_tienda, p.desc_tienda, p.marca, p.precio_vta, p.estatus, c.desc_categoria " +
+                    "FROM productos p " +
+                    "JOIN categorias c ON p.id_categoria = c.id_categoria " +
+                    "WHERE p.id_tienda = ?";
             statement = connection.prepareStatement(query);
             statement.setInt(1, idT); // Asignar el valor de idT al parámetro de la consulta
             resultSet = statement.executeQuery();
@@ -87,10 +109,16 @@ public class MisProductosFragment extends Fragment {
                 String marca = resultSet.getString("marca");
                 double precioVenta = resultSet.getDouble("precio_vta");
                 boolean estatus = resultSet.getBoolean("estatus");
+                String descCategoria = resultSet.getString("desc_categoria");
 
                 BigDecimal precioVentaDecimal = BigDecimal.valueOf(precioVenta); // Convertir a BigDecimal
 
+                String descrCategoria = resultSet.getString("desc_categoria");
+                Categoria categoria = new Categoria(); // Crear un nuevo objeto Categoria
+                categoria.setDesc_categoria(descrCategoria); // Establecer la descripción de la categoría en el objeto Categoria
                 Producto producto = new Producto(idInternoProducto, idTienda, idCategoria, skuTienda, descTienda, marca, precioVentaDecimal, estatus);
+                producto.setCategoria(categoria); // Asignar el objeto Categoria al Producto
+
                 productos.add(producto);
             }
             statement.close();

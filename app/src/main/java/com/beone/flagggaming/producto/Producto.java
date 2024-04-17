@@ -11,6 +11,7 @@ public class Producto {
     private String marca;
     private BigDecimal precioVta;
     private boolean estatus;
+    private Categoria categoria;
 
     public Producto(int idInternoProducto, int idTienda, int idCategoria, String skuTienda, String descTienda, String marca, BigDecimal precioVta, boolean estatus) {
         this.idInternoProducto = idInternoProducto;
@@ -86,4 +87,8 @@ public class Producto {
     public void setEstatus(boolean estatus) {
         this.estatus = estatus;
     }
+
+    public Categoria getCategoria() { return categoria; }
+
+    public void setCategoria(Categoria categoria) { this.categoria = categoria; }
 }

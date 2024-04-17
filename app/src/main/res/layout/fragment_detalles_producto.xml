@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".tiendas.DetallesProductoFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/txtModifProducto"
+            android:text="Modificar Producto"
+            android:textSize="30sp"
+            android:textStyle="bold"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="16dp"/>
+
+        <EditText
+            android:id="@+id/editTextModifSkuTienda"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="SKU de la Tienda"
+            android:inputType="text"/>
+
+        <EditText
+            android:id="@+id/editTextModifDescTienda"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Descripción de la Tienda"
+            android:inputType="text"/>
+
+        <EditText
+            android:id="@+id/editTextModifMarca"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Marca"
+            android:inputType="text"/>
+
+        <EditText
+            android:id="@+id/editTextModifPrecioVta"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Precio de Venta"
+            android:inputType="numberDecimal"/>
+
+        <Spinner
+            android:id="@+id/spinnerModifCategoria"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:prompt="@string/prompt_categoria" />
+
+        <CheckBox
+            android:id="@+id/checkBoxModifEstatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Activo"
+            android:checked="true"/>
+
+        <Button
+            android:id="@+id/buttonModifProducto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Modificar Producto"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="16dp"/>
+        <Button
+            android:id="@+id/buttonElimProducto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Eliminar Producto"
+            android:padding="5dp"
+            android:background="@color/flagg"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="16dp"/>
+
+    </LinearLayout>
+
+</FrameLayout>

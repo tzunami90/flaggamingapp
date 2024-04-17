@@ -22,13 +22,20 @@
             android:layout_height="wrap_content"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:text="Nombre del Producto"/>
+            android:text="ID del Producto"/>
 
         <TextView
             android:id="@+id/textViewProductDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:textStyle="bold"
             android:text="Descripción del Producto"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/textViewCategoria"
+            android:text="Categoria"/>
 
         <TextView
             android:id="@+id/textViewProductPrice"

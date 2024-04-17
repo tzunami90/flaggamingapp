@@ -21,18 +21,6 @@
             android:name=".HomeAcitivity"
             android:exported="false" />
         <activity
-            android:name=".tiendas.ModificarProducto"
-            android:exported="false" />
-        <activity
-            android:name=".tiendas.MisProductosTienda"
-            android:exported="false" />
-        <activity
-            android:name=".tiendas.CargaDeProducto"
-            android:exported="false" />
-        <activity
-            android:name=".tiendas.RegistroTiendas"
-            android:exported="false" />
-        <activity
             android:name=".steamapi.ListaJuegosSteam"
             android:exported="false" />
         <activity

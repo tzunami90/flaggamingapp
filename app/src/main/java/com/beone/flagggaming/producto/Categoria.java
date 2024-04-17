@@ -4,6 +4,9 @@ public class Categoria {
     int id_categoria;
     String desc_categoria;
 
+    public Categoria(){
+
+    }
     public Categoria(int id_categoria, String desc_categoria) {
         this.id_categoria = id_categoria;
         this.desc_categoria = desc_categoria;
