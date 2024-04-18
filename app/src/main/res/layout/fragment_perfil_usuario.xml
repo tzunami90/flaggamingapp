@@ -4,16 +4,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/register"
-    tools:context=".usuario.RegisterActivity">
+    android:id="@+id/modificarPerfil"
+    tools:context=".navbar.PerfilUsuarioFragment">
+
 
     <ImageView
-        android:id="@+id/imageViewLogo"
+        android:id="@+id/imageViewLogoModif"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:src="@drawable/logonobg"
         app:layout_constraintDimensionRatio="3:1"
-        app:layout_constraintBottom_toTopOf="@+id/textViewRegisterTitle"
+        app:layout_constraintBottom_toTopOf="@+id/textViewRegisterTitleModif"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -21,19 +22,19 @@
         android:layout_marginTop="32dp" />
 
     <TextView
-        android:id="@+id/textViewRegisterTitle"
+        android:id="@+id/textViewRegisterTitleModif"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="REGISTRO DE NUEVO USAURIO"
+        android:text="ACTUALIZAR PERFIL"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageViewLogo"
+        app:layout_constraintTop_toBottomOf="@+id/imageViewLogoModif"
         android:layout_marginTop="32dp" />
 
     <EditText
-        android:id="@+id/editTextFirstName"
+        android:id="@+id/editTextFirstNameModif"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
@@ -43,10 +44,10 @@
         android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewRegisterTitle" />
+        app:layout_constraintTop_toBottomOf="@+id/textViewRegisterTitleModif" />
 
     <EditText
-        android:id="@+id/editTextLastName"
+        android:id="@+id/editTextLastNameModif"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
@@ -56,10 +57,10 @@
         android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextFirstName" />
+        app:layout_constraintTop_toBottomOf="@+id/editTextFirstNameModif" />
 
     <EditText
-        android:id="@+id/editTextEmail"
+        android:id="@+id/editTextEmailModif"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
@@ -69,41 +70,41 @@
         android:inputType="textEmailAddress"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextLastName" />
-
-<com.google.android.material.textfield.TextInputLayout
-    android:id="@+id/layoutinput"
-    android:layout_width="0dp"
-    android:layout_height="wrap_content"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@+id/editTextEmail"
-    app:endIconMode="password_toggle">
-    <com.google.android.material.textfield.TextInputEditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/editTextPassword"
-        android:inputType="textPassword"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="32dp"
-        android:hint="Contraseña"/>
-</com.google.android.material.textfield.TextInputLayout>
-
-
+        app:layout_constraintTop_toBottomOf="@+id/editTextLastNameModif" />
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/layoutinput2"
+        android:id="@+id/layoutinputModif"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/layoutinput"
+        app:layout_constraintTop_toBottomOf="@+id/editTextEmailModif"
         app:endIconMode="password_toggle">
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/editTextRepeatPassword"
+            android:id="@+id/editTextPasswordModif"
+            android:inputType="textPassword"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="32dp"
+            android:hint="Contraseña"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layoutinput2Modif"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/layoutinputModif"
+        app:endIconMode="password_toggle">
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/editTextRepeatPasswordModif"
             android:inputType="textPassword"
             android:layout_marginStart="32dp"
             android:layout_marginTop="16dp"
@@ -111,29 +112,16 @@
             android:hint="Repetir Contraseña"/>
     </com.google.android.material.textfield.TextInputLayout>
 
-
-
     <Button
-        android:id="@+id/buttonRegister"
+        android:id="@+id/buttonModifcarUsuario"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginTop="32dp"
         android:layout_marginEnd="32dp"
-        android:text="Registrarse"
+        android:text="Actualizar Datos"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/layoutinput2" />
+        app:layout_constraintTop_toBottomOf="@+id/layoutinput2Modif" />
 
-    <TextView
-        android:id="@+id/texViewLogin"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:onClick="openLoginActivity"
-        android:text="@string/login_link"
-        android:textColor="@android:color/darker_gray"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buttonRegister" />
 </androidx.constraintlayout.widget.ConstraintLayout>

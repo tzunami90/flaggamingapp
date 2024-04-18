@@ -22,6 +22,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import com.beone.flagggaming.navbar.AboutUsFragment;
 import com.beone.flagggaming.navbar.HomeFragment;
 import com.beone.flagggaming.navbar.PanelTiendaFragment;
+import com.beone.flagggaming.navbar.PerfilUsuarioFragment;
 import com.beone.flagggaming.navbar.RegisterTiendaFragment;
 import com.beone.flagggaming.usuario.LoginActivity;
 import com.google.android.material.navigation.NavigationView;
@@ -115,6 +116,14 @@ public class HomeAcitivity extends AppCompatActivity implements NavigationView.O
         }
         if((itemId == R.id.nav_panel_tienda) && (rol == 0)) {
             Toast.makeText(this,"NO TIENES UNA TIENDA REGISTRADA", Toast.LENGTH_SHORT).show();
+        }
+        if(itemId == R.id.nav_perfil_usuario) {
+            Bundle bundlePU = new Bundle();
+            bundlePU.putInt("id",idU);
+            PerfilUsuarioFragment perfilUsuarioFragment = new PerfilUsuarioFragment();
+            perfilUsuarioFragment.setArguments(bundlePU);
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, perfilUsuarioFragment).commit();
+            navigationView.setCheckedItem(R.id.nav_perfil_usuario);
         }
         if(itemId == R.id.nav_logout) {
             Toast.makeText(this,"Sesión Finalizada", Toast.LENGTH_SHORT).show();

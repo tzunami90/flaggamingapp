@@ -118,8 +118,13 @@ public class PanelTiendaFragment extends Fragment {
         getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,newProductFragment).addToBackStack(null).commit();
     }
     public void goPerfilTienda(){
+        Bundle bundlePT = new Bundle();
+        bundlePT.putInt("idU",idU);
+        bundlePT.putInt("idT",idT);
+        PerfilTiendaFragment perfilTiendaFragment = new PerfilTiendaFragment();
+        perfilTiendaFragment.setArguments(bundlePT);
         getActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container,new PerfilTiendaFragment())
+                .replace(R.id.fragment_container,perfilTiendaFragment)
                 .addToBackStack(null)
                 .commit();
     }

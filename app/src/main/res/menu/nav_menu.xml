@@ -21,6 +21,11 @@
             android:title="Panel de Tienda"/>
 
         <item
+            android:id="@+id/nav_perfil_usuario"
+            android:icon="@drawable/perfil"
+            android:title="Perfil de Usuario"/>
+
+        <item
             android:id="@+id/nav_about_us"
             android:icon="@drawable/nav_aboutus"
             android:title="Sobre Nosotros"/>
@@ -31,6 +36,7 @@
         android:title="">
 
         <menu>
+
             <item
                 android:id="@+id/nav_logout"
                 android:icon="@drawable/sign_out"
