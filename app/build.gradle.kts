@@ -40,6 +40,7 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.interceptor)
     implementation(libs.jtds)
+    implementation(libs.glide)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

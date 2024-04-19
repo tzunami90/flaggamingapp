@@ -7,5 +7,5 @@ import retrofit2.http.GET;
 public interface SteamApiService {
 
     @GET("ISteamApps/GetAppList/v2")
-   Call<List<Juegos>> getJuego();
+    Call<SteamAppList> getAppList();
 }

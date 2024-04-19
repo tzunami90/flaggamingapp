@@ -1,24 +1,21 @@
 package com.beone.flagggaming.steamapi;
 
 import java.util.List;
-
+import com.google.gson.annotations.SerializedName;
 public class Juegos {
 
-    private String appid, name;
+    @SerializedName("appid")
+    private int appId;
+    @SerializedName("name")
+    private String appName;
 
-    public String getAppid() {
-        return appid;
+    public int getAppId() {
+        return appId;
     }
 
-    public void setAppid(String appid) {
-        this.appid = appid;
+
+    public String getAppName() {
+        return appName;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 }

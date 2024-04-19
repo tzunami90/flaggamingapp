@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    tools:context=".steamapi.MostrarJuegoSteam">
+
+    <RelativeLayout
+        android:id="@+id/main"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/imageView_capsule"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/placeholder_image" />
+
+        <TextView
+            android:id="@+id/textView_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/imageView_capsule"
+            android:layout_marginTop="16dp"
+            android:text="Name"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/textView_short_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/textView_name"
+            android:layout_marginTop="8dp"
+            android:text="Short Description"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/textView_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/textView_short_description"
+            android:layout_marginTop="8dp"
+            android:text="ID: "
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/textView_pc_requirements"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/textView_id"
+            android:layout_marginTop="8dp"
+            android:text="PC Requirements"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/textView_mac_requirements"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/textView_pc_requirements"
+            android:layout_marginTop="8dp"
+            android:text="Mac Requirements"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/textView_linux_requirements"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/textView_mac_requirements"
+            android:layout_marginTop="8dp"
+            android:text="Linux Requirements"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <!-- TextView del precio -->
+        <TextView
+            android:id="@+id/textView_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/textView_linux_requirements"
+            android:layout_marginTop="8dp"
+            android:text="Price"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+    </RelativeLayout>
+</ScrollView>

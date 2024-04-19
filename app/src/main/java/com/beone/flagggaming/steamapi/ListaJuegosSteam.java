@@ -1,6 +1,8 @@
 package com.beone.flagggaming.steamapi;
 
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -13,6 +15,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.beone.flagggaming.R;
+import com.beone.flagggaming.db.DBHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +32,7 @@ public class ListaJuegosSteam extends AppCompatActivity {
     private List<Juegos> listJuegos;
     private RecyclerView recyclerView;
     private SteamJuegoAdapter steamJuegoAdapter;
+    private Button btnGrabarJuegos;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +43,7 @@ public class ListaJuegosSteam extends AppCompatActivity {
         titulo = findViewById(R.id.titulo);
         recyclerView=findViewById(R.id.rv_juegossteam);
         recyclerView.setLayoutManager(new GridLayoutManager(getApplicationContext(),2));
+        btnGrabarJuegos = findViewById(R.id.btnGrabarJuegos);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.listasteam), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -48,6 +53,14 @@ public class ListaJuegosSteam extends AppCompatActivity {
         });
 
         getJuego();
+
+        //Boton para actualizar la BD -> podriam poner para que lo haga en 2do plano y siga trabajando
+        btnGrabarJuegos.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                grabarJuegos();
+            }
+        });
     }
 
     private void getJuego(){
@@ -58,30 +71,38 @@ public class ListaJuegosSteam extends AppCompatActivity {
 
         SteamApiService steamApiService = retrofit.create(SteamApiService.class);
 
-        Call<List<Juegos>> call = steamApiService.getJuego();
-        call.enqueue(new Callback<List<Juegos>>() {
+        Call<SteamAppList> call = steamApiService.getAppList();
+        call.enqueue(new Callback<SteamAppList>() {
             @Override
-            public void onResponse(Call<List<Juegos>> call, Response<List<Juegos>> response) {
+            public void onResponse(Call<SteamAppList> call, Response<SteamAppList> response) {
 
                 if(!response.isSuccessful()){
                     titulo.setText("Codigo: " + response.code());
                     return;
                 }
 
-                listJuegos = response.body();
+                SteamAppList steamAppList = response.body();
+                if (steamAppList != null) {
+                    listJuegos = steamAppList.getAppList().getApps();
+                    steamJuegoAdapter = new SteamJuegoAdapter(listJuegos,getApplicationContext());
+                    recyclerView.setAdapter(steamJuegoAdapter);
+                }
+
                 steamJuegoAdapter = new SteamJuegoAdapter(listJuegos,getApplicationContext());
                 recyclerView.setAdapter(steamJuegoAdapter);
             }
 
             @Override
-            public void onFailure(Call<List<Juegos>> call, Throwable t) {
+            public void onFailure(Call<SteamAppList> call, Throwable t) {
 
                 Toast.makeText(ListaJuegosSteam.this, "ERROR CON API STEAM", Toast.LENGTH_SHORT).show();
 
             }
         });
+    }
 
-
+    public void grabarJuegos(){
+        DBHelper.saveAppList(listJuegos);
     }
 
 }

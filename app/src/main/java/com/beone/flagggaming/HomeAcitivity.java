@@ -24,7 +24,9 @@ import com.beone.flagggaming.navbar.HomeFragment;
 import com.beone.flagggaming.navbar.PanelTiendaFragment;
 import com.beone.flagggaming.navbar.PerfilUsuarioFragment;
 import com.beone.flagggaming.navbar.RegisterTiendaFragment;
+import com.beone.flagggaming.steamapi.ListaJuegosSteam;
 import com.beone.flagggaming.usuario.LoginActivity;
+import com.beone.flagggaming.usuario.RegisterActivity;
 import com.google.android.material.navigation.NavigationView;
 
 public class HomeAcitivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -88,8 +90,12 @@ public class HomeAcitivity extends AppCompatActivity implements NavigationView.O
         int itemId = menuItem.getItemId();
 
         if(itemId == R.id.nav_home) {
+          /*
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new HomeFragment()).commit();
             navigationView.setCheckedItem(R.id.nav_home);
+            */
+            Intent intent = new Intent(this, ListaJuegosSteam.class);
+            startActivity(intent);
         }
         if((itemId == R.id.nav_registro_tiendas) && (rol == 0)) {
             Bundle bundleR = new Bundle();
