@@ -90,10 +90,11 @@ public class HomeAcitivity extends AppCompatActivity implements NavigationView.O
         int itemId = menuItem.getItemId();
 
         if(itemId == R.id.nav_home) {
-          /*
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new HomeFragment()).commit();
             navigationView.setCheckedItem(R.id.nav_home);
-            */
+        }
+
+        if(itemId == R.id.nav_home) {
             Intent intent = new Intent(this, ListaJuegosSteam.class);
             startActivity(intent);
         }

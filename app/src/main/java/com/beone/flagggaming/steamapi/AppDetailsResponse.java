@@ -1,6 +1,6 @@
 package com.beone.flagggaming.steamapi;
+import com.beone.flagggaming.steamapi.details.Data;
 import com.google.gson.annotations.SerializedName;
-import java.util.Map;
 
 public class AppDetailsResponse {
 
@@ -8,13 +8,13 @@ public class AppDetailsResponse {
     private boolean success;
 
     @SerializedName("data")
-    private Map<String, AppDetails> data;
+    private Data data;
 
     public boolean isSuccess() {
         return success;
     }
 
-    public Map<String, AppDetails> getData() {
+    public Data getData() {
         return data;
     }
 }

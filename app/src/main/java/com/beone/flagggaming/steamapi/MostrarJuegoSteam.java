@@ -1,5 +1,6 @@
 package com.beone.flagggaming.steamapi;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
@@ -7,23 +8,25 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import com.beone.flagggaming.steamapi.details.Data;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
-import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 
 import com.beone.flagggaming.R;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
-import com.beone.flagggaming.steamapi.SteamApiAdapter;
-
-import java.util.Map;
 
 public class MostrarJuegoSteam extends AppCompatActivity {
 
@@ -89,27 +92,59 @@ public class MostrarJuegoSteam extends AppCompatActivity {
                     AppDetailsResponse appDetailsResponse = response.body();
 
                     // Verificar si la respuesta contiene datos y si el mapa de datos no es nulo
-                    if (appDetailsResponse != null && appDetailsResponse.getData() != null) {
+                    if (appDetailsResponse != null) {
                         // Obtener el mapa de datos completo
-                        Map<String, AppDetails> data = appDetailsResponse.getData();
+                        Data data = appDetailsResponse.getData();
                         // Verificar si el mapa de datos contiene la información del juego
-                        if (!data.isEmpty()) {
-                            // Obtener los detalles del juego usando el ID proporcionado
-                            AppDetails appDetails = data.get(id);
+                        if (data != null) {
                             // Verificar si los detalles del juego no son nulos
-                            if (appDetails != null) {
+                            if (data != null) {
                                 // Establecer los datos en las vistas correspondientes
-                                textViewName.setText(appDetails.getName());
-                                textViewShortDescription.setText(appDetails.getShortDescription());
-                                textViewPcRequirements.setText("Requisitos de PC:\nMínimos: " + appDetails.getPcRequirements().getMinimum() + "\nRecomendados: " + appDetails.getPcRequirements().getRecommended());
-                                textViewMacRequirements.setText("Requisitos de Mac:\nMínimos: " + appDetails.getMacRequirements().getMinimum() + "\nRecomendados: " + appDetails.getMacRequirements().getRecommended());
-                                textViewLinuxRequirements.setText("Requisitos de Linux:\nMínimos: " + appDetails.getLinuxRequirements().getMinimum() + "\nRecomendados: " + appDetails.getLinuxRequirements().getRecommended());
-                                textViewPrice.setText("Precio: " + appDetails.getPriceOverview().getFinalFormatted());
+                                textViewName.setText(data.getName());
+                                textViewShortDescription.setText(data.getShortDescription());
+                                textViewPcRequirements.setText("Requisitos de PC:\nMínimos: " + data.getPcRequirements().getMinimum() + "\nRecomendados: " + data.getPcRequirements().getRecommended());
+                                // Verificar si hay requisitos para Mac
+                                if (data.getMacRequirements() != null) {
+                                    textViewMacRequirements.setText("Requisitos de Mac:\nMínimos: " + data.getMacRequirements().getMinimum() + "\nRecomendados: " + data.getMacRequirements().getRecommended());
+                                } else {
+                                    textViewMacRequirements.setText("Requisitos de Mac: No especificado");
+                                }
+                                // Verificar si hay requisitos para Linux
+                                if (data.getLinuxRequirements() != null) {
+                                    textViewLinuxRequirements.setText("Requisitos de Linux:\nMínimos: " + data.getLinuxRequirements().getMinimum() + "\nRecomendados: " + data.getLinuxRequirements().getRecommended());
+                                } else {
+                                    textViewLinuxRequirements.setText("Requisitos de Linux: No especificado");
+                                }
+                                // Verificar si el juego es gratuito
+                                if (data.isIsFree()) {
+                                    textViewPrice.setText("Precio: GRATIS");
+                                } else {
+                                    // Verificar si se proporciona información de precio
+                                    if (data.getPriceOverview() != null) {
+                                        textViewPrice.setText("Precio: " + data.getPriceOverview().getFinalFormatted());
+                                    } else {
+                                        // Si no se proporciona información de precio, establecer precio como 0
+                                        textViewPrice.setText("Precio: 0");
+                                    }
+                                }
                                 // Mostrar el ID del juego en el textViewId
                                 textViewId.setText("ID: " + id);
                                 // Cargar la imagen del juego usando Glide
                                 Glide.with(MostrarJuegoSteam.this)
-                                        .load(appDetails.getHeaderImage())
+                                        .load(data.getHeaderImage())
+                                        .listener(new RequestListener<Drawable>() {
+                                            @Override
+                                            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                                                Log.e("Glide", "Error al cargar la imagen", e);
+                                                // Aquí puedes realizar acciones adicionales en caso de que falle la carga de la imagen
+                                                return false;
+                                            }
+                                            @Override
+                                            public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                                                // La imagen se ha cargado correctamente
+                                                return false;
+                                            }
+                                        })
                                         .transition(DrawableTransitionOptions.withCrossFade())
                                         .placeholder(R.drawable.placeholder_image)
                                         .error(R.drawable.placeholder_image)

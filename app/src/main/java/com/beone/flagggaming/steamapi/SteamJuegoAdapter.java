@@ -67,6 +67,10 @@ public class SteamJuegoAdapter extends RecyclerView.Adapter<SteamJuegoAdapter.Vi
         return appList.size();
     }
 
+    public void setJuegos(List<Juegos> juegos) {
+        this.appList = juegos;
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
         private TextView tvAppId, tvName;
         public ViewHolder(@NonNull View itemView) {

@@ -3,6 +3,7 @@ package com.beone.flagggaming.steamapi;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,7 +33,8 @@ public class ListaJuegosSteam extends AppCompatActivity {
     private List<Juegos> listJuegos;
     private RecyclerView recyclerView;
     private SteamJuegoAdapter steamJuegoAdapter;
-    private Button btnGrabarJuegos;
+    private Button btnGrabarJuegos, buttonSearch;
+    private EditText editTextSearch;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +42,9 @@ public class ListaJuegosSteam extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_lista_juegos_steam);
 
+        // Obtener referencias a los elementos de la interfaz de usuario
+        editTextSearch = findViewById(R.id.editText_search);
+        buttonSearch = findViewById(R.id.button_search);
         titulo = findViewById(R.id.titulo);
         recyclerView=findViewById(R.id.rv_juegossteam);
         recyclerView.setLayoutManager(new GridLayoutManager(getApplicationContext(),2));
@@ -59,6 +64,20 @@ public class ListaJuegosSteam extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 grabarJuegos();
+            }
+        });
+
+        // Clic del botón de búsqueda
+        buttonSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String query = editTextSearch.getText().toString().trim();
+                if (!query.isEmpty()) {
+                    searchGames(query);
+                } else {
+                    // Si el campo de búsqueda está vacío, mostrar mensaje de advertencia
+                    Toast.makeText(ListaJuegosSteam.this, "Ingrese un nombre para buscar", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
@@ -103,6 +122,20 @@ public class ListaJuegosSteam extends AppCompatActivity {
 
     public void grabarJuegos(){
         DBHelper.saveAppList(listJuegos);
+    }
+
+    private void searchGames(String query) {
+        // Filtrar la lista de juegos según el nombre ingresado en el EditText
+        List<Juegos> filteredList = new ArrayList<>();
+        for (Juegos juego : listJuegos) {
+            if (juego.getAppName().toLowerCase().contains(query.toLowerCase())) {
+                filteredList.add(juego);
+            }
+        }
+
+        // Actualizar el RecyclerView con los resultados de la búsqueda
+        steamJuegoAdapter.setJuegos(filteredList);
+        steamJuegoAdapter.notifyDataSetChanged();
     }
 
 }

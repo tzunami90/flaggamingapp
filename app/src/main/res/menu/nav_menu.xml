@@ -11,6 +11,11 @@
             android:title="Home"/>
 
         <item
+            android:id="@+id/nav_steamList"
+            android:icon="@drawable/steamic"
+            android:title="Listado Steam"/>
+
+        <item
             android:id="@+id/nav_registro_tiendas"
             android:icon="@drawable/nav_registrotienda"
             android:title="Registro de Tienda"/>
