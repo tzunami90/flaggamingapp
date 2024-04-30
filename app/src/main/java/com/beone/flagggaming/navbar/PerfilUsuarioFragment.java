@@ -1,5 +1,6 @@
 package com.beone.flagggaming.navbar;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.beone.flagggaming.R;
@@ -26,6 +28,8 @@ public class PerfilUsuarioFragment extends Fragment {
     int idU;
     EditText editTextFirstNameModif, editTextLastNameModif, editTextEmailModif, editTextPasswordModif, editTextRepeatPasswordModif;
     Button buttonModifcarUsuario;
+    String firstName, lastName, email, password;
+    ProgressBar progressBar;
     public PerfilUsuarioFragment() {
         // Required empty public constructor
     }
@@ -42,6 +46,12 @@ public class PerfilUsuarioFragment extends Fragment {
         // Inflate the layout for this fragment
         View root = inflater.inflate(R.layout.fragment_perfil_usuario, container, false);
 
+        // Encuentra la referencia al ProgressBar
+        ProgressBar progressBar = root.findViewById(R.id.progressBar);
+
+        // Mostrar el ProgressBar
+        progressBar.setVisibility(View.VISIBLE);
+
         editTextFirstNameModif = root.findViewById(R.id.editTextFirstNameModif);
         editTextLastNameModif = root.findViewById(R.id.editTextLastNameModif);
         editTextEmailModif = root.findViewById(R.id.editTextEmailModif);
@@ -49,8 +59,8 @@ public class PerfilUsuarioFragment extends Fragment {
         editTextRepeatPasswordModif = root.findViewById(R.id.editTextRepeatPasswordModif);
         buttonModifcarUsuario = root.findViewById(R.id.buttonModifcarUsuario);
 
-        // Cargar datos del usuario desde la base de datos
-        cargarDatosUsuario();
+        // Cargar datos del usuario en segundo plano
+        new LoadUserDataAsyncTask(progressBar).execute();
 
         // Configurar clics de botones
         buttonModifcarUsuario.setOnClickListener(new View.OnClickListener() {
@@ -62,6 +72,29 @@ public class PerfilUsuarioFragment extends Fragment {
         });
 
         return root;
+    }
+    private class LoadUserDataAsyncTask extends AsyncTask<Void, Void, Void> {
+        private ProgressBar progressBar;
+        public LoadUserDataAsyncTask(ProgressBar progressBar) {
+            this.progressBar = progressBar;
+        }
+        @Override
+        protected Void doInBackground(Void... voids) {
+            cargarDatosUsuario();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            // Actualizar los EditText con los datos del usuario
+            editTextFirstNameModif.setText(firstName);
+            editTextLastNameModif.setText(lastName);
+            editTextEmailModif.setText(email);
+            editTextPasswordModif.setText(password);
+            editTextRepeatPasswordModif.setText(password);
+            // Ocultar el ProgressBar
+            progressBar.setVisibility(View.GONE);
+        }
     }
 
     // Método para conectar a la base de datos
@@ -89,17 +122,10 @@ public class PerfilUsuarioFragment extends Fragment {
                 ResultSet resultSet = statement.executeQuery();
 
                 if (resultSet.next()) {
-                    String firstName = resultSet.getString("firstName");
-                    String lastName = resultSet.getString("lastName");
-                    String email = resultSet.getString("eMail");
-                    String password = resultSet.getString("password");
-
-                    // Mostrar los datos en los EditText
-                    editTextFirstNameModif.setText(firstName);
-                    editTextLastNameModif.setText(lastName);
-                    editTextEmailModif.setText(email);
-                    editTextPasswordModif.setText(password);
-                    editTextRepeatPasswordModif.setText(password);
+                   firstName = resultSet.getString("firstName");
+                   lastName = resultSet.getString("lastName");
+                   email = resultSet.getString("eMail");
+                   password = resultSet.getString("password");
                 }
                 statement.close();
                 resultSet.close();
@@ -108,8 +134,7 @@ public class PerfilUsuarioFragment extends Fragment {
                 Toast.makeText(getContext(), "Error de conexión a la base de datos", Toast.LENGTH_SHORT).show();
             }
         } catch (SQLException e) {
-            Toast.makeText(getContext(),e.getMessage(), Toast.LENGTH_SHORT).show();
-            System.out.println(e.getMessage());
+            Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
             Log.d("Error", e.getMessage());
         }
     }

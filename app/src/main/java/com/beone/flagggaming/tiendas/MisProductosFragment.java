@@ -1,5 +1,6 @@
 package com.beone.flagggaming.tiendas;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -11,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.beone.flagggaming.R;
@@ -31,6 +33,7 @@ import java.util.List;
 public class MisProductosFragment extends Fragment {
     Connection conection = null;
     int idU, idT;
+    View root;
 
     public MisProductosFragment() {
         // Required empty public constructor
@@ -48,54 +51,80 @@ public class MisProductosFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View root = inflater.inflate(R.layout.fragment_mis_productos, container, false);
+        root = inflater.inflate(R.layout.fragment_mis_productos, container, false);
 
         // Configura el RecyclerView
         RecyclerView recyclerViewProductos = root.findViewById(R.id.recyclerViewProducts);
         recyclerViewProductos.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        // Crea y establece el adaptador para el RecyclerView
-        List<Producto> productosList = obtenerProductosDesdeBaseDeDatos();
-        ProductoAdapter productosAdapter = new ProductoAdapter(productosList);
-        recyclerViewProductos.setAdapter(productosAdapter);
+        // Muestra el ProgressBar
+        ProgressBar progressBarMisProductos = root.findViewById(R.id.progressBarMisProductos);
+        progressBarMisProductos.setVisibility(View.VISIBLE);
 
-        productosAdapter.setOnItemClickListener(new ProductoAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int productId) { // Ajustamos el parámetro para que sea un entero
-                // Crear el fragmento de detalles del producto y pasar el ID del producto
-                DetallesProductoFragment detallesFragment = new DetallesProductoFragment();
-                Bundle bundle = new Bundle();
-                bundle.putInt("idP", productId); // Pasar el ID del producto al fragmento
-                bundle.putInt("idU", idU);
-                bundle.putInt("idT", idT);
-                detallesFragment.setArguments(bundle);
+        // Realiza la tarea de obtención de productos en segundo plano
+        obtenerProductosDesdeBaseDeDatos();
 
-                // Reemplazar el fragmento actual con el fragmento de detalles del producto
-                getActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container,detallesFragment)
-                        .addToBackStack(null)
-                        .commit();
-            }
-        });
         return root;
     }
 
-    private List<Producto> obtenerProductosDesdeBaseDeDatos() {
+    private void obtenerProductosDesdeBaseDeDatos() {
+        // Realiza la tarea de obtención de productos en segundo plano
+        new AsyncTask<Void, Void, List<Producto>>() {
+            @Override
+            protected List<Producto> doInBackground(Void... voids) {
+                // Coloca aquí tu lógica para obtener productos desde la base de datos
+                return obtenerProductos();
+            }
+
+            @Override
+            protected void onPostExecute(List<Producto> productosList) {
+                // Oculta el ProgressBar
+                ProgressBar progressBarMisProductos = root.findViewById(R.id.progressBarMisProductos);
+                progressBarMisProductos.setVisibility(View.GONE);
+
+                // Crea y establece el adaptador para el RecyclerView
+                ProductoAdapter productosAdapter = new ProductoAdapter(productosList);
+                RecyclerView recyclerViewProductos = root.findViewById(R.id.recyclerViewProducts);
+                recyclerViewProductos.setAdapter(productosAdapter);
+
+                // Establecer el listener de clic en el adaptador
+                productosAdapter.setOnItemClickListener(new ProductoAdapter.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(int productId) {
+                        // Crear el fragmento de detalles del producto y pasar el ID del producto
+                        DetallesProductoFragment detallesFragment = new DetallesProductoFragment();
+                        Bundle bundle = new Bundle();
+                        bundle.putInt("idP", productId); // Pasar el ID del producto al fragmento
+                        bundle.putInt("idU", idU);
+                        bundle.putInt("idT", idT);
+                        detallesFragment.setArguments(bundle);
+
+                        // Reemplazar el fragmento actual con el fragmento de detalles del producto
+                        getActivity().getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.fragment_container, detallesFragment)
+                                .addToBackStack(null)
+                                .commit();
+                    }
+                });
+            }
+        }.execute();
+    }
+
+    private List<Producto> obtenerProductos() {
         List<Producto> productos = new ArrayList<>();
-        Connection connection = null;
         PreparedStatement statement = null;
         ResultSet resultSet = null;
 
         try {
             // Obtener la conexión a la base de datos
-            connection = conDB();
+            conection = conDB();
 
             // Consulta SQL para seleccionar productos
             String query = "SELECT p.id_interno_producto, p.id_tienda, p.id_categoria, p.sku_tienda, p.desc_tienda, p.marca, p.precio_vta, p.estatus, c.desc_categoria " +
                     "FROM productos p " +
                     "JOIN categorias c ON p.id_categoria = c.id_categoria " +
                     "WHERE p.id_tienda = ?";
-            statement = connection.prepareStatement(query);
+            statement = conection.prepareStatement(query);
             statement.setInt(1, idT); // Asignar el valor de idT al parámetro de la consulta
             resultSet = statement.executeQuery();
 
@@ -123,19 +152,17 @@ public class MisProductosFragment extends Fragment {
             }
             statement.close();
         } catch (SQLException e) {
-            Toast.makeText(getContext(),e.getMessage(), Toast.LENGTH_SHORT).show();
-            System.out.println(e.getMessage());
-            Log.d("Error", e.getMessage());
+            Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
         } finally {
-            // Cerrar la conexión y los recursos JDBC
+            // Cerrar los recursos JDBC
             try {
                 if (resultSet != null) resultSet.close();
                 if (statement != null) statement.close();
-                if (connection != null) connection.close();
+                if (conection != null) conection.close();
             } catch (SQLException e) {
-                Toast.makeText(getContext(),e.getMessage(), Toast.LENGTH_SHORT).show();
-                System.out.println(e.getMessage());
-                Log.d("Error", e.getMessage());
+                Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
             }
         }
         return productos;
@@ -153,6 +180,7 @@ public class MisProductosFragment extends Fragment {
             conection = DriverManager.getConnection("jdbc:jtds:sqlserver://10.0.2.2:1433;instance=SQLEXPRESS;databaseName=flagg_test2;user=sa;password=Alexx2003;");
         } catch (Exception e){
             Toast.makeText(getContext(),e.getMessage(),Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
         }
         return conection;
     }

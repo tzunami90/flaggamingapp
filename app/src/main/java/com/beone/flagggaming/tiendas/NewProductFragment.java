@@ -149,6 +149,19 @@ public class NewProductFragment extends Fragment {
 
     //Método para crear el producto en la BD
     private void crearProducto(){
+        // Obtener la cantidad de productos creados por el usuario
+        int cantidadProductosCreados = obtenerCantidadProductosCreados();
+
+        // Verificar si el usuario tiene una suscripción premium
+        boolean tieneSuscripcionPremium = verificarSuscripcionPremium();
+
+        // Verificar si el usuario puede crear más productos según su tipo de suscripción
+        if (!tieneSuscripcionPremium && cantidadProductosCreados >= 10) {
+            // El usuario ha alcanzado el límite de productos para la suscripción gratuita
+            Toast.makeText(getContext(), "¡Has alcanzado el límite de productos para la suscripción gratuita! Suscríbete al plan premium para crear más productos.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         String skuTienda = editTextSkuTienda.getText().toString().trim();
         String descTienda = editTextDescTienda.getText().toString().trim();
         String marca = editTextMarca.getText().toString().trim();
@@ -209,8 +222,52 @@ public class NewProductFragment extends Fragment {
             System.out.println(e.getMessage());
             Log.d("Error", e.getMessage());
             }
+    }
+    // Método para obtener la cantidad de productos creados por el usuario
+    private int obtenerCantidadProductosCreados() {
+        int cantidadProductos = 0;
+        try {
+            // Realizar una consulta SQL para contar los productos creados por el usuario
+            String selectQuery = "SELECT COUNT(*) AS cantidad FROM productos WHERE id_tienda = ?";
+            PreparedStatement pstSelect = conDB().prepareStatement(selectQuery);
+            pstSelect.setInt(1, idT);
+            ResultSet resultSet = pstSelect.executeQuery();
 
+            if (resultSet.next()) {
+                cantidadProductos = resultSet.getInt("cantidad");
+            }
 
+            pstSelect.close();
+        } catch (SQLException e) {
+            Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+            Log.d("Error", e.getMessage());
+        }
 
+        return cantidadProductos;
+    }
+
+    // Método para verificar si la tienda tiene una suscripción premium
+    private boolean verificarSuscripcionPremium() {
+        boolean tieneSuscripcionPremium = false;
+        try {
+            // Realizar una consulta SQL para obtener el estado de la suscripción premium de la tienda del usuario
+            String selectQuery = "SELECT premium FROM tiendas WHERE id = ?";
+            PreparedStatement pstSelect = conDB().prepareStatement(selectQuery);
+            pstSelect.setInt(1, idT);
+            ResultSet resultSet = pstSelect.executeQuery();
+
+            if (resultSet.next()) {
+                // Obtener el valor del campo premium de la consulta
+                int premium = resultSet.getInt("premium");
+                tieneSuscripcionPremium = (premium == 1); // Si premium es 1, la tienda tiene suscripción premium
+            }
+
+            pstSelect.close();
+        } catch (SQLException e) {
+            Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+            Log.d("Error", e.getMessage());
+        }
+
+        return tieneSuscripcionPremium;
     }
 }

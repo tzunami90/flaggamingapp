@@ -1,6 +1,7 @@
 package com.beone.flagggaming;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,6 +19,7 @@ import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
 
 import com.beone.flagggaming.navbar.AboutUsFragment;
 import com.beone.flagggaming.navbar.HomeFragment;
@@ -28,6 +30,8 @@ import com.beone.flagggaming.steamapi.ListaJuegosSteam;
 import com.beone.flagggaming.usuario.LoginActivity;
 import com.beone.flagggaming.usuario.RegisterActivity;
 import com.google.android.material.navigation.NavigationView;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class HomeAcitivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -35,9 +39,10 @@ public class HomeAcitivity extends AppCompatActivity implements NavigationView.O
     ImageButton buttonDrawerToggle;
     NavigationView navigationView;
     TextView textUserName, textUserMail;
-    Bundle bundle;
     String name, mail;
     int idU, rol;
+    private ExecutorService executorService = Executors.newSingleThreadExecutor();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,12 +54,6 @@ public class HomeAcitivity extends AppCompatActivity implements NavigationView.O
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
-        bundle = getIntent().getExtras();
-        name = bundle.getString("name");
-        mail = bundle.getString("mail");
-        idU = bundle.getInt("id");
-        rol = bundle.getInt("rol");
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -77,12 +76,36 @@ public class HomeAcitivity extends AppCompatActivity implements NavigationView.O
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
-        //Ingreso al home fragment
-        if(savedInstanceState == null){
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new HomeFragment()).commit();
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
+            name = bundle.getString("name");
+            mail = bundle.getString("mail");
+            idU = bundle.getInt("id");
+            rol = bundle.getInt("rol");
+            updateHeaderView();
+        }
+
+        if (savedInstanceState == null) {
+            loadFragment(new HomeFragment());
             navigationView.setCheckedItem(R.id.nav_home);
         }
     }
+
+    private void updateHeaderView() {
+        if (navigationView != null && name != null && mail != null) {
+            navigationView.post(() -> {
+                textUserName = navigationView.getHeaderView(0).findViewById(R.id.textUserName);
+                textUserMail = navigationView.getHeaderView(0).findViewById(R.id.textUserMail);
+                textUserName.setText(name);
+                textUserMail.setText(mail);
+            });
+        }
+    }
+
+    private void loadFragment(Fragment fragment) {
+        executorService.execute(() -> getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment).commit());
+    }
+
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
@@ -90,72 +113,73 @@ public class HomeAcitivity extends AppCompatActivity implements NavigationView.O
         int itemId = menuItem.getItemId();
 
         if(itemId == R.id.nav_home) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new HomeFragment()).commit();
+            // Llamada a AsyncTask para cargar el fragmento de inicio
+            loadFragment(new HomeFragment());
             navigationView.setCheckedItem(R.id.nav_home);
-        }
-
-        if(itemId == R.id.nav_home) {
-            Intent intent = new Intent(this, ListaJuegosSteam.class);
-            startActivity(intent);
-        }
-        if((itemId == R.id.nav_registro_tiendas) && (rol == 0)) {
+        } else if(itemId == R.id.nav_steamList) {
+            startActivity(new Intent(this, ListaJuegosSteam.class));
+        } else if((itemId == R.id.nav_registro_tiendas) && (rol == 0)) {
             Bundle bundleR = new Bundle();
             bundleR.putInt("idU",idU);
             RegisterTiendaFragment registerTiendaFragment = new RegisterTiendaFragment();
             registerTiendaFragment.setArguments(bundleR);
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,  registerTiendaFragment).commit();
-            navigationView.setCheckedItem(R.id.nav_registro_tiendas);
-        }
-        if((itemId == R.id.nav_registro_tiendas) && (rol == 1)) {
+            // Llamada a AsyncTask para cargar el fragmento de registro de tiendas
+            loadFragment(registerTiendaFragment);
+           navigationView.setCheckedItem(R.id.nav_registro_tiendas);
+        } else if((itemId == R.id.nav_registro_tiendas) && (rol == 1)) {
             Toast.makeText(this,"YA TIENES UNA TIENDA REGISTRADA", Toast.LENGTH_SHORT).show();
-        }
-        if(itemId == R.id.nav_about_us) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new AboutUsFragment()).commit();
-            navigationView.setCheckedItem(R.id.nav_about_us);
-        }
-        if((itemId == R.id.nav_panel_tienda) && (rol == 1)) {
+        } else if(itemId == R.id.nav_about_us) {
+            // Llamada a AsyncTask para cargar el fragmento "About Us"
+            loadFragment(new AboutUsFragment());
+           navigationView.setCheckedItem(R.id.nav_about_us);
+        } else if((itemId == R.id.nav_panel_tienda) && (rol == 1)) {
             Bundle bundleF = new Bundle();
             bundleF.putInt("id",idU);
             PanelTiendaFragment panelTiendaFragment = new PanelTiendaFragment();
             panelTiendaFragment.setArguments(bundleF);
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, panelTiendaFragment).commit();
+            // Llamada a AsyncTask para cargar el fragmento del panel de la tienda
+            loadFragment(panelTiendaFragment);
             navigationView.setCheckedItem(R.id.nav_panel_tienda);
-        }
-        if((itemId == R.id.nav_panel_tienda) && (rol == 0)) {
+        } else if((itemId == R.id.nav_panel_tienda) && (rol == 0)) {
             Toast.makeText(this,"NO TIENES UNA TIENDA REGISTRADA", Toast.LENGTH_SHORT).show();
-        }
-        if(itemId == R.id.nav_perfil_usuario) {
+        } else if(itemId == R.id.nav_perfil_usuario) {
             Bundle bundlePU = new Bundle();
             bundlePU.putInt("id",idU);
             PerfilUsuarioFragment perfilUsuarioFragment = new PerfilUsuarioFragment();
             perfilUsuarioFragment.setArguments(bundlePU);
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, perfilUsuarioFragment).commit();
+            // Llamada a AsyncTask para cargar el fragmento del perfil del usuario
+            loadFragment(perfilUsuarioFragment);
             navigationView.setCheckedItem(R.id.nav_perfil_usuario);
+        } else if(itemId == R.id.nav_logout) {
+            logout();
         }
-        if(itemId == R.id.nav_logout) {
-            Toast.makeText(this,"Sesión Finalizada", Toast.LENGTH_SHORT).show();
-            name = null;
-            mail = null;
-            idU = 0;
-            rol = 0;
-            Intent intent = new Intent(this, LoginActivity.class);
-            startActivity(intent);
 
-        }
-        drawerLayout.close();
+        drawerLayout.closeDrawer(GravityCompat.START);
         return false;
+    }
+
+    private void logout() {
+        Toast.makeText(this, "Sesión Finalizada", Toast.LENGTH_SHORT).show();
+        name = null;
+        mail = null;
+        idU = 0;
+        rol = 0;
+        startActivity(new Intent(this, LoginActivity.class));
+        finish();
     }
 
     @Override
     public void onBackPressed() {
-        if(drawerLayout.isDrawerOpen(GravityCompat.START)){
-            drawerLayout.closeDrawer(GravityCompat.START);
-        }else{
+        if (drawerLayout.isDrawerOpen(navigationView)) {
+            drawerLayout.closeDrawer(navigationView);
+        } else {
             super.onBackPressed();
         }
     }
 
-    public void openNavBar(View v){
-        drawerLayout.open();
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        executorService.shutdown();
     }
 }

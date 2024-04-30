@@ -1,5 +1,6 @@
 package com.beone.flagggaming.tiendas;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -13,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,7 +39,9 @@ public class DetallesProductoFragment extends Fragment {
     Button buttonModifProducto, buttonElimProducto;
     private List<Categoria> categoriasList;
     private ArrayAdapter<Categoria> categoriaArrayAdapter;
-
+    View root;
+    private ProgressBar progressBar;
+    private String errorMessage;
     public DetallesProductoFragment() {
         // Required empty public constructor
     }
@@ -54,7 +58,7 @@ public class DetallesProductoFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View root = inflater.inflate(R.layout.fragment_detalles_producto, container, false);
+        root = inflater.inflate(R.layout.fragment_detalles_producto, container, false);
         // Enlazar vistas
         editTextModifSkuTienda = root.findViewById(R.id.editTextModifSkuTienda);
         editTextModifDescTienda = root.findViewById(R.id.editTextModifDescTienda);
@@ -64,12 +68,16 @@ public class DetallesProductoFragment extends Fragment {
         checkBoxModifEstatus = root.findViewById(R.id.checkBoxModifEstatus);
         buttonModifProducto = root.findViewById(R.id.buttonModifProducto);
         buttonElimProducto = root.findViewById(R.id.buttonElimProducto);
+        progressBar = root.findViewById(R.id.progressBarDetallesProducto);
 
-        // Cargar las categorías desde la base de datos
-        cargarCategoriasDesdeBaseDeDatos();
+        // Mostrar ProgressBar
+        progressBar.setVisibility(View.VISIBLE);
 
-        // Cargar datos del producto
-        cargarDatosProducto();
+        // Inicializar categoriasList
+        categoriasList = new ArrayList<>();
+
+        // Realizar la carga de datos en segundo plano
+        new LoadDataAsyncTask().execute();
 
         // Configurar clics de botones
         buttonModifProducto.setOnClickListener(new View.OnClickListener() {
@@ -89,6 +97,67 @@ public class DetallesProductoFragment extends Fragment {
         });
 
         return root;
+    }
+
+    private class LoadDataAsyncTask extends AsyncTask<Void, Void, Void> {
+
+        private List<Categoria> categoriasList; // Aquí almacenaremos las categorías cargadas
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            categoriasList = new ArrayList<>(); // Inicializamos la lista de categorías aquí
+
+            try {
+                // Establecer conexión a la base de datos
+                conection = conDB();
+
+                // Consulta SQL para obtener las categorías
+                String query = "SELECT id_categoria, desc_categoria FROM categorias";
+                PreparedStatement statement = conection.prepareStatement(query);
+                ResultSet resultSet = statement.executeQuery();
+
+                // Recorrer los resultados y agregar las categorías a la lista
+                while (resultSet.next()) {
+                    int idCategoria = resultSet.getInt("id_categoria");
+                    String descCategoria = resultSet.getString("desc_categoria");
+                    Categoria categoria = new Categoria(idCategoria, descCategoria);
+                    categoriasList.add(categoria);
+                }
+
+                // Cerrar conexión y recursos
+                resultSet.close();
+                statement.close();
+                conection.close();
+            } catch (SQLException e) {
+                errorMessage = "Error al cargar las categorías: " + e.getMessage();
+                Log.e("Error", "Error al cargar las categorías", e);
+            }
+
+            // Llamar al método para cargar los datos del producto
+            cargarDatosProducto();
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            // Ocultar ProgressBar después de cargar los datos
+            progressBar.setVisibility(View.GONE);
+
+            if (categoriasList != null && !categoriasList.isEmpty()) {
+                // Configurar el ArrayAdapter para el Spinner
+                categoriaArrayAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, categoriasList);
+                categoriaArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinnerModifCategoria.setAdapter(categoriaArrayAdapter);
+
+                // Configurar "Seleccione una categoría" como el elemento seleccionado por defecto
+                spinnerModifCategoria.setSelection(0);
+            } else {
+                Toast.makeText(getContext(), "No se encontraron categorías", Toast.LENGTH_SHORT).show();
+                errorMessage = "No se encontraron categorías";
+                Log.e("Error", "No se encontraron categorías");
+            }
+        }
     }
 
     private void cargarDatosProducto() {
@@ -238,9 +307,9 @@ public class DetallesProductoFragment extends Fragment {
         }
     }
 
-
     private void cargarCategoriasDesdeBaseDeDatos() {
-        categoriasList = new ArrayList<>(); // Inicializar la lista de categorías
+        // Elimina la inicialización redundante de categoriasList aquí
+        // No es necesario inicializarla de nuevo
 
         try {
             // Establecer conexión a la base de datos
@@ -264,21 +333,8 @@ public class DetallesProductoFragment extends Fragment {
             statement.close();
             conection.close();
         } catch (SQLException e) {
-            Toast.makeText(getContext(), "Error al cargar las categorías: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            errorMessage = "Error al cargar las categorías: " + e.getMessage();
             Log.e("Error", "Error al cargar las categorías", e);
-        }
-
-        // Verificar si se encontraron categorías
-        if (!categoriasList.isEmpty()) {
-            // Configurar el ArrayAdapter para el Spinner
-            categoriaArrayAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, categoriasList);
-            categoriaArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            spinnerModifCategoria.setAdapter(categoriaArrayAdapter);
-
-            // Configurar "Seleccione una categoría" como el elemento seleccionado por defecto
-            spinnerModifCategoria.setSelection(0);
-        } else {
-            Toast.makeText(getContext(), "No se encontraron categorías", Toast.LENGTH_SHORT).show();
         }
     }
 

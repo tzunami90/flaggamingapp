@@ -1,7 +1,6 @@
 package com.beone.flagggaming.tiendas;
-
+import android.os.AsyncTask;
 import android.os.Bundle;
-
 import androidx.fragment.app.Fragment;
 
 import android.os.StrictMode;
@@ -66,17 +65,11 @@ public class PerfilTiendaFragment extends Fragment {
         // Establecer la conexión a la base de datos
         conection = conDB();
 
-        // Obtener y mostrar los datos de la tienda
-        obtenerDatosTienda();
+        // Obtener y mostrar datos de la tienda
+        new ObtenerDatosTiendaTask().execute();
 
-        // Configuración del botón de actualización
-        btnActualizarPerfil.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Lógica para actualizar los datos de la tienda
-                actualizarDatosTienda();
-            }
-        });
+        // Configurar el botón de actualización
+        btnActualizarPerfil.setOnClickListener(v -> actualizarDatosTienda());
 
         return root;
     }
@@ -96,31 +89,51 @@ public class PerfilTiendaFragment extends Fragment {
         return con;
     }
 
-    // Método para obtener y mostrar los datos de la tienda
-    private void obtenerDatosTienda() {
-        if (conection != null) {
-            try {
-                String query = "SELECT * FROM tiendas WHERE id = ?";
-                PreparedStatement statement = conection.prepareStatement(query);
-                statement.setInt(1, idT);
-                ResultSet resultSet = statement.executeQuery();
-                if (resultSet.next()) {
-                    edtRazonSocial.setText(resultSet.getString("razonSocial"));
-                    edtCuit.setText(resultSet.getString("cuit"));
-                    edtNombreFantasia.setText(resultSet.getString("name"));
-                    edtMail.setText(resultSet.getString("mail"));
-                    edtDireccion.setText(resultSet.getString("dir"));
-                    edtHorarios.setText(resultSet.getString("hr"));
-                    edtDiasAtencion.setText(resultSet.getString("days"));
-                    edtTelefono.setText(resultSet.getString("tel"));
-                    edtInstagram.setText(resultSet.getString("insta"));
-                    edtPassword.setText(resultSet.getString("password"));
+    // Tarea asincrónica para obtener y mostrar los datos de la tienda
+    private class ObtenerDatosTiendaTask extends AsyncTask<Void, Void, Void> {
+
+        String razonSocial, cuit, nombreFantasia, mail, password, direccion, horarios, diasAtencion, telefono, instagram;
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            if (conection != null) {
+                try {
+                    String consulta = "SELECT * FROM tiendas WHERE id = ?";
+                    PreparedStatement sentencia = conection.prepareStatement(consulta);
+                    sentencia.setInt(1, idT);
+                    ResultSet resultado = sentencia.executeQuery();
+                    if (resultado.next()) {
+                        razonSocial = resultado.getString("razonSocial");
+                        cuit = resultado.getString("cuit");
+                        nombreFantasia = resultado.getString("name");
+                        mail = resultado.getString("mail");
+                        direccion = resultado.getString("dir");
+                        horarios = resultado.getString("hr");
+                        diasAtencion = resultado.getString("days");
+                        telefono = resultado.getString("tel");
+                        instagram = resultado.getString("insta");
+                        password = resultado.getString("password");
+                    }
+                } catch (SQLException e) {
+                    Log.e("ObtenerDatosTiendaTask", "Error al obtener datos de la tienda: " + e.getMessage());
                 }
-            } catch (SQLException e) {
-                Toast.makeText(getContext(),e.getMessage(), Toast.LENGTH_SHORT).show();
-                System.out.println(e.getMessage());
-                Log.d("Error", e.getMessage());
             }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            // Mostrar datos obtenidos en la interfaz de usuario
+            edtRazonSocial.setText(razonSocial);
+            edtCuit.setText(cuit);
+            edtNombreFantasia.setText(nombreFantasia);
+            edtMail.setText(mail);
+            edtDireccion.setText(direccion);
+            edtHorarios.setText(horarios);
+            edtDiasAtencion.setText(diasAtencion);
+            edtTelefono.setText(telefono);
+            edtInstagram.setText(instagram);
+            edtPassword.setText(password);
         }
     }
 

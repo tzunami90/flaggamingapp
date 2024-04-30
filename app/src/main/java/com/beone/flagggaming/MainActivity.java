@@ -58,6 +58,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        finish();
+        if (vwLogo.isPlaying()) {
+            vwLogo.pause();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        vwLogo.stopPlayback();
     }
 }

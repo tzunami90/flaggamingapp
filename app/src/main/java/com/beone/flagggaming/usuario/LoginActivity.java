@@ -1,29 +1,25 @@
 package com.beone.flagggaming.usuario;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
-
 import android.os.StrictMode;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
-
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-
 import com.beone.flagggaming.HomeAcitivity;
 import com.beone.flagggaming.R;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -51,98 +47,89 @@ public class LoginActivity extends AppCompatActivity {
             return insets;
         });
     }
-
     public void loginButtonClicked(View v) {
+        String email = editTextEmail.getText().toString().trim();
+        String password = editTextPassword.getText().toString().trim();
 
-        try {
+        if (!isValidEmail(email)) {
+            editTextEmail.setError("Correo Electrónico inválido");
+            editTextEmail.requestFocus();
+            return;
+        }
+
+        if (password.isEmpty()) {
+            editTextPassword.setError("Por favor, ingresa tu contraseña");
+            editTextPassword.requestFocus();
+            return;
+        }
+
+        if (containsSqlInjection(email) || containsSqlInjection(password)) {
+            Toast.makeText(this, "Correo Electrónico o Contraseña inválidos", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        new LoginTask().execute(email, password);
+    }
+
+    private class LoginTask extends AsyncTask<String, Void, Boolean> {
+        String name, mail;
+        int id, rol;
+
+        @Override
+        protected void onPreExecute() {
             progressLogin.setVisibility(View.VISIBLE);
-            String email = editTextEmail.getText().toString().trim();
-            String password = editTextPassword.getText().toString().trim();
+            buttonLogin.setEnabled(false); // Disable login button while logging in
+        }
 
-            // Comprobación de nulidad
-            if (editTextEmail == null || editTextPassword == null) {
-                progressLogin.setVisibility(View.GONE);
-                Toast.makeText(this, "EditText no inicializado", Toast.LENGTH_SHORT).show();
-                return;
-            }
+        @Override
+        protected Boolean doInBackground(String... params) {
+            String email = params[0];
+            String password = params[1];
 
-            // Comprobación de vacío
-            if (email.isEmpty()) {
-                progressLogin.setVisibility(View.GONE);
-                editTextEmail.setError("Por favor, ingresa tu correo electrónico ");
-                editTextEmail.requestFocus();
-                return;
-            }
+            try (Connection con = conDB()) {
+                if (con != null) {
+                    PreparedStatement pst = con.prepareStatement("SELECT * FROM USUARIOS WHERE eMail = ? AND password = ?");
+                    pst.setString(1, email);
+                    pst.setString(2, password);
+                    ResultSet rs = pst.executeQuery();
 
-            if (!isValidEmail(email)) {
-                progressLogin.setVisibility(View.GONE);
-                editTextEmail.setError("Correo Electrónico inválido");
-                editTextEmail.requestFocus();
-                return;
-            }
-
-            if (password.isEmpty()) {
-                progressLogin.setVisibility(View.GONE);
-                editTextPassword.setError("Por favor, ingresa tu contraseña");
-                editTextPassword.requestFocus();
-                return;
-            }
-
-            // Validación de prevención de inyecciones SQL
-            if (containsSqlInjection(email) || containsSqlInjection(password)) {
-                progressLogin.setVisibility(View.GONE);
-                editTextEmail.setError("Correo Electrónico inválido");
-                editTextEmail.requestFocus();
-                return;
-            }
-
-            // Validaciones pasadas exitosamente:
-            try{
-                if(conDB() == null){
-                    Toast.makeText(this, "ERROR DE CONEXION - Por favor reintente en unos momentos", Toast.LENGTH_SHORT).show();
-                }else{
-
-                    PreparedStatement pst = conDB().prepareStatement("SELECT * FROM USUARIOS WHERE eMail = '" + editTextEmail.getText() + "' AND password ='" + editTextPassword.getText()+"';");
-                    pst.executeQuery();
-                    ResultSet rs = pst.getResultSet();
-
-                    if(rs.next()){
-                        int id = rs.getInt(1);
+                    if (rs.next()) {
+                        id = rs.getInt(1);
                         name = rs.getString(2) + " " + rs.getString(3);
                         mail = rs.getString(4);
-                        int rol = rs.getInt(6);
-                        Toast.makeText(this, "Inicio de sesión exitoso.", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(this, HomeAcitivity.class);
-                        intent.putExtra("name", name);
-                        intent.putExtra("mail", mail);
-                        intent.putExtra("id", id);
-                        intent.putExtra("rol", rol);
-                        pst.close();
-                        rs.close();
-                        conDB().close();
-                        startActivity(intent);
-                    } else{
-                        Toast.makeText(this, "Mail y/o Contraseña incorrectos", Toast.LENGTH_SHORT).show();
+                        rol = rs.getInt(6);
+                        return true;
                     }
-
                 }
-
-            } catch(SQLException e){
-                Toast.makeText(getApplicationContext(),e.getMessage(), Toast.LENGTH_SHORT).show();
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            Toast.makeText(this, "Ha ocurrido un error. Por favor, inténtalo de nuevo.", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean success) {
+            progressLogin.setVisibility(View.GONE);
+            buttonLogin.setEnabled(true); // Re-enable login button
+            if (success) {
+                Toast.makeText(LoginActivity.this, "Inicio de sesión exitoso.", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(LoginActivity.this, HomeAcitivity.class);
+                intent.putExtra("name", name);
+                intent.putExtra("mail", mail);
+                intent.putExtra("id", id);
+                intent.putExtra("rol", rol);
+                startActivity(intent);
+            } else {
+                Toast.makeText(LoginActivity.this, "Mail y/o Contraseña incorrectos", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
-    //////////////////////////////////////////////////////////////
     //VALIDACIONES DE INGRESO DE DATOS//
     private boolean isValidEmail(String email) {
         return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
-
     private boolean containsSqlInjection(String input) {
         String[] sqlKeywords = {"SELECT", "INSERT", "UPDATE", "DELETE", "DROP", "TABLE"};
         for (String keyword : sqlKeywords) {
@@ -152,28 +139,18 @@ public class LoginActivity extends AppCompatActivity {
         }
         return false;
     }
-    //////////////////////////////////////////////////////////////
-
-
-    public void openRegisterActivity(View v) {
-        Intent intent = new Intent(this, RegisterActivity.class);
-        startActivity(intent);
-    }
-
     //Conexion a SQL
-    public Connection conDB(){
-        Connection conection = null;
-
-        try{
+    private Connection conDB() {
+        try {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
                     .permitAll().build();
             StrictMode.setThreadPolicy(policy);
             Class.forName("net.sourceforge.jtds.jdbc.Driver").newInstance();
-            conection = DriverManager.getConnection("jdbc:jtds:sqlserver://10.0.2.2:1433;instance=SQLEXPRESS;databaseName=flagg_test2;user=sa;password=Alexx2003;");
-        } catch (Exception e){
-            Toast.makeText(getApplicationContext(),e.getMessage(),Toast.LENGTH_SHORT).show();
+            return DriverManager.getConnection("jdbc:jtds:sqlserver://10.0.2.2:1433;instance=SQLEXPRESS;databaseName=flagg_test2;user=sa;password=Alexx2003;");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
-        return conection;
     }
 
 }

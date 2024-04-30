@@ -5,6 +5,6 @@ import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface SteamDetailApiService {
-    @GET("api/appdetails")
+    @GET("appdetails")
     Call<AppDetailsResponse> getAppDetails(@Query("appids") String id, @Query("cc") String cc);
 }

@@ -1,5 +1,5 @@
 package com.beone.flagggaming.navbar;
-
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.cardview.widget.CardView;
@@ -9,6 +9,7 @@ import android.os.StrictMode;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,6 +29,7 @@ public class PanelTiendaFragment extends Fragment {
     int idU,idT;
     TextView txNroTienda, txNombreTienda;
     CardView cvNuevoProducto, cvPerfilTienda, cvMisProductos, cvEliminarTienda;
+    ProgressBar progressBar;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -46,68 +48,86 @@ public class PanelTiendaFragment extends Fragment {
         cvPerfilTienda = root.findViewById(R.id.cvPerfilTienda);
         cvMisProductos = root.findViewById(R.id.cvMisProductos);
         cvEliminarTienda = root.findViewById(R.id.cvEliminarTIenda);
-
-        try {
-            if (conDB() == null) {
-                Toast.makeText(root.getContext(), "ERROR DE CONEXION - Por favor reintente en unos momentos", Toast.LENGTH_SHORT).show();
-            } else {
-                PreparedStatement pstT = conDB().prepareStatement("SELECT * FROM usuarios_tiendas WHERE idU =" + idU + ";");
-                pstT.executeQuery();
-                ResultSet rsT = pstT.getResultSet();
-                if(rsT.next()) {
-                    idT = rsT.getInt(2);
-                    txNroTienda.setText("Tienda Nro.: " + Integer.toString(idT));
-                }else{
-                    Toast.makeText(getContext(), "Sin Resultados", Toast.LENGTH_SHORT).show();
-                }
+        progressBar = root.findViewById(R.id.progressBar);
 
 
-                PreparedStatement pst2 = conDB().prepareStatement("SELECT * FROM tiendas WHERE id =" + idT + ";");
-                pst2.executeQuery();
-                ResultSet rs2 = pst2.getResultSet();
-                if(rs2.next()) {
-                String nombreT = rs2.getString(4);
-                    txNombreTienda.setText(nombreT);
-                }else{
-                    Toast.makeText(getContext(), "Sin Resultados", Toast.LENGTH_SHORT).show();
-                }
+        // Iniciar tarea asincrónica para obtener los datos de la tienda
+        new ObtenerDatosTiendaTask().execute();
 
-
-            }
-        }catch(SQLException e){
-            Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
-
-
-        //Habilito los click listener de los card view
-        cvNuevoProducto.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goNuevoProducto();
-            }
-        });
-        cvPerfilTienda.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goPerfilTienda();
-            }
-        });
-        cvMisProductos.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goMisProductos();
-            }
-        });
-        cvEliminarTienda.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goEliminarTienda();
-            }
-        });
+        // Habilitar clics en los CardView
+        cvNuevoProducto.setOnClickListener(v -> goNuevoProducto());
+        cvPerfilTienda.setOnClickListener(v -> goPerfilTienda());
+        cvMisProductos.setOnClickListener(v -> goMisProductos());
+        cvEliminarTienda.setOnClickListener(v -> goEliminarTienda());
 
         return root;
     }
+    // Tarea asincrónica para obtener los datos de la tienda
+    private class ObtenerDatosTiendaTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected void onPreExecute() {
+            // Antes de ejecutar la tarea, muestra el ProgressBar
+            progressBar.setVisibility(View.VISIBLE);
+        }
+        @Override
+        protected Void doInBackground(Void... voids) {
+            Connection conexion = null;
+            try {
+                conexion = conDB();
+                if (conexion != null) {
+                    PreparedStatement pstT = conexion.prepareStatement("SELECT * FROM usuarios_tiendas WHERE idU =" + idU + ";");
+                    pstT.executeQuery();
+                    ResultSet rsT = pstT.getResultSet();
+                    if (rsT.next()) {
+                        idT = rsT.getInt(2);
+                        // Actualizar el UI en el hilo principal
+                        if (isAdded()) {
+                            // El fragmento está adjunto a una actividad, es seguro llamar a getActivity()
+                            getActivity().runOnUiThread(() -> txNroTienda.setText("Tienda Nro.: " + idT));
+                        }
+                    }
 
+                    PreparedStatement pst2 = conexion.prepareStatement("SELECT * FROM tiendas WHERE id =" + idT + ";");
+                    pst2.executeQuery();
+                    ResultSet rs2 = pst2.getResultSet();
+                    if (rs2.next()) {
+                        String nombreTienda = rs2.getString(4);
+                        // Actualizar el UI en el hilo principal
+                        if (isAdded()) {
+                            // El fragmento está adjunto a una actividad, es seguro llamar a getActivity()
+                            getActivity().runOnUiThread(() -> txNombreTienda.setText(nombreTienda));
+                        }
+                    }
+                } else {
+                    // Mostrar mensaje de error en el hilo principal
+                    if (isAdded()) {
+                        // El fragmento está adjunto a una actividad, es seguro llamar a getActivity()
+                        getActivity().runOnUiThread(() -> Toast.makeText(getContext(), "ERROR DE CONEXION - Por favor reintente en unos momentos", Toast.LENGTH_SHORT).show());
+                    }
+                }
+            } catch (SQLException e) {
+                // Mostrar mensaje de error en el hilo principal
+                if (isAdded()) {
+                    // El fragmento está adjunto a una actividad, es seguro llamar a getActivity()
+                    getActivity().runOnUiThread(() -> Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show());
+                }
+            } finally {
+                if (conexion != null) {
+                    try {
+                        conexion.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            return null;
+        }
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            // Después de que la tarea haya finalizado, oculta el ProgressBar
+            progressBar.setVisibility(View.GONE);
+        }
+    }
     //Métodos de enlace cardviews
     public void goNuevoProducto(){
         Bundle bundleNP = new Bundle();
@@ -115,7 +135,10 @@ public class PanelTiendaFragment extends Fragment {
         bundleNP.putInt("idT",idT);
         NewProductFragment newProductFragment = new NewProductFragment();
         newProductFragment.setArguments(bundleNP);
-        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,newProductFragment).addToBackStack(null).commit();
+        if (isAdded()) {
+            // El fragmento está adjunto a una actividad, es seguro llamar a getActivity()
+            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, newProductFragment).addToBackStack(null).commit();
+        }
     }
     public void goPerfilTienda(){
         Bundle bundlePT = new Bundle();
@@ -123,10 +146,13 @@ public class PanelTiendaFragment extends Fragment {
         bundlePT.putInt("idT",idT);
         PerfilTiendaFragment perfilTiendaFragment = new PerfilTiendaFragment();
         perfilTiendaFragment.setArguments(bundlePT);
-        getActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container,perfilTiendaFragment)
-                .addToBackStack(null)
-                .commit();
+        if (isAdded()) {
+            // El fragmento está adjunto a una actividad, es seguro llamar a getActivity()
+            getActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, perfilTiendaFragment)
+                    .addToBackStack(null)
+                    .commit();
+        }
     }
     public void goMisProductos(){
         Bundle bundleMP = new Bundle();
@@ -134,16 +160,22 @@ public class PanelTiendaFragment extends Fragment {
         bundleMP.putInt("idT",idT);
         MisProductosFragment misProductosFragment = new MisProductosFragment();
         misProductosFragment.setArguments(bundleMP);
-        getActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container,misProductosFragment)
-                .addToBackStack(null)
-                .commit();
+        if (isAdded()) {
+            // El fragmento está adjunto a una actividad, es seguro llamar a getActivity()
+            getActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, misProductosFragment)
+                    .addToBackStack(null)
+                    .commit();
+        }
     }
     public void goEliminarTienda(){
-        getActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container,new EliminarTiendaFragment())
-                .addToBackStack(null)
-                .commit();
+        if (isAdded()) {
+            // El fragmento está adjunto a una actividad, es seguro llamar a getActivity()
+            getActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, new EliminarTiendaFragment())
+                    .addToBackStack(null)
+                    .commit();
+        }
     }
 
 
