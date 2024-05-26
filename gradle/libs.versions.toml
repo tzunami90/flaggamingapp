@@ -11,6 +11,7 @@ constraintlayout = "2.1.4"
 ktx = "2.11.0"
 interceptor = "4.12.0"
 glide = "4.12.0"
+jsoup = "1.14.3"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -25,6 +26,7 @@ gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref 
 interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "interceptor" }
 jtds = { group = "net.sourceforge.jtds", name = "jtds", version.ref = "jtds"}
 glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
+jsoup = { group = "org.jsoup", name = "jsoup", version.ref = "jsoup" }
 
 
 [plugins]

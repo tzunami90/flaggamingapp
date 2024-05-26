@@ -1,15 +1,10 @@
 package com.beone.flagggaming.steamapi.details;
 
-import java.util.List;
 import com.google.gson.annotations.SerializedName;
 
-import javax.crypto.Mac;
-
-public class Data{
-	@SerializedName("steam_appid")
-	private int steamAppId;
-	@SerializedName("header_image")
-	private String headerImage;
+public class Data {
+	@SerializedName("name")
+	private String name;
 
 	@SerializedName("short_description")
 	private String shortDescription;
@@ -17,46 +12,36 @@ public class Data{
 	@SerializedName("pc_requirements")
 	private PcRequirements pcRequirements;
 
-	@SerializedName("price_overview")
-	private PriceOverview priceOverview;
-
-	@SerializedName("type")
-	private String type;
-
 	@SerializedName("is_free")
 	private boolean isFree;
 
-	@SerializedName("name")
-	private String name;
+	@SerializedName("price_overview")
+	private PriceOverview priceOverview;
 
-	public String getHeaderImage(){
-		return headerImage;
+	@SerializedName("header_image")
+	private String headerImage;
+
+	public String getName() {
+		return name;
 	}
 
-	public String getShortDescription(){
+	public String getShortDescription() {
 		return shortDescription;
 	}
 
-	public PcRequirements getPcRequirements(){
+	public PcRequirements getPcRequirements() {
 		return pcRequirements;
 	}
 
-	public PriceOverview getPriceOverview(){
-		return priceOverview;
-	}
-
-	public String getType(){
-		return type;
-	}
-	public boolean isIsFree(){
+	public boolean isIsFree() {
 		return isFree;
 	}
 
-	public String getName(){
-		return name;
-	}
-	public int getSteamAppId() {
-		return steamAppId;
+	public PriceOverview getPriceOverview() {
+		return priceOverview;
 	}
 
+	public String getHeaderImage() {
+		return headerImage;
+	}
 }

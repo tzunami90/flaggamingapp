@@ -41,6 +41,7 @@ dependencies {
     implementation(libs.interceptor)
     implementation(libs.jtds)
     implementation(libs.glide)
+    implementation(libs.jsoup)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
