@@ -86,10 +86,10 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/textView_short_description"
             android:layout_marginTop="8dp"
-            android:text="PC Requirements"
             android:inputType="textMultiLine"
             android:maxLines="50"
-            android:textSize="18sp" />
+            android:text="PC Requirements"
+            android:textSize="16sp" />
 
     </RelativeLayout>
 </ScrollView>
