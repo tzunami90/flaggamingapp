@@ -69,6 +69,7 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         new LoginTask().execute(email, password);
+
     }
 
     private class LoginTask extends AsyncTask<String, Void, Boolean> {
@@ -139,6 +140,11 @@ public class LoginActivity extends AppCompatActivity {
         }
         return false;
     }
+
+    public void openRegisterActivity(View v) {
+        Intent intent = new Intent(this, RegisterActivity.class);
+        startActivity(intent);
+    }
     //Conexion a SQL
     private Connection conDB() {
         try {
@@ -146,6 +152,9 @@ public class LoginActivity extends AppCompatActivity {
                     .permitAll().build();
             StrictMode.setThreadPolicy(policy);
             Class.forName("net.sourceforge.jtds.jdbc.Driver").newInstance();
+           //Conexion AWS
+            //return DriverManager.getConnection("jdbc:jtds:sqlserver://16.171.5.184:1433;instance=SQLEXPRESS;databaseName=flagg_test3;user=sa;password=Flagg2024;");
+           //Conexion Local
             return DriverManager.getConnection("jdbc:jtds:sqlserver://10.0.2.2:1433;instance=SQLEXPRESS;databaseName=flagg_test2;user=sa;password=Alexx2003;");
         } catch (Exception e) {
             e.printStackTrace();

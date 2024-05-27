@@ -216,6 +216,7 @@ public class MostrarJuegoSteam extends AppCompatActivity {
                 textView_priceARS.setText("");
                 textView_price3m.setText("");
             } else {
+                if (data.getPriceOverview() != null) {
                 textViewPrice.setText("Precio: " + (data.getPriceOverview() != null ? data.getPriceOverview().getFinalFormatted() : "No disponible"));
                 int precioFinalInt = data.getPriceOverview().getFinalPrice();
                 precioFinalDouble = precioFinalInt / 100.0;
@@ -223,6 +224,11 @@ public class MostrarJuegoSteam extends AppCompatActivity {
                 // Recalcular el precio si ya se obtuvieron los datos necesarios
                 if (isDolarDataFetched && isInflationDataFetched) {
                     recalcularPrecios();
+                }
+                } else {
+                    textViewPrice.setText("Precio: No disponible");
+                    textView_priceARS.setText("");
+                    textView_price3m.setText("");
                 }
             }
             cargarImagenJuego(data.getHeaderImage());
