@@ -42,10 +42,8 @@ dependencies {
     implementation(libs.jtds)
     implementation(libs.glide)
     implementation(libs.jsoup)
+    implementation(libs.bcrypt)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
-
-
-
 }

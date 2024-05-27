@@ -1,6 +1,7 @@
 package com.beone.flagggaming.usuario;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.text.TextUtils;
@@ -8,6 +9,7 @@ import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -21,6 +23,8 @@ import com.beone.flagggaming.R;
 import com.beone.flagggaming.db.DBHelper;
 import com.beone.flagggaming.usuario.LoginActivity;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -28,10 +32,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class RegisterActivity extends AppCompatActivity {
-    Connection conn;
-    String str;
     private EditText editTextFirstName, editTextLastName, editTextEmail, editTextPassword, editTextRepeatPassword;
     private Button buttonRegister;
+    private ProgressBar progressRegister;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,13 +48,9 @@ public class RegisterActivity extends AppCompatActivity {
         editTextPassword = findViewById(R.id.editTextPassword);
         editTextRepeatPassword = findViewById(R.id.editTextRepeatPassword);
         buttonRegister = findViewById(R.id.buttonRegister);
+        progressRegister = findViewById(R.id.progressRegister);
 
-        buttonRegister.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                register();
-            }
-        });
+        buttonRegister.setOnClickListener(this::registerButtonClicked);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.register), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -60,7 +59,7 @@ public class RegisterActivity extends AppCompatActivity {
         });
     }
 
-    private void register() {
+    private void registerButtonClicked(View v) {
         String firstName = editTextFirstName.getText().toString().trim();
         String lastName = editTextLastName.getText().toString().trim();
         String email = editTextEmail.getText().toString().trim();
@@ -134,32 +133,7 @@ public class RegisterActivity extends AppCompatActivity {
             return;
         }
 
-        // LOGICA REGISTRO SQL - Tabla Usuarios
-
-        try(Connection con = DBHelper.conDB(RegisterActivity.this)){
-            if (con == null) {
-                Toast.makeText(this, "ERROR DE CONEXION - Por favor reintente en unos momentos", Toast.LENGTH_SHORT).show();
-            }else{
-                PreparedStatement pst = con.prepareStatement("INSERT INTO usuarios  values(?,?,?,?,?)");
-                pst.setString(1,editTextFirstName.getText().toString());
-                pst.setString(2,editTextLastName.getText().toString());
-                pst.setString(3,editTextEmail.getText().toString());
-                pst.setString(4,editTextPassword.getText().toString());
-                pst.setString(5, "0");
-                int filasAfectadas = pst.executeUpdate();
-                if(filasAfectadas>0){
-                    Toast.makeText(this, "¡Registro exitoso!", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(this, LoginActivity.class);
-                    startActivity(intent);
-                } else{
-                    Toast.makeText(this, "ERROR - Reintente", Toast.LENGTH_SHORT).show();
-                }
-
-            }
-
-        } catch(SQLException e){
-            Toast.makeText(getApplicationContext(),e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
+        new RegisterTask().execute(firstName, lastName, email, password);
 
     }
     //////////////////////////////////////////////////////////////
@@ -181,5 +155,50 @@ public class RegisterActivity extends AppCompatActivity {
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
     }
+    private class RegisterTask extends AsyncTask<String, Void, Boolean> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressRegister.setVisibility(View.VISIBLE);
+            buttonRegister.setEnabled(false); // Disable register button to prevent multiple clicks
+        }
 
+        @Override
+        protected Boolean doInBackground(String... params) {
+            String firstName = params[0];
+            String lastName = params[1];
+            String email = params[2];
+            String password = params[3];
+            String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+
+            try (Connection con = DBHelper.conDB(RegisterActivity.this)) {
+                if (con != null) {
+                    PreparedStatement pst = con.prepareStatement("INSERT INTO USUARIOS (firstName, lastName, eMail, password, rolTienda) VALUES (?, ?, ?, ?, 0)");
+                    pst.setString(1, firstName);
+                    pst.setString(2, lastName);
+                    pst.setString(3, email);
+                    pst.setString(4, hashedPassword);
+                    int rowsAffected = pst.executeUpdate();
+                    return rowsAffected > 0;
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return false;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean success) {
+            progressRegister.setVisibility(View.GONE);
+            buttonRegister.setEnabled(true); // Re-enable register button
+            if (success) {
+                Toast.makeText(RegisterActivity.this, "Registro exitoso.", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
+            } else {
+                Toast.makeText(RegisterActivity.this, "Registro fallido.", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 }

@@ -17,6 +17,8 @@ import com.beone.flagggaming.HomeAcitivity;
 import com.beone.flagggaming.R;
 import com.beone.flagggaming.db.DBHelper;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -28,8 +30,6 @@ public class LoginActivity extends AppCompatActivity {
     private EditText editTextEmail, editTextPassword;
     private Button buttonLogin;
     ProgressBar progressLogin;
-
-    String name,mail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,13 +75,16 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private class LoginTask extends AsyncTask<String, Void, Boolean> {
-        String name, mail;
-        int id, rol;
+        private int id;
+        private String name;
+        private String mail;
+        private int rol;
 
         @Override
         protected void onPreExecute() {
+            super.onPreExecute();
             progressLogin.setVisibility(View.VISIBLE);
-            buttonLogin.setEnabled(false); // Disable login button while logging in
+            buttonLogin.setEnabled(false); // Disable login button to prevent multiple clicks
         }
 
         @Override
@@ -91,17 +94,19 @@ public class LoginActivity extends AppCompatActivity {
 
             try (Connection con = DBHelper.conDB(LoginActivity.this)) {
                 if (con != null) {
-                    PreparedStatement pst = con.prepareStatement("SELECT * FROM USUARIOS WHERE eMail = ? AND password = ?");
+                    PreparedStatement pst = con.prepareStatement("SELECT * FROM USUARIOS WHERE eMail = ?");
                     pst.setString(1, email);
-                    pst.setString(2, password);
                     ResultSet rs = pst.executeQuery();
 
                     if (rs.next()) {
-                        id = rs.getInt(1);
-                        name = rs.getString(2) + " " + rs.getString(3);
-                        mail = rs.getString(4);
-                        rol = rs.getInt(6);
-                        return true;
+                        String storedHashedPassword = rs.getString("password");
+                        if (BCrypt.checkpw(password, storedHashedPassword)) {
+                            id = rs.getInt("id");
+                            name = rs.getString("firstName") + " " + rs.getString("lastName");
+                            mail = rs.getString("eMail");
+                            rol = rs.getInt("rolTienda");
+                            return true;
+                        }
                     }
                 }
             } catch (SQLException e) {

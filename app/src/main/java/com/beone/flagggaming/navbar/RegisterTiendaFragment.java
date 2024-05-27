@@ -197,6 +197,7 @@ public class RegisterTiendaFragment extends Fragment {
             return;
         }
 
+
         // LOGICA REGISTRO SQL - Tabla Tiendas
         try (Connection connection = DBHelper.conDB(getContext())) {
             if (connection == null) {
@@ -204,7 +205,7 @@ public class RegisterTiendaFragment extends Fragment {
                 return;
             }
 
-            String insertQuery = "INSERT INTO tiendas (razon_social, cuit, nombre_fantasia, mail, password, direccion, horario, dias, telefono, instagram) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            String insertQuery = "INSERT INTO tiendas (razonSocial, cuit, name, mail, password, dir, hr, days, tel, insta) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             try (PreparedStatement pstTienda = connection.prepareStatement(insertQuery)) {
                 pstTienda.setString(1, rs);
                 pstTienda.setString(2, cuit);
@@ -216,6 +217,7 @@ public class RegisterTiendaFragment extends Fragment {
                 pstTienda.setString(8, days);
                 pstTienda.setString(9, tel);
                 pstTienda.setString(10, insta);
+               // pstTienda.setInt(11,0);
 
                 int rowsAffected = pstTienda.executeUpdate();
 
