@@ -18,6 +18,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.beone.flagggaming.HomeAcitivity;
 import com.beone.flagggaming.R;
+import com.beone.flagggaming.db.DBHelper;
 import com.beone.flagggaming.usuario.LoginActivity;
 
 import java.sql.Connection;
@@ -135,11 +136,11 @@ public class RegisterActivity extends AppCompatActivity {
 
         // LOGICA REGISTRO SQL - Tabla Usuarios
 
-        try{
-            if(conDB() == null){
+        try(Connection con = DBHelper.conDB(RegisterActivity.this)){
+            if (con == null) {
                 Toast.makeText(this, "ERROR DE CONEXION - Por favor reintente en unos momentos", Toast.LENGTH_SHORT).show();
             }else{
-                PreparedStatement pst = conDB().prepareStatement("INSERT INTO usuarios  values(?,?,?,?,?)");
+                PreparedStatement pst = con.prepareStatement("INSERT INTO usuarios  values(?,?,?,?,?)");
                 pst.setString(1,editTextFirstName.getText().toString());
                 pst.setString(2,editTextLastName.getText().toString());
                 pst.setString(3,editTextEmail.getText().toString());
@@ -179,25 +180,6 @@ public class RegisterActivity extends AppCompatActivity {
     public void openLoginActivity(View v) {
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
-    }
-
-    //Conexion a SQL
-    public Connection conDB(){
-        Connection conection = null;
-
-        try{
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-                    .permitAll().build();
-            StrictMode.setThreadPolicy(policy);
-            Class.forName("net.sourceforge.jtds.jdbc.Driver").newInstance();
-           //Conexion AWS
-            //conection = DriverManager.getConnection("jdbc:jtds:sqlserver://16.171.5.184:1433;instance=SQLEXPRESS;databaseName=flagg_test3;user=sa;password=Flagg2024;");
-            //Conexion Local
-            conection = DriverManager.getConnection("jdbc:jtds:sqlserver://10.0.2.2:1433;instance=SQLEXPRESS;databaseName=flagg_test2;user=sa;password=Alexx2003;");
-        } catch (Exception e){
-            Toast.makeText(getApplicationContext(),e.getMessage(),Toast.LENGTH_SHORT).show();
-        }
-        return conection;
     }
 
 }

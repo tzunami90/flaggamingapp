@@ -1,5 +1,7 @@
 package com.beone.flagggaming.db;
 
+import android.content.Context;
+import android.os.StrictMode;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -16,19 +18,26 @@ public class DBHelper {
 
     public static final String DB_URL = "jdbc:jtds:sqlserver://10.0.2.2:1433;instance=SQLEXPRESS;databaseName=flagg_test2;user=sa;password=Alexx2003;";
 
-    public static Connection conDB() throws SQLException {
+    public static Connection conDB(Context context) {
         Connection connection = null;
+
         try {
-            Class.forName("net.sourceforge.jtds.jdbc.Driver");
-            connection = DriverManager.getConnection(DB_URL);
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+                    .permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+            Class.forName("net.sourceforge.jtds.jdbc.Driver").newInstance();
+            // Conexion AWS o local
+            connection = DriverManager.getConnection("jdbc:jtds:sqlserver://16.171.5.184:1433;instance=SQLEXPRESS;databaseName=flagg_test3;user=sa;password=Flagg2024;");
+            // Conexion Local
+            // connection = DriverManager.getConnection("jdbc:jtds:sqlserver://10.0.2.2:1433;instance=SQLEXPRESS;databaseName=flagg_test2;user=sa;password=Alexx2003;");
+        } catch (Exception e) {
+            Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
         }
         return connection;
     }
 
-    public static void saveAppList(List<Juegos> appList) {
-        try (Connection connection = conDB()) {
+    public static void saveAppList(Context context, List<Juegos> appList) {
+        try (Connection connection = conDB(context)) {
             // Insertar los datos en la tabla (si no existen)
             String insertSQL = "INSERT INTO SteamList (appid, name, created_at) VALUES (?, ?, CURRENT_TIMESTAMP)";
             String selectSQL = "SELECT 1 FROM SteamList WHERE appid = ?";

@@ -121,7 +121,7 @@ public class ListaJuegosSteam extends AppCompatActivity {
     }
 
     public void grabarJuegos(){
-        DBHelper.saveAppList(listJuegos);
+        DBHelper.saveAppList(this, listJuegos);
     }
 
     private void searchGames(String query) {

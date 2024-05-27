@@ -15,6 +15,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.beone.flagggaming.R;
+import com.beone.flagggaming.db.DBHelper;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.sql.Connection;
@@ -63,7 +64,7 @@ public class PerfilTiendaFragment extends Fragment {
         btnActualizarPerfil = root.findViewById(R.id.btnModificarPerfil);
 
         // Establecer la conexión a la base de datos
-        conection = conDB();
+        conection = DBHelper.conDB(getContext());
 
         // Obtener y mostrar datos de la tienda
         new ObtenerDatosTiendaTask().execute();
@@ -72,21 +73,6 @@ public class PerfilTiendaFragment extends Fragment {
         btnActualizarPerfil.setOnClickListener(v -> actualizarDatosTienda());
 
         return root;
-    }
-
-    // Método para conectar a la base de datos
-    public Connection conDB() {
-        Connection con = null;
-        try {
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-                    .permitAll().build();
-            StrictMode.setThreadPolicy(policy);
-            Class.forName("net.sourceforge.jtds.jdbc.Driver").newInstance();
-            con = DriverManager.getConnection("jdbc:jtds:sqlserver://10.0.2.2:1433;instance=SQLEXPRESS;databaseName=flagg_test2;user=sa;password=Alexx2003;");
-        } catch (Exception e) {
-            Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
-        return con;
     }
 
     // Tarea asincrónica para obtener y mostrar los datos de la tienda
@@ -265,13 +251,13 @@ public class PerfilTiendaFragment extends Fragment {
 
 
         // Lógica para actualizar los datos en la base de datos
-        try {
-            if (conDB() == null) {
+        try{
+            if (conection == null) {
                 Toast.makeText(getContext(), "ERROR DE CONEXION - Por favor reintente en unos momentos", Toast.LENGTH_SHORT).show();
             } else {
                 // Construir la consulta SQL de actualización
                 String updateQuery = "UPDATE tiendas SET razonSocial=?, cuit=?, name=?, mail=?, password=?, dir=?, hr=?, days=?, tel=?, insta=? WHERE id=?";
-                PreparedStatement pstUpdate = conDB().prepareStatement(updateQuery);
+                PreparedStatement pstUpdate = conection.prepareStatement(updateQuery);
                 pstUpdate.setString(1, rs);
                 pstUpdate.setString(2, cuit);
                 pstUpdate.setString(3, name);

@@ -15,6 +15,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import com.beone.flagggaming.HomeAcitivity;
 import com.beone.flagggaming.R;
+import com.beone.flagggaming.db.DBHelper;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -87,7 +89,7 @@ public class LoginActivity extends AppCompatActivity {
             String email = params[0];
             String password = params[1];
 
-            try (Connection con = conDB()) {
+            try (Connection con = DBHelper.conDB(LoginActivity.this)) {
                 if (con != null) {
                     PreparedStatement pst = con.prepareStatement("SELECT * FROM USUARIOS WHERE eMail = ? AND password = ?");
                     pst.setString(1, email);
@@ -145,21 +147,6 @@ public class LoginActivity extends AppCompatActivity {
         Intent intent = new Intent(this, RegisterActivity.class);
         startActivity(intent);
     }
-    //Conexion a SQL
-    private Connection conDB() {
-        try {
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-                    .permitAll().build();
-            StrictMode.setThreadPolicy(policy);
-            Class.forName("net.sourceforge.jtds.jdbc.Driver").newInstance();
-           //Conexion AWS
-            //return DriverManager.getConnection("jdbc:jtds:sqlserver://16.171.5.184:1433;instance=SQLEXPRESS;databaseName=flagg_test3;user=sa;password=Flagg2024;");
-           //Conexion Local
-            return DriverManager.getConnection("jdbc:jtds:sqlserver://10.0.2.2:1433;instance=SQLEXPRESS;databaseName=flagg_test2;user=sa;password=Alexx2003;");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
+
 
 }
