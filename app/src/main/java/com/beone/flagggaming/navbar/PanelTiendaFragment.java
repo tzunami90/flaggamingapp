@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.beone.flagggaming.R;
+import com.beone.flagggaming.db.DBHelper;
 import com.beone.flagggaming.tiendas.EliminarTiendaFragment;
 import com.beone.flagggaming.tiendas.MisProductosFragment;
 import com.beone.flagggaming.tiendas.NewProductFragment;
@@ -71,13 +72,11 @@ public class PanelTiendaFragment extends Fragment {
         }
         @Override
         protected Void doInBackground(Void... voids) {
-            Connection conexion = null;
-            try {
-                conexion = conDB();
+            try (Connection conexion = DBHelper.conDB(getContext())) {
                 if (conexion != null) {
-                    PreparedStatement pstT = conexion.prepareStatement("SELECT * FROM usuarios_tiendas WHERE idU =" + idU + ";");
-                    pstT.executeQuery();
-                    ResultSet rsT = pstT.getResultSet();
+                    PreparedStatement pstT = conexion.prepareStatement("SELECT * FROM usuarios_tiendas WHERE idU = ?");
+                    pstT.setInt(1, idU);
+                    ResultSet rsT = pstT.executeQuery();
                     if (rsT.next()) {
                         idT = rsT.getInt(2);
                         // Actualizar el UI en el hilo principal
@@ -87,9 +86,9 @@ public class PanelTiendaFragment extends Fragment {
                         }
                     }
 
-                    PreparedStatement pst2 = conexion.prepareStatement("SELECT * FROM tiendas WHERE id =" + idT + ";");
-                    pst2.executeQuery();
-                    ResultSet rs2 = pst2.getResultSet();
+                    PreparedStatement pst2 = conexion.prepareStatement("SELECT * FROM tiendas WHERE id = ?");
+                    pst2.setInt(1, idT);
+                    ResultSet rs2 = pst2.executeQuery();
                     if (rs2.next()) {
                         String nombreTienda = rs2.getString(4);
                         // Actualizar el UI en el hilo principal
@@ -111,17 +110,10 @@ public class PanelTiendaFragment extends Fragment {
                     // El fragmento está adjunto a una actividad, es seguro llamar a getActivity()
                     getActivity().runOnUiThread(() -> Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show());
                 }
-            } finally {
-                if (conexion != null) {
-                    try {
-                        conexion.close();
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-                }
             }
             return null;
         }
+
         @Override
         protected void onPostExecute(Void aVoid) {
             // Después de que la tarea haya finalizado, oculta el ProgressBar
@@ -176,25 +168,5 @@ public class PanelTiendaFragment extends Fragment {
                     .addToBackStack(null)
                     .commit();
         }
-    }
-
-
-    //Conexion a SQL
-    public Connection conDB(){
-        Connection conection2 = null;
-
-        try{
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-                    .permitAll().build();
-            StrictMode.setThreadPolicy(policy);
-            Class.forName("net.sourceforge.jtds.jdbc.Driver").newInstance();
-            //Conexion AWS
-            conection2 = DriverManager.getConnection("jdbc:jtds:sqlserver://16.171.5.184:1433;instance=SQLEXPRESS;databaseName=flagg_test3;user=sa;password=Flagg2024;");
-            //Conexion Local
-            //conection2 = DriverManager.getConnection("jdbc:jtds:sqlserver://10.0.2.2:1433;instance=SQLEXPRESS;databaseName=flagg_test2;user=sa;password=Alexx2003;");
-        } catch (Exception e){
-            Toast.makeText(getContext(),e.getMessage(),Toast.LENGTH_SHORT).show();
-        }
-        return conection2;
     }
 }

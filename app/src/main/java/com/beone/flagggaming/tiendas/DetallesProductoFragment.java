@@ -20,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.beone.flagggaming.R;
+import com.beone.flagggaming.db.DBHelper;
 import com.beone.flagggaming.producto.Categoria;
 
 import java.sql.Connection;
@@ -31,7 +32,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DetallesProductoFragment extends Fragment {
-    Connection conection = null;
     private int idU, idP, idT;
     EditText editTextModifSkuTienda, editTextModifDescTienda, editTextModifMarca, editTextModifPrecioVta;
     Spinner spinnerModifCategoria;
@@ -101,41 +101,13 @@ public class DetallesProductoFragment extends Fragment {
 
     private class LoadDataAsyncTask extends AsyncTask<Void, Void, Void> {
 
-        private List<Categoria> categoriasList; // Aquí almacenaremos las categorías cargadas
+        private List<Categoria> categoriasList = new ArrayList<>(); // Inicializamos la lista aquí
+
 
         @Override
         protected Void doInBackground(Void... voids) {
-            categoriasList = new ArrayList<>(); // Inicializamos la lista de categorías aquí
-
-            try {
-                // Establecer conexión a la base de datos
-                conection = conDB();
-
-                // Consulta SQL para obtener las categorías
-                String query = "SELECT id_categoria, desc_categoria FROM categorias";
-                PreparedStatement statement = conection.prepareStatement(query);
-                ResultSet resultSet = statement.executeQuery();
-
-                // Recorrer los resultados y agregar las categorías a la lista
-                while (resultSet.next()) {
-                    int idCategoria = resultSet.getInt("id_categoria");
-                    String descCategoria = resultSet.getString("desc_categoria");
-                    Categoria categoria = new Categoria(idCategoria, descCategoria);
-                    categoriasList.add(categoria);
-                }
-
-                // Cerrar conexión y recursos
-                resultSet.close();
-                statement.close();
-                conection.close();
-            } catch (SQLException e) {
-                errorMessage = "Error al cargar las categorías: " + e.getMessage();
-                Log.e("Error", "Error al cargar las categorías", e);
-            }
-
-            // Llamar al método para cargar los datos del producto
+            cargarCategoriasDesdeBaseDeDatos();
             cargarDatosProducto();
-
             return null;
         }
 
@@ -159,15 +131,46 @@ public class DetallesProductoFragment extends Fragment {
             }
         }
     }
+    private void cargarCategoriasDesdeBaseDeDatos() {
+        try (Connection connection = DBHelper.conDB(getContext())) {
+            if (connection == null) {
+                errorMessage = "Error al conectar con la base de datos.";
+                Log.e("Error", errorMessage);
+                return;
+            }
 
+            // Consulta SQL para obtener las categorías
+            String query = "SELECT id_categoria, desc_categoria FROM categorias";
+            PreparedStatement statement = connection.prepareStatement(query);
+            ResultSet resultSet = statement.executeQuery();
+
+            // Recorrer los resultados y agregar las categorías a la lista
+            while (resultSet.next()) {
+                int idCategoria = resultSet.getInt("id_categoria");
+                String descCategoria = resultSet.getString("desc_categoria");
+                Categoria categoria = new Categoria(idCategoria, descCategoria);
+                categoriasList.add(categoria);
+            }
+
+            // Cerrar recursos
+            resultSet.close();
+            statement.close();
+        } catch (SQLException e) {
+            errorMessage = "Error al cargar las categorías: " + e.getMessage();
+            Log.e("Error", "Error al cargar las categorías", e);
+        }
+    }
     private void cargarDatosProducto() {
-        try {
-            // Establecer conexión a la base de datos
-            conection = conDB();
+        try (Connection connection = DBHelper.conDB(getContext())) {
+            if (connection == null) {
+                errorMessage = "Error al conectar con la base de datos.";
+                Log.e("Error", errorMessage);
+                return;
+            }
 
             // Consulta SQL para obtener los detalles del producto
             String query = "SELECT sku_tienda, desc_tienda, marca, precio_vta, estatus, id_categoria FROM productos WHERE id_interno_producto = ? AND id_tienda = ?";
-            PreparedStatement statement = conection.prepareStatement(query);
+            PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1, idP);
             statement.setInt(2, idT);
             ResultSet resultSet = statement.executeQuery();
@@ -204,7 +207,6 @@ public class DetallesProductoFragment extends Fragment {
             // Cerrar conexión y recursos
             resultSet.close();
             statement.close();
-            conection.close();
         } catch (SQLException e) {
             Toast.makeText(getContext(),e.getMessage(), Toast.LENGTH_SHORT).show();
             System.out.println(e.getMessage());
@@ -236,13 +238,16 @@ public class DetallesProductoFragment extends Fragment {
             return;
         }
 
-        try {
-            // Establecer conexión a la base de datos
-            conection = conDB();
+        try (Connection connection = DBHelper.conDB(getContext())) {
+            if (connection == null) {
+                errorMessage = "Error al conectar con la base de datos.";
+                Log.e("Error", errorMessage);
+                return;
+            }
 
             // Consulta SQL para actualizar el producto
             String query = "UPDATE productos SET sku_tienda = ?, desc_tienda = ?, marca = ?, precio_vta = ?, estatus = ?, id_categoria = ? WHERE id_interno_producto = ? AND id_tienda = ?";
-            PreparedStatement statementUpdate = conection.prepareStatement(query);
+            PreparedStatement statementUpdate = connection.prepareStatement(query);
             statementUpdate.setString(1, sku);
             statementUpdate.setString(2, descripcion);
             statementUpdate.setString(3, marca);
@@ -262,7 +267,6 @@ public class DetallesProductoFragment extends Fragment {
 
             // Cerrar conexión y recursos
             statementUpdate.close();
-            conection.close();
         } catch (SQLException e) {
             Toast.makeText(getContext(),e.getMessage(), Toast.LENGTH_SHORT).show();
             System.out.println(e.getMessage());
@@ -271,13 +275,16 @@ public class DetallesProductoFragment extends Fragment {
     }
 
     private void eliminarProducto() {
-        try {
-            // Establecer conexión a la base de datos
-            conection = conDB();
+        try (Connection connection = DBHelper.conDB(getContext())) {
+            if (connection == null) {
+                errorMessage = "Error al conectar con la base de datos.";
+                Log.e("Error", errorMessage);
+                return;
+            }
 
             // Consulta SQL para eliminar el producto
             String query = "DELETE FROM productos WHERE id_interno_producto = ? AND id_tienda = ?";
-            PreparedStatement statementDelete = conection.prepareStatement(query);
+            PreparedStatement statementDelete = connection.prepareStatement(query);
             statementDelete.setInt(1, idP);
             statementDelete.setInt(2, idT);
 
@@ -300,59 +307,9 @@ public class DetallesProductoFragment extends Fragment {
 
             // Cerrar conexión y recursos
             statementDelete.close();
-            conection.close();
         } catch (SQLException e) {
             Toast.makeText(getContext(), "Error al eliminar el producto: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             e.printStackTrace();
         }
-    }
-
-    private void cargarCategoriasDesdeBaseDeDatos() {
-        // Elimina la inicialización redundante de categoriasList aquí
-        // No es necesario inicializarla de nuevo
-
-        try {
-            // Establecer conexión a la base de datos
-            conection = conDB();
-
-            // Consulta SQL para obtener las categorías
-            String query = "SELECT id_categoria, desc_categoria FROM categorias";
-            PreparedStatement statement = conection.prepareStatement(query);
-            ResultSet resultSet = statement.executeQuery();
-
-            // Recorrer los resultados y agregar las categorías a la lista
-            while (resultSet.next()) {
-                int idCategoria = resultSet.getInt("id_categoria");
-                String descCategoria = resultSet.getString("desc_categoria");
-                Categoria categoria = new Categoria(idCategoria, descCategoria);
-                categoriasList.add(categoria);
-            }
-
-            // Cerrar conexión y recursos
-            resultSet.close();
-            statement.close();
-            conection.close();
-        } catch (SQLException e) {
-            errorMessage = "Error al cargar las categorías: " + e.getMessage();
-            Log.e("Error", "Error al cargar las categorías", e);
-        }
-    }
-
-    //Conexion a SQL
-    public Connection conDB(){
-
-        try{
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-                    .permitAll().build();
-            StrictMode.setThreadPolicy(policy);
-            Class.forName("net.sourceforge.jtds.jdbc.Driver").newInstance();
-            //Conexion AWS
-            conection = DriverManager.getConnection("jdbc:jtds:sqlserver://16.171.5.184:1433;instance=SQLEXPRESS;databaseName=flagg_test3;user=sa;password=Flagg2024;");
-            //Conexion Local
-            //conection = DriverManager.getConnection("jdbc:jtds:sqlserver://10.0.2.2:1433;instance=SQLEXPRESS;databaseName=flagg_test2;user=sa;password=Alexx2003;");
-        } catch (Exception e){
-            Toast.makeText(getContext(),e.getMessage(),Toast.LENGTH_SHORT).show();
-        }
-        return conection;
     }
 }

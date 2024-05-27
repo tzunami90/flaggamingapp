@@ -16,6 +16,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.beone.flagggaming.R;
+import com.beone.flagggaming.db.DBHelper;
 import com.beone.flagggaming.producto.Categoria;
 import com.beone.flagggaming.producto.Producto;
 import com.beone.flagggaming.producto.ProductoAdapter;
@@ -115,9 +116,12 @@ public class MisProductosFragment extends Fragment {
         PreparedStatement statement = null;
         ResultSet resultSet = null;
 
-        try {
-            // Obtener la conexión a la base de datos
-            conection = conDB();
+        //Conexion BD
+        try (Connection connection = DBHelper.conDB(getContext()))  {
+            if (connection == null) {
+                Toast.makeText(getContext(), "ERROR DE CONEXION - Por favor reintente en unos momentos", Toast.LENGTH_SHORT).show();
+                return productos;
+            }
 
             // Consulta SQL para seleccionar productos
             String query = "SELECT p.id_interno_producto, p.id_tienda, p.id_categoria, p.sku_tienda, p.desc_tienda, p.marca, p.precio_vta, p.estatus, c.desc_categoria " +
@@ -166,25 +170,5 @@ public class MisProductosFragment extends Fragment {
             }
         }
         return productos;
-    }
-
-
-    //Conexion a SQL
-    public Connection conDB(){
-
-        try{
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-                    .permitAll().build();
-            StrictMode.setThreadPolicy(policy);
-            Class.forName("net.sourceforge.jtds.jdbc.Driver").newInstance();
-            //Conexion AWS
-            conection = DriverManager.getConnection("jdbc:jtds:sqlserver://16.171.5.184:1433;instance=SQLEXPRESS;databaseName=flagg_test3;user=sa;password=Flagg2024;");
-            //Conexion Local
-            //conection = DriverManager.getConnection("jdbc:jtds:sqlserver://10.0.2.2:1433;instance=SQLEXPRESS;databaseName=flagg_test2;user=sa;password=Alexx2003;");
-        } catch (Exception e){
-            Toast.makeText(getContext(),e.getMessage(),Toast.LENGTH_SHORT).show();
-            e.printStackTrace();
-        }
-        return conection;
     }
 }

@@ -18,6 +18,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.beone.flagggaming.R;
+import com.beone.flagggaming.db.DBHelper;
 import com.beone.flagggaming.producto.Producto;
 import com.beone.flagggaming.producto.Categoria;
 
@@ -37,7 +38,6 @@ public class NewProductFragment extends Fragment {
     Button buttonAgregarProducto;
     CheckBox checkBoxEstatus;
     private boolean estatusProducto = true; // Por defecto, producto activo
-    Connection conection = null;
     int idU, idT;
 
     public NewProductFragment(){
@@ -86,10 +86,6 @@ public class NewProductFragment extends Fragment {
     }
 
     private void cargarCategoriasDesdeBaseDeDatos() {
-        // Aquí deberías implementar la lógica para recuperar las categorías de tu base de datos
-        // Por ejemplo, podrías usar una consulta SQL para obtener las categorías y luego agregarlas a la lista categoriasList
-        // Supongamos que tienes un método obtenerCategoriasDesdeBaseDeDatos() que devuelve una lista de objetos Categoria
-        // Implementa este método según tu lógica de base de datos
         categoriasList = obtenerCategoriasDesdeBaseDeDatos();
         // Agregar un elemento adicional para "Seleccione una categoría"
         Categoria categoriaSeleccione = new Categoria(0, "Seleccione una categoría");
@@ -107,12 +103,12 @@ public class NewProductFragment extends Fragment {
     // Método simulado para obtener categorías desde la base de datos
     private List<Categoria> obtenerCategoriasDesdeBaseDeDatos() {
         List<Categoria> categorias = new ArrayList<>();
-        try {
-            if(conDB() == null){
+        try (Connection connection = DBHelper.conDB(getContext())){
+            if(connection == null){
                 Toast.makeText(getContext(), "ERROR DE CONEXION - Por favor reintente en unos momentos", Toast.LENGTH_SHORT).show();
             }else {
                 String selectQuery = "SELECT id_categoria, desc_categoria FROM categorias";
-                PreparedStatement pstSelect = conDB().prepareStatement(selectQuery);
+                PreparedStatement pstSelect = connection.prepareStatement(selectQuery);
                 ResultSet resultSet = pstSelect.executeQuery();
 
                 while (resultSet.next()) {
@@ -132,23 +128,6 @@ public class NewProductFragment extends Fragment {
         return categorias;
     }
 
-    //Conexion a SQL
-    public Connection conDB(){
-
-        try{
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-                    .permitAll().build();
-            StrictMode.setThreadPolicy(policy);
-            Class.forName("net.sourceforge.jtds.jdbc.Driver").newInstance();
-            //Conexion AWS
-            conection = DriverManager.getConnection("jdbc:jtds:sqlserver://16.171.5.184:1433;instance=SQLEXPRESS;databaseName=flagg_test3;user=sa;password=Flagg2024;");
-            //Conexion Local
-            //conection = DriverManager.getConnection("jdbc:jtds:sqlserver://10.0.2.2:1433;instance=SQLEXPRESS;databaseName=flagg_test2;user=sa;password=Alexx2003;");
-        } catch (Exception e){
-            Toast.makeText(getContext(),e.getMessage(),Toast.LENGTH_SHORT).show();
-        }
-        return conection;
-    }
 
     //Método para crear el producto en la BD
     private void crearProducto(){
@@ -187,14 +166,14 @@ public class NewProductFragment extends Fragment {
         }
 
         // Crear el producto en la base de datos
-        try {
-            if (conDB() == null) {
+        try (Connection connection = DBHelper.conDB(getContext())) {
+            if (connection == null) {
                 Toast.makeText(getContext(), "ERROR DE CONEXION - Por favor reintente en unos momentos", Toast.LENGTH_SHORT).show();
                 return;
             } else {
                 // Consulta SQL para insertar el producto en la base de datos
                 String insertQuery = "INSERT INTO productos (id_tienda, id_categoria, sku_tienda, desc_tienda, marca, precio_vta, estatus) VALUES (?, ?, ?, ?, ?, ?, ?)";
-                PreparedStatement pstInsert = conDB().prepareStatement(insertQuery);
+                PreparedStatement pstInsert = connection.prepareStatement(insertQuery);
                 pstInsert.setInt(1, idT); // ID de la tienda
                 pstInsert.setInt(2, categoriaSeleccionada.getId_categoria()); // ID de la categoría seleccionada
                 pstInsert.setString(3, skuTienda); // SKU de la tienda
@@ -229,18 +208,22 @@ public class NewProductFragment extends Fragment {
     // Método para obtener la cantidad de productos creados por el usuario
     private int obtenerCantidadProductosCreados() {
         int cantidadProductos = 0;
-        try {
-            // Realizar una consulta SQL para contar los productos creados por el usuario
-            String selectQuery = "SELECT COUNT(*) AS cantidad FROM productos WHERE id_tienda = ?";
-            PreparedStatement pstSelect = conDB().prepareStatement(selectQuery);
-            pstSelect.setInt(1, idT);
-            ResultSet resultSet = pstSelect.executeQuery();
+        try (Connection connection = DBHelper.conDB(getContext())) {
+            if (connection == null) {
+                Toast.makeText(getContext(), "ERROR DE CONEXION - Por favor reintente en unos momentos", Toast.LENGTH_SHORT).show();
+            } else {
+                // Realizar una consulta SQL para contar los productos creados por el usuario
+                String selectQuery = "SELECT COUNT(*) AS cantidad FROM productos WHERE id_tienda = ?";
+                PreparedStatement pstSelect = connection.prepareStatement(selectQuery);
+                pstSelect.setInt(1, idT);
+                ResultSet resultSet = pstSelect.executeQuery();
 
-            if (resultSet.next()) {
-                cantidadProductos = resultSet.getInt("cantidad");
+                if (resultSet.next()) {
+                    cantidadProductos = resultSet.getInt("cantidad");
+                }
+
+                pstSelect.close();
             }
-
-            pstSelect.close();
         } catch (SQLException e) {
             Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
             Log.d("Error", e.getMessage());
@@ -252,20 +235,24 @@ public class NewProductFragment extends Fragment {
     // Método para verificar si la tienda tiene una suscripción premium
     private boolean verificarSuscripcionPremium() {
         boolean tieneSuscripcionPremium = false;
-        try {
-            // Realizar una consulta SQL para obtener el estado de la suscripción premium de la tienda del usuario
-            String selectQuery = "SELECT premium FROM tiendas WHERE id = ?";
-            PreparedStatement pstSelect = conDB().prepareStatement(selectQuery);
-            pstSelect.setInt(1, idT);
-            ResultSet resultSet = pstSelect.executeQuery();
+        try (Connection connection = DBHelper.conDB(getContext())) {
+            if (connection == null) {
+                Toast.makeText(getContext(), "ERROR DE CONEXION - Por favor reintente en unos momentos", Toast.LENGTH_SHORT).show();
+            } else {
+                // Realizar una consulta SQL para obtener el estado de la suscripción premium de la tienda del usuario
+                String selectQuery = "SELECT premium FROM tiendas WHERE id = ?";
+                PreparedStatement pstSelect = connection.prepareStatement(selectQuery);
+                pstSelect.setInt(1, idT);
+                ResultSet resultSet = pstSelect.executeQuery();
 
-            if (resultSet.next()) {
-                // Obtener el valor del campo premium de la consulta
-                int premium = resultSet.getInt("premium");
-                tieneSuscripcionPremium = (premium == 1); // Si premium es 1, la tienda tiene suscripción premium
+                if (resultSet.next()) {
+                    // Obtener el valor del campo premium de la consulta
+                    int premium = resultSet.getInt("premium");
+                    tieneSuscripcionPremium = (premium == 1); // Si premium es 1, la tienda tiene suscripción premium
+                }
+
+                pstSelect.close();
             }
-
-            pstSelect.close();
         } catch (SQLException e) {
             Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
             Log.d("Error", e.getMessage());

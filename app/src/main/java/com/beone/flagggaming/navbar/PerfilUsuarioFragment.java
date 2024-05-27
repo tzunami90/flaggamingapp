@@ -16,6 +16,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.beone.flagggaming.R;
+import com.beone.flagggaming.db.DBHelper;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -24,7 +25,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class PerfilUsuarioFragment extends Fragment {
-    Connection conection = null;
     int idU;
     EditText editTextFirstNameModif, editTextLastNameModif, editTextEmailModif, editTextPasswordModif, editTextRepeatPasswordModif;
     Button buttonModifcarUsuario;
@@ -97,42 +97,22 @@ public class PerfilUsuarioFragment extends Fragment {
         }
     }
 
-    // Método para conectar a la base de datos
-    public Connection conDB() {
-        conection = null;
-        try {
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-                    .permitAll().build();
-            StrictMode.setThreadPolicy(policy);
-            Class.forName("net.sourceforge.jtds.jdbc.Driver").newInstance();
-            //Conexion AWS
-            conection = DriverManager.getConnection("jdbc:jtds:sqlserver://16.171.5.184:1433;instance=SQLEXPRESS;databaseName=flagg_test3;user=sa;password=Flagg2024;");
-            //Conexion Local
-            //conection = DriverManager.getConnection("jdbc:jtds:sqlserver://10.0.2.2:1433;instance=SQLEXPRESS;databaseName=flagg_test2;user=sa;password=Alexx2003;");
-        } catch (Exception e) {
-            Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
-        return conection;
-    }
-
     // Método para cargar datos del usuario desde la base de datos
     private void cargarDatosUsuario() {
-        try {
-            conection = conDB();
-            if (conection != null) {
-                PreparedStatement statement = conection.prepareStatement("SELECT firstName, lastName, eMail, password FROM usuarios WHERE id = ?");
+        try (Connection connection = DBHelper.conDB(getContext())) {
+            if (connection != null) {
+                PreparedStatement statement = connection.prepareStatement("SELECT firstName, lastName, eMail, password FROM usuarios WHERE id = ?");
                 statement.setInt(1, idU);
                 ResultSet resultSet = statement.executeQuery();
 
                 if (resultSet.next()) {
-                   firstName = resultSet.getString("firstName");
-                   lastName = resultSet.getString("lastName");
-                   email = resultSet.getString("eMail");
-                   password = resultSet.getString("password");
+                    firstName = resultSet.getString("firstName");
+                    lastName = resultSet.getString("lastName");
+                    email = resultSet.getString("eMail");
+                    password = resultSet.getString("password");
                 }
-                statement.close();
                 resultSet.close();
-                conection.close();
+                statement.close();
             } else {
                 Toast.makeText(getContext(), "Error de conexión a la base de datos", Toast.LENGTH_SHORT).show();
             }
@@ -184,10 +164,9 @@ public class PerfilUsuarioFragment extends Fragment {
             return;
         }
 
-        try {
-            conection = conDB();
-            if (conection != null) {
-                PreparedStatement statementUpdate = conection.prepareStatement("UPDATE usuarios SET firstName = ?, lastName = ?, eMail = ?, password = ? WHERE id = ?");
+        try (Connection connection = DBHelper.conDB(getContext())) {
+            if (connection != null) {
+                PreparedStatement statementUpdate = connection.prepareStatement("UPDATE usuarios SET firstName = ?, lastName = ?, eMail = ?, password = ? WHERE id = ?");
                 statementUpdate.setString(1, firstName);
                 statementUpdate.setString(2, lastName);
                 statementUpdate.setString(3, email);
@@ -203,15 +182,12 @@ public class PerfilUsuarioFragment extends Fragment {
                 }
 
                 statementUpdate.close();
-                conection.close();
             } else {
                 Toast.makeText(getContext(), "Error de conexión a la base de datos", Toast.LENGTH_SHORT).show();
             }
         } catch (SQLException e) {
-            Toast.makeText(getContext(),e.getMessage(), Toast.LENGTH_SHORT).show();
-            System.out.println(e.getMessage());
+            Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
             Log.d("Error", e.getMessage());
         }
     }
-
 }

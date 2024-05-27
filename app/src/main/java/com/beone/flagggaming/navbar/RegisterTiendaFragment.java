@@ -25,6 +25,7 @@ import android.widget.Toast;
 
 import com.beone.flagggaming.HomeAcitivity;
 import com.beone.flagggaming.R;
+import com.beone.flagggaming.db.DBHelper;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -39,9 +40,6 @@ public class RegisterTiendaFragment extends Fragment {
     int idU,idT;
     EditText edtRazonsocial, edtCuit, edtName, edtMail, edtPass, edtDir, edtHr, edtDays, edtTel, edtInsta;
     Button btnSolicitud;
-    Layout mainpopup;
-    Connection conection = null;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -200,58 +198,56 @@ public class RegisterTiendaFragment extends Fragment {
         }
 
         // LOGICA REGISTRO SQL - Tabla Tiendas
-        try{
-            if(conDB() == null){
+        try (Connection connection = DBHelper.conDB(getContext())) {
+            if (connection == null) {
                 Toast.makeText(getContext(), "ERROR DE CONEXION - Por favor reintente en unos momentos", Toast.LENGTH_SHORT).show();
-            }else{
-                PreparedStatement pstTienda = conDB().prepareStatement("INSERT INTO tiendas values(?,?,?,?,?,?,?,?,?,?)");
-                pstTienda.setString(1,edtRazonsocial.getText().toString());
-                pstTienda.setString(2,edtCuit.getText().toString());
-                pstTienda.setString(3,edtName.getText().toString());
-                pstTienda.setString(4,edtMail.getText().toString());
-                pstTienda.setString(5,edtPass.getText().toString());
-                pstTienda.setString(6,edtDir.getText().toString());
-                pstTienda.setString(7,edtHr.getText().toString());
-                pstTienda.setString(8,edtDays.getText().toString());
-                pstTienda.setString(9,edtTel.getText().toString());
-                pstTienda.setString(10,edtInsta.getText().toString());
+                return;
+            }
+
+            String insertQuery = "INSERT INTO tiendas (razon_social, cuit, nombre_fantasia, mail, password, direccion, horario, dias, telefono, instagram) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            try (PreparedStatement pstTienda = connection.prepareStatement(insertQuery)) {
+                pstTienda.setString(1, rs);
+                pstTienda.setString(2, cuit);
+                pstTienda.setString(3, name);
+                pstTienda.setString(4, mail);
+                pstTienda.setString(5, pass);
+                pstTienda.setString(6, dir);
+                pstTienda.setString(7, hr);
+                pstTienda.setString(8, days);
+                pstTienda.setString(9, tel);
+                pstTienda.setString(10, insta);
 
                 int rowsAffected = pstTienda.executeUpdate();
-                pstTienda.close();
 
-                if(rowsAffected == 1){
+                if (rowsAffected == 1) {
                     String selectQuery = "SELECT id FROM tiendas WHERE mail = ?";
-                    PreparedStatement pstSelect = conDB().prepareStatement(selectQuery);
-                    pstSelect.setString(1, edtMail.getText().toString());
-                    ResultSet resultSet = pstSelect.executeQuery();
+                    try (PreparedStatement pstSelect = connection.prepareStatement(selectQuery)) {
+                        pstSelect.setString(1, mail);
+                        try (ResultSet resultSet = pstSelect.executeQuery()) {
+                            if (resultSet.next()) {
+                                idT = resultSet.getInt("id");
+                                String insertUsuariosTiendas = "INSERT INTO usuarios_tiendas (idU, idT, active) VALUES (?, ?, ?)";
+                                try (PreparedStatement pstUsuariosTiendas = connection.prepareStatement(insertUsuariosTiendas)) {
+                                    pstUsuariosTiendas.setInt(1, idU);
+                                    pstUsuariosTiendas.setInt(2, idT);
+                                    pstUsuariosTiendas.setInt(3, 0);
+                                    pstUsuariosTiendas.executeUpdate();
 
-                    if(resultSet.next()){
-                        idT = resultSet.getInt("id");
-                        PreparedStatement pstUsuariosTiendas = conDB().prepareStatement("INSERT INTO usuarios_tiendas (idU,idT,active) values (?,?,?)");
-                        pstUsuariosTiendas.setInt(1,idU);
-                        pstUsuariosTiendas.setInt(2, idT);
-                        pstUsuariosTiendas.setInt(3,0);
-                        pstUsuariosTiendas.executeUpdate();
-                        pstUsuariosTiendas.close();
+                                    Toast.makeText(getContext(), "Solicitud Recibida. Número tienda: " + idT, Toast.LENGTH_SHORT).show();
 
-
-                        Toast.makeText(getContext(), "Solicitud Recibida. Número tienda: "+idT, Toast.LENGTH_SHORT).show();
-
-                        //EL usuario tendrá rol tienda cuando FLAGG active la tienda en la tabla usuarios_tienda.
-                        //Existe un TRIGGER que actualiza el rol del usuario ni bien se active la tienda en la BD:
-
-                                //Redireccion a Fragment HOME
-                                getActivity().getSupportFragmentManager().beginTransaction()
-                                        .replace(R.id.fragment_container,new HomeFragment())
-                                        .addToBackStack(null)
-                                        .commit();
-
+                                    // Redireccion a Fragment HOME
+                                    getActivity().getSupportFragmentManager().beginTransaction()
+                                            .replace(R.id.fragment_container, new HomeFragment())
+                                            .addToBackStack(null)
+                                            .commit();
+                                }
+                            }
+                        }
                     }
                 }
-                }
-        } catch(SQLException e){
-            Toast.makeText(getContext(),e.getMessage(), Toast.LENGTH_SHORT).show();
-            System.out.println(e.getMessage());
+            }
+        } catch (SQLException e) {
+            Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
             Log.d("Error", e.getMessage());
         }
     }
@@ -267,23 +263,4 @@ public class RegisterTiendaFragment extends Fragment {
         }
         return false;
     }
-
-    //Conexion a SQL
-    public Connection conDB(){
-
-        try{
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-                    .permitAll().build();
-            StrictMode.setThreadPolicy(policy);
-            Class.forName("net.sourceforge.jtds.jdbc.Driver").newInstance();
-            //Conexion AWS
-            conection = DriverManager.getConnection("jdbc:jtds:sqlserver://16.171.5.184:1433;instance=SQLEXPRESS;databaseName=flagg_test3;user=sa;password=Flagg2024;");
-            //Conexion Local
-            //conection = DriverManager.getConnection("jdbc:jtds:sqlserver://10.0.2.2:1433;instance=SQLEXPRESS;databaseName=flagg_test2;user=sa;password=Alexx2003;");
-        } catch (Exception e){
-            Toast.makeText(getContext(),e.getMessage(),Toast.LENGTH_SHORT).show();
-        }
-        return conection;
-    }
-
 }
