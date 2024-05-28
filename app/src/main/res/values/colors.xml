@@ -7,4 +7,5 @@
         <item name="android:background">@color/colorBoton</item>
     </style>
     <color name="flagg">#FF5530</color>
+    <color name="colorAccent">#FF4081</color>
 </resources>

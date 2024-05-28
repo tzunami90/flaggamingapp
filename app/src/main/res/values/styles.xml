@@ -8,4 +8,7 @@
         <item name="colorPrimaryVariant">@color/flagg</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
+    <style name="Widget.AppCompat.ProgressBar" parent="android:Widget.ProgressBar">
+        <item name="android:indeterminateDrawable">@drawable/progress_medium</item>
+    </style>
 </resources>

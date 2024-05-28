@@ -12,8 +12,18 @@
 
         <item
             android:id="@+id/nav_steamList"
-            android:icon="@drawable/steamic"
+            android:icon="@drawable/steamic2"
             android:title="Listado Steam"/>
+
+        <item
+            android:id="@+id/nav_epicList"
+            android:icon="@drawable/epicic"
+            android:title="Listado Epic"/>
+
+        <item
+            android:id="@+id/nav_hardware"
+            android:icon="@drawable/hardwareic"
+            android:title="Hardware"/>
 
         <item
             android:id="@+id/nav_registro_tiendas"

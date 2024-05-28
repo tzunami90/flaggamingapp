@@ -21,11 +21,13 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
+import com.beone.flagggaming.epicapi.ListaJuegosEpic;
 import com.beone.flagggaming.navbar.AboutUsFragment;
 import com.beone.flagggaming.navbar.HomeFragment;
 import com.beone.flagggaming.navbar.PanelTiendaFragment;
 import com.beone.flagggaming.navbar.PerfilUsuarioFragment;
 import com.beone.flagggaming.navbar.RegisterTiendaFragment;
+import com.beone.flagggaming.producto.ListaHardware;
 import com.beone.flagggaming.steamapi.ListaJuegosSteam;
 import com.beone.flagggaming.usuario.LoginActivity;
 import com.beone.flagggaming.usuario.RegisterActivity;
@@ -118,6 +120,10 @@ public class HomeAcitivity extends AppCompatActivity implements NavigationView.O
             navigationView.setCheckedItem(R.id.nav_home);
         } else if(itemId == R.id.nav_steamList) {
             startActivity(new Intent(this, ListaJuegosSteam.class));
+        } else if(itemId == R.id.nav_epicList) {
+            startActivity(new Intent(this, ListaJuegosEpic.class));
+        } else if(itemId == R.id.nav_hardware) {
+            startActivity(new Intent(this, ListaHardware.class));
         } else if((itemId == R.id.nav_registro_tiendas) && (rol == 0)) {
             Bundle bundleR = new Bundle();
             bundleR.putInt("idU",idU);
