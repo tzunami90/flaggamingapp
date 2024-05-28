@@ -46,7 +46,7 @@ public class ListaHardware extends AppCompatActivity {
         new LoadProductsTask().execute();
 
         filteredList.addAll(productoList);
-        productoClienteAdapter = new ProductoClienteAdapter(filteredList);
+        productoClienteAdapter = new ProductoClienteAdapter(filteredList, this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(productoClienteAdapter);
 

@@ -12,6 +12,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
 
 public class DBHelper {
@@ -62,6 +63,35 @@ public class DBHelper {
             Log.d("Error", e.getMessage());
         }
 
+    }
+
+    public static HashMap<String, String> getTiendaById(Context context, int idTienda) {
+        HashMap<String, String> tiendaData = new HashMap<>();
+
+        try (Connection connection = conDB(context)) {
+            // Consulta para obtener los datos de la tienda por ID
+            String query = "SELECT [dir], [hr], [mail], [days], [tel], [insta] FROM [tiendas] WHERE [id] = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, idTienda);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                // Obtener los datos de la tienda del resultado de la consulta y agregarlos al HashMap
+                tiendaData.put("dir", resultSet.getString("dir"));
+                tiendaData.put("days", resultSet.getString("days"));
+                tiendaData.put("hr", resultSet.getString("hr"));
+                tiendaData.put("mail", resultSet.getString("mail"));
+                tiendaData.put("tel", resultSet.getString("tel"));
+                tiendaData.put("insta", resultSet.getString("insta"));
+            }
+
+            resultSet.close();
+            statement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return tiendaData;
     }
 
 }

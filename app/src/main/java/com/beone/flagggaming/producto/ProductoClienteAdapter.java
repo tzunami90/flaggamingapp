@@ -1,4 +1,6 @@
 package com.beone.flagggaming.producto;
+import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,18 +20,11 @@ import java.sql.ResultSet;
 import java.util.List;
 public class ProductoClienteAdapter extends RecyclerView.Adapter<ProductoClienteAdapter.ProductoClienteViewHolder> {
     private List<Producto> productosList;
-    private OnItemClickListener mListener;
+    private Context context;
 
-    public ProductoClienteAdapter(List<Producto> productosList) {
+    public ProductoClienteAdapter(List<Producto> productosList, Context context) {
+        this.context = context;
         this.productosList = productosList;
-    }
-
-    public interface OnItemClickListener {
-        void onItemClick(int productId);
-    }
-
-    public void setOnItemClickListener(OnItemClickListener listener) {
-        mListener = listener;
     }
 
     @NonNull
@@ -44,15 +39,17 @@ public class ProductoClienteAdapter extends RecyclerView.Adapter<ProductoCliente
         Producto producto = productosList.get(position);
         holder.bind(producto);
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                int clickedPosition = holder.getAdapterPosition();
-                if (mListener != null && clickedPosition != RecyclerView.NO_POSITION) {
-                    int productId = productosList.get(clickedPosition).getIdInternoProducto();
-                    mListener.onItemClick(productId);
-                }
-            }
+        holder.itemView.setOnClickListener(view -> {
+            Intent intent = new Intent(context, ProductoDetalle.class);
+            intent.putExtra("skuTienda", producto.getSkuTienda());
+            intent.putExtra("descTienda", producto.getDescTienda());
+            intent.putExtra("marca", producto.getMarca());
+            intent.putExtra("precioVta", producto.getPrecioVta().toString());
+            intent.putExtra("idCategoria", producto.getIdCategoria());
+            intent.putExtra("categoriaDesc", producto.getCategoria().getDesc_categoria());
+            intent.putExtra("tiendaNombre", producto.getTiendaNombre());
+            intent.putExtra("idTienda", producto.getIdTienda());
+            context.startActivity(intent);
         });
     }
 
@@ -61,7 +58,7 @@ public class ProductoClienteAdapter extends RecyclerView.Adapter<ProductoCliente
         return productosList.size();
     }
 
-       public static class ProductoClienteViewHolder extends RecyclerView.ViewHolder {
+    public static class ProductoClienteViewHolder extends RecyclerView.ViewHolder {
         private TextView textViewIDProducto;
         private TextView textViewProductDescription;
         private TextView textViewProductPrice;
@@ -87,6 +84,35 @@ public class ProductoClienteAdapter extends RecyclerView.Adapter<ProductoCliente
             textViewCategoria.setText(producto.getCategoria().getDesc_categoria());
             textViewTiendaNombre.setText(producto.getTiendaNombre());
             imageViewCategoria.setImageResource(producto.getCategoria().getCategoriaImageResource());
+        }
+
+        private int getCategoriaImageResource(int idCategoria) {
+            switch (idCategoria) {
+                case 1:
+                    return R.drawable.cat1;
+                case 2:
+                    return R.drawable.cat2;
+                case 3:
+                    return R.drawable.cat3;
+                case 4:
+                    return R.drawable.cat4;
+                case 5:
+                    return R.drawable.cat5;
+                case 6:
+                    return R.drawable.cat6;
+                case 7:
+                    return R.drawable.cat7;
+                case 8:
+                    return R.drawable.cat8;
+                case 9:
+                    return R.drawable.cat9;
+                case 10:
+                    return R.drawable.cat10;
+                case 11:
+                    return R.drawable.cat11;
+                default:
+                    return R.drawable.nopic;
+            }
         }
     }
 }
