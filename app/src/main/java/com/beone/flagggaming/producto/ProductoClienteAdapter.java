@@ -3,6 +3,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -60,12 +61,14 @@ public class ProductoClienteAdapter extends RecyclerView.Adapter<ProductoCliente
         return productosList.size();
     }
 
-    public static class ProductoClienteViewHolder extends RecyclerView.ViewHolder {
+       public static class ProductoClienteViewHolder extends RecyclerView.ViewHolder {
         private TextView textViewIDProducto;
         private TextView textViewProductDescription;
         private TextView textViewProductPrice;
         private TextView textViewCategoria;
         private TextView textViewTiendaNombre;
+        private ImageView imageViewCategoria;
+
 
         public ProductoClienteViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -74,6 +77,7 @@ public class ProductoClienteAdapter extends RecyclerView.Adapter<ProductoCliente
             textViewProductPrice = itemView.findViewById(R.id.textViewProductPrice);
             textViewCategoria = itemView.findViewById(R.id.textViewCategoria);
             textViewTiendaNombre = itemView.findViewById(R.id.textViewTiendaNombre);
+            imageViewCategoria = itemView.findViewById(R.id.imageViewCategoria);
         }
 
         public void bind(Producto producto) {
@@ -82,6 +86,7 @@ public class ProductoClienteAdapter extends RecyclerView.Adapter<ProductoCliente
             textViewProductPrice.setText("$" + producto.getPrecioVta());
             textViewCategoria.setText(producto.getCategoria().getDesc_categoria());
             textViewTiendaNombre.setText(producto.getTiendaNombre());
+            imageViewCategoria.setImageResource(producto.getCategoria().getCategoriaImageResource());
         }
     }
 }
