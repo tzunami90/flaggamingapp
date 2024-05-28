@@ -1,5 +1,8 @@
 package com.beone.flagggaming.producto;
 
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
@@ -10,14 +13,19 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.beone.flagggaming.R;
 import com.beone.flagggaming.db.DBHelper;
 
 import java.util.HashMap;
+import java.util.List;
 
 public class ProductoDetalle extends AppCompatActivity {
 
@@ -33,6 +41,9 @@ public class ProductoDetalle extends AppCompatActivity {
     private TextView textViewTiendaMail;
     private TextView textViewTiendaTel;
     private TextView textViewTiendaInsta;
+    private ImageView iconAbrirEnMaps;
+
+    private TextView abrirmaps;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,6 +63,8 @@ public class ProductoDetalle extends AppCompatActivity {
         textViewTiendaMail = findViewById(R.id.textViewTiendaMail);
         textViewTiendaTel = findViewById(R.id.textViewTiendaTel);
         textViewTiendaInsta = findViewById(R.id.textViewTiendaInsta);
+        iconAbrirEnMaps = findViewById(R.id.iconAbrirEnMaps);
+        abrirmaps = findViewById(R.id.abrirmaps);
 
         Intent intent = getIntent();
 
@@ -78,12 +91,26 @@ public class ProductoDetalle extends AppCompatActivity {
 
             new ProductoDetalle.LoadTiendaTask().execute();
         }
+        iconAbrirEnMaps.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                abrirEnMaps();
+            }
+        });
+        abrirmaps.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                abrirGoogleMapsDirecto();
+            }
+        });
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.layoutproductodetalle), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+
     }
 
     private int getCategoriaImageResource(int idCategoria) {
@@ -133,8 +160,71 @@ public class ProductoDetalle extends AppCompatActivity {
                 textViewTiendaTel.setText("Teléfono de Tienda: " + tiendaData.get("tel"));
                 textViewTiendaInsta.setText("Instagram: " + tiendaData.get("insta"));
 
+                // Hacer visible el ícono para abrir en Google Maps y en Instagram
+                iconAbrirEnMaps.setVisibility(View.VISIBLE);
+
             }
         }
     }
 
+    public void abrirEnMaps() {
+        Log.d("ProductoDetalle", "Método abrirEnMaps llamado");
+        String direccion = textViewTiendaDireccion.getText().toString().replace("Dirección: ", "");
+        Log.d("ProductoDetalle", "Dirección obtenida: " + direccion);
+        if (!direccion.isEmpty()) {
+            Uri gmmIntentUri = Uri.parse("geo:0,0?q=" + Uri.encode(direccion));
+
+            // Crear Intent para Google Maps
+            Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+            mapIntent.setPackage("com.google.android.apps.maps");
+
+            // Verificar si Google Maps puede manejar el Intent
+            if (mapIntent.resolveActivity(getPackageManager()) != null) {
+                Log.d("ProductoDetalle", "Intent resuelto con Google Maps, iniciando actividad...");
+                startActivity(mapIntent);
+            } else {
+                Log.d("ProductoDetalle", "Google Maps no puede manejar el Intent, buscando otras aplicaciones de mapas...");
+
+                // Intent genérico para cualquier aplicación de mapas
+                mapIntent.setPackage(null);
+                if (mapIntent.resolveActivity(getPackageManager()) != null) {
+                    Log.d("ProductoDetalle", "Intent resuelto con otra aplicación de mapas, iniciando actividad...");
+                    startActivity(mapIntent);
+                } else {
+                    Log.d("ProductoDetalle", "No se encontró ninguna aplicación de mapas, abriendo en el navegador...");
+
+                    // Intent para abrir en el navegador web
+                    String mapQuery = "http://maps.google.com/maps?q=" + Uri.encode(direccion);
+                    Uri webIntentUri = Uri.parse(mapQuery);
+                    Intent webIntent = new Intent(Intent.ACTION_VIEW, webIntentUri);
+
+                    if (webIntent.resolveActivity(getPackageManager()) != null) {
+                        Log.d("ProductoDetalle", "Intent resuelto con navegador web, iniciando actividad...");
+                        startActivity(webIntent);
+                    } else {
+                        Log.d("ProductoDetalle", "No se encontró ninguna aplicación para manejar el Intent.");
+                        Toast.makeText(this, "Por favor, instale Google Maps para ver la dirección.", Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+        } else {
+            Log.d("ProductoDetalle", "La dirección está vacía.");
+            Toast.makeText(this, "La dirección está vacía.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    // Método separado para probar Google Maps con una URI simplificada
+    public void abrirGoogleMapsDirecto() {
+        Uri gmmIntentUri = Uri.parse("geo:0,0?q=Buenos+Aires");
+        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+        mapIntent.setPackage("com.google.android.apps.maps");
+
+        if (mapIntent.resolveActivity(getPackageManager()) != null) {
+            Log.d("ProductoDetalle", "Google Maps puede manejar el Intent, iniciando actividad...");
+            startActivity(mapIntent);
+        } else {
+            Log.d("ProductoDetalle", "Google Maps no puede manejar el Intent.");
+            Toast.makeText(this, "Google Maps no puede manejar el Intent.", Toast.LENGTH_LONG).show();
+        }
+    }
 }

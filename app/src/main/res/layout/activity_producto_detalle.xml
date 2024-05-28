@@ -98,4 +98,31 @@
         android:layout_height="wrap_content"
         android:textSize="18sp" />
 
+    <ImageView
+        android:id="@+id/iconAbrirEnMaps"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/icgooglemaps"
+        android:contentDescription="@string/abrir_en_google_maps"
+        android:clickable="true"
+        android:visibility="gone" />
+    <ImageView
+        android:id="@+id/iconAbrirInsta"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/icinsta"
+        android:contentDescription="@string/abrir_en_instagram"
+        android:clickable="true"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/abrirmaps"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="ABRIR GOOGLE MAPS"
+        android:onClick="abrirGoogleMapsDirecto"
+        android:textSize="18sp" />
+
 </LinearLayout>
