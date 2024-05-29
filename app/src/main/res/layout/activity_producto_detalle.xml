@@ -135,6 +135,15 @@
             android:clickable="true"
             android:visibility="gone" />
 
+        <ImageView
+            android:id="@+id/iconAbrirTel"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/icphone"
+            android:contentDescription="@string/abrir_telefono"
+            android:clickable="true"
+            android:visibility="gone" />
+
     </LinearLayout>
 
 </LinearLayout>

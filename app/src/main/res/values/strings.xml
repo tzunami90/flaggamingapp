@@ -11,4 +11,6 @@
     <string name="abrir_en_google_maps">Redireccion a Google Maps</string>
     <string name="abrir_en_instagram">Redireccion a Instagram</string>
     <string name="abrir_mail">Redireccion a Mail</string>
+    <string name="abrir_telefono">Redireccion a Llamada</string>
+
 </resources>

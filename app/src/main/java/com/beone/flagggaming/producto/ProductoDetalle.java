@@ -41,7 +41,7 @@ public class ProductoDetalle extends AppCompatActivity {
     private TextView textViewTiendaMail;
     private TextView textViewTiendaTel;
     private TextView textViewTiendaInsta;
-    private ImageView iconAbrirEnMaps, iconAbrirInsta, iconAbrirMail ;
+    private ImageView iconAbrirEnMaps, iconAbrirInsta, iconAbrirMail, iconAbrirTel ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +65,7 @@ public class ProductoDetalle extends AppCompatActivity {
         iconAbrirEnMaps = findViewById(R.id.iconAbrirEnMaps);
         iconAbrirInsta = findViewById(R.id.iconAbrirInsta);
         iconAbrirMail = findViewById(R.id.iconAbrirMail);
+        iconAbrirTel = findViewById(R.id.iconAbrirTel);
 
 
         Intent intent = getIntent();
@@ -110,7 +111,12 @@ public class ProductoDetalle extends AppCompatActivity {
                 abrirCorreo();
             }
         });
-
+        iconAbrirTel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                abrirTelefono();
+            }
+        });
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.layoutproductodetalle), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -168,14 +174,11 @@ public class ProductoDetalle extends AppCompatActivity {
                 textViewTiendaTel.setText("Teléfono de Tienda: " + tiendaData.get("tel"));
                 textViewTiendaInsta.setText("Instagram: " + tiendaData.get("insta"));
 
-                // Hacer visible el ícono para abrir en Google Maps y en Instagram
+                // Hacer visible los iconos de redireccion
                 iconAbrirEnMaps.setVisibility(View.VISIBLE);
-                if (!tiendaData.get("mail").isEmpty()) {
-                    iconAbrirMail.setVisibility(View.VISIBLE);
-                }
-                if (!tiendaData.get("insta").isEmpty()) {
-                    iconAbrirInsta.setVisibility(View.VISIBLE);
-                }
+                iconAbrirInsta.setVisibility(View.VISIBLE);
+                iconAbrirMail.setVisibility(View.VISIBLE);
+                iconAbrirTel.setVisibility(View.VISIBLE);
 
             }
         }
@@ -230,7 +233,7 @@ public class ProductoDetalle extends AppCompatActivity {
                 }
             }
         } else {
-            Toast.makeText(this, "El nombre de usuario de Instagram está vacío.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "La tienda no tiene Instagram o no la registró.", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -250,6 +253,22 @@ public class ProductoDetalle extends AppCompatActivity {
             }
         } else {
             Toast.makeText(this, "La dirección de correo está vacía.", Toast.LENGTH_SHORT).show();
+        }
+    }
+    //Metodo para hacer llamada a la tienda
+    public void abrirTelefono() {
+        Log.d("ProductoDetalle", "Método abrirTelefono llamado");
+        String telefono = textViewTiendaTel.getText().toString();
+        if (!telefono.isEmpty()) {
+            Intent callIntent = new Intent(Intent.ACTION_DIAL);
+            callIntent.setData(Uri.parse("tel:" + telefono));
+            if (callIntent.resolveActivity(getPackageManager()) != null) {
+                startActivity(callIntent);
+            } else {
+                Toast.makeText(this, "No se encontró ninguna aplicación para manejar el Intent.", Toast.LENGTH_LONG).show();
+            }
+        } else {
+            Toast.makeText(this, "El número de teléfono está vacío.", Toast.LENGTH_SHORT).show();
         }
     }
 }
