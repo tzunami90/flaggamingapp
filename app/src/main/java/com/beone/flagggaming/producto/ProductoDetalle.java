@@ -42,6 +42,7 @@ public class ProductoDetalle extends AppCompatActivity {
     private TextView textViewTiendaTel;
     private TextView textViewTiendaInsta;
     private ImageView iconAbrirEnMaps, iconAbrirInsta, iconAbrirMail, iconAbrirTel ;
+    private String address, subject;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,7 +109,8 @@ public class ProductoDetalle extends AppCompatActivity {
         iconAbrirMail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                abrirCorreo();
+                subject = "Contacto desde Flagg Gaming";
+                abrirCorreo(address, subject);
             }
         });
         iconAbrirTel.setOnClickListener(new View.OnClickListener() {
@@ -174,6 +176,8 @@ public class ProductoDetalle extends AppCompatActivity {
                 textViewTiendaTel.setText("Teléfono de Tienda: " + tiendaData.get("tel"));
                 textViewTiendaInsta.setText("Instagram: " + tiendaData.get("insta"));
 
+                address = tiendaData.get("mail");
+
                 // Hacer visible los iconos de redireccion
                 iconAbrirEnMaps.setVisibility(View.VISIBLE);
                 iconAbrirInsta.setVisibility(View.VISIBLE);
@@ -193,19 +197,8 @@ public class ProductoDetalle extends AppCompatActivity {
 
             // Crear Intent para Google Maps
             Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+            startActivity(mapIntent);
 
-            // Verificar si hay una aplicación que pueda manejar el Intent
-            PackageManager packageManager = getPackageManager();
-            List<ResolveInfo> activities = packageManager.queryIntentActivities(mapIntent, PackageManager.MATCH_DEFAULT_ONLY);
-            boolean isIntentSafe = activities.size() > 0;
-
-            if (isIntentSafe) {
-                Log.d("ProductoDetalle", "Intent resuelto, iniciando actividad...");
-                startActivity(mapIntent);
-            } else {
-                Log.d("ProductoDetalle", "No se encontró ninguna aplicación para manejar el Intent.");
-                Toast.makeText(this, "No se encontró ninguna aplicación para manejar el Intent.", Toast.LENGTH_LONG).show();
-            }
         } else {
             Log.d("ProductoDetalle", "La dirección está vacía.");
             Toast.makeText(this, "La dirección está vacía.", Toast.LENGTH_SHORT).show();
@@ -218,42 +211,25 @@ public class ProductoDetalle extends AppCompatActivity {
         if (!username.isEmpty()) {
             Uri uri = Uri.parse("https://www.instagram.com/" + username);
             Intent instagramIntent = new Intent(Intent.ACTION_VIEW, uri);
-            instagramIntent.setPackage("com.instagram.android");
-
-            // Verificar si Instagram está instalado y puede manejar el Intent
-            if (instagramIntent.resolveActivity(getPackageManager()) != null) {
-                startActivity(instagramIntent);
-            } else {
-                // Si Instagram no está instalado, abrir en el navegador
-                Intent webIntent = new Intent(Intent.ACTION_VIEW, uri);
-                if (webIntent.resolveActivity(getPackageManager()) != null) {
-                    startActivity(webIntent);
-                } else {
-                    Toast.makeText(this, "No se encontró ninguna aplicación para manejar el Intent.", Toast.LENGTH_LONG).show();
-                }
-            }
+            startActivity(instagramIntent);
         } else {
             Toast.makeText(this, "La tienda no tiene Instagram o no la registró.", Toast.LENGTH_SHORT).show();
         }
     }
 
     //Metodo para enviar un correo a la tienda
-    public void abrirCorreo() {
-        String email = textViewTiendaMail.getText().toString().replace("Mail de Tienda: ", "").trim();
-        if (!email.isEmpty()) {
-            Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
-            emailIntent.setData(Uri.parse("mailto:" + email));
-            emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Contacto desde Flagg Gaming");
+    public void abrirCorreo(String address, String subject) {
+        Log.d("Correo", "Mail destinatario: " + address);
+        Log.d("Correo", "Subject: " + subject);
 
-            // Verificar si hay una aplicación que pueda manejar el Intent
-            if (emailIntent.resolveActivity(getPackageManager()) != null) {
-                startActivity(emailIntent);
-            } else {
-                Toast.makeText(this, "No se encontró ninguna aplicación de correo para manejar el Intent.", Toast.LENGTH_LONG).show();
-            }
-        } else {
-            Toast.makeText(this, "La dirección de correo está vacía.", Toast.LENGTH_SHORT).show();
-        }
+        // Sanitizar los valores y codificarlos para que sean seguros en la URI
+        String sanitizedAddress = Uri.encode(address.trim());
+        String sanitizedSubject = Uri.encode(subject.trim());
+
+        Uri uri = Uri.parse("mailto:" + sanitizedAddress + "?subject=" + sanitizedSubject);
+
+        Intent mail = new Intent(Intent.ACTION_SENDTO, uri);
+        startActivity(mail);
     }
     //Metodo para hacer llamada a la tienda
     public void abrirTelefono() {
