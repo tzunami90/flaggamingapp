@@ -41,9 +41,8 @@ public class ProductoDetalle extends AppCompatActivity {
     private TextView textViewTiendaMail;
     private TextView textViewTiendaTel;
     private TextView textViewTiendaInsta;
-    private ImageView iconAbrirEnMaps;
+    private ImageView iconAbrirEnMaps, iconAbrirInsta, iconAbrirMail ;
 
-    private TextView abrirmaps;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,7 +63,9 @@ public class ProductoDetalle extends AppCompatActivity {
         textViewTiendaTel = findViewById(R.id.textViewTiendaTel);
         textViewTiendaInsta = findViewById(R.id.textViewTiendaInsta);
         iconAbrirEnMaps = findViewById(R.id.iconAbrirEnMaps);
-        abrirmaps = findViewById(R.id.abrirmaps);
+        iconAbrirInsta = findViewById(R.id.iconAbrirInsta);
+        iconAbrirMail = findViewById(R.id.iconAbrirMail);
+
 
         Intent intent = getIntent();
 
@@ -97,12 +98,19 @@ public class ProductoDetalle extends AppCompatActivity {
                 abrirEnMaps();
             }
         });
-        abrirmaps.setOnClickListener(new View.OnClickListener() {
+        iconAbrirInsta.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                abrirGoogleMapsDirecto();
+            public void onClick(View v) {
+                abrirEnInstagram();
             }
         });
+        iconAbrirMail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                abrirCorreo();
+            }
+        });
+
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.layoutproductodetalle), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -162,6 +170,12 @@ public class ProductoDetalle extends AppCompatActivity {
 
                 // Hacer visible el ícono para abrir en Google Maps y en Instagram
                 iconAbrirEnMaps.setVisibility(View.VISIBLE);
+                if (!tiendaData.get("mail").isEmpty()) {
+                    iconAbrirMail.setVisibility(View.VISIBLE);
+                }
+                if (!tiendaData.get("insta").isEmpty()) {
+                    iconAbrirInsta.setVisibility(View.VISIBLE);
+                }
 
             }
         }
@@ -176,36 +190,18 @@ public class ProductoDetalle extends AppCompatActivity {
 
             // Crear Intent para Google Maps
             Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-            mapIntent.setPackage("com.google.android.apps.maps");
 
-            // Verificar si Google Maps puede manejar el Intent
-            if (mapIntent.resolveActivity(getPackageManager()) != null) {
-                Log.d("ProductoDetalle", "Intent resuelto con Google Maps, iniciando actividad...");
+            // Verificar si hay una aplicación que pueda manejar el Intent
+            PackageManager packageManager = getPackageManager();
+            List<ResolveInfo> activities = packageManager.queryIntentActivities(mapIntent, PackageManager.MATCH_DEFAULT_ONLY);
+            boolean isIntentSafe = activities.size() > 0;
+
+            if (isIntentSafe) {
+                Log.d("ProductoDetalle", "Intent resuelto, iniciando actividad...");
                 startActivity(mapIntent);
             } else {
-                Log.d("ProductoDetalle", "Google Maps no puede manejar el Intent, buscando otras aplicaciones de mapas...");
-
-                // Intent genérico para cualquier aplicación de mapas
-                mapIntent.setPackage(null);
-                if (mapIntent.resolveActivity(getPackageManager()) != null) {
-                    Log.d("ProductoDetalle", "Intent resuelto con otra aplicación de mapas, iniciando actividad...");
-                    startActivity(mapIntent);
-                } else {
-                    Log.d("ProductoDetalle", "No se encontró ninguna aplicación de mapas, abriendo en el navegador...");
-
-                    // Intent para abrir en el navegador web
-                    String mapQuery = "http://maps.google.com/maps?q=" + Uri.encode(direccion);
-                    Uri webIntentUri = Uri.parse(mapQuery);
-                    Intent webIntent = new Intent(Intent.ACTION_VIEW, webIntentUri);
-
-                    if (webIntent.resolveActivity(getPackageManager()) != null) {
-                        Log.d("ProductoDetalle", "Intent resuelto con navegador web, iniciando actividad...");
-                        startActivity(webIntent);
-                    } else {
-                        Log.d("ProductoDetalle", "No se encontró ninguna aplicación para manejar el Intent.");
-                        Toast.makeText(this, "Por favor, instale Google Maps para ver la dirección.", Toast.LENGTH_LONG).show();
-                    }
-                }
+                Log.d("ProductoDetalle", "No se encontró ninguna aplicación para manejar el Intent.");
+                Toast.makeText(this, "No se encontró ninguna aplicación para manejar el Intent.", Toast.LENGTH_LONG).show();
             }
         } else {
             Log.d("ProductoDetalle", "La dirección está vacía.");
@@ -213,18 +209,47 @@ public class ProductoDetalle extends AppCompatActivity {
         }
     }
 
-    // Método separado para probar Google Maps con una URI simplificada
-    public void abrirGoogleMapsDirecto() {
-        Uri gmmIntentUri = Uri.parse("geo:0,0?q=Buenos+Aires");
-        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-        mapIntent.setPackage("com.google.android.apps.maps");
+    // Método para abrir Instagram con el nombre de usuario
+    private void abrirEnInstagram() {
+        String username = textViewTiendaInsta.getText().toString().replace("Instagram: ", "").trim();
+        if (!username.isEmpty()) {
+            Uri uri = Uri.parse("https://www.instagram.com/" + username);
+            Intent instagramIntent = new Intent(Intent.ACTION_VIEW, uri);
+            instagramIntent.setPackage("com.instagram.android");
 
-        if (mapIntent.resolveActivity(getPackageManager()) != null) {
-            Log.d("ProductoDetalle", "Google Maps puede manejar el Intent, iniciando actividad...");
-            startActivity(mapIntent);
+            // Verificar si Instagram está instalado y puede manejar el Intent
+            if (instagramIntent.resolveActivity(getPackageManager()) != null) {
+                startActivity(instagramIntent);
+            } else {
+                // Si Instagram no está instalado, abrir en el navegador
+                Intent webIntent = new Intent(Intent.ACTION_VIEW, uri);
+                if (webIntent.resolveActivity(getPackageManager()) != null) {
+                    startActivity(webIntent);
+                } else {
+                    Toast.makeText(this, "No se encontró ninguna aplicación para manejar el Intent.", Toast.LENGTH_LONG).show();
+                }
+            }
         } else {
-            Log.d("ProductoDetalle", "Google Maps no puede manejar el Intent.");
-            Toast.makeText(this, "Google Maps no puede manejar el Intent.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "El nombre de usuario de Instagram está vacío.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    //Metodo para enviar un correo a la tienda
+    public void abrirCorreo() {
+        String email = textViewTiendaMail.getText().toString().replace("Mail de Tienda: ", "").trim();
+        if (!email.isEmpty()) {
+            Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
+            emailIntent.setData(Uri.parse("mailto:" + email));
+            emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Contacto desde Flagg Gaming");
+
+            // Verificar si hay una aplicación que pueda manejar el Intent
+            if (emailIntent.resolveActivity(getPackageManager()) != null) {
+                startActivity(emailIntent);
+            } else {
+                Toast.makeText(this, "No se encontró ninguna aplicación de correo para manejar el Intent.", Toast.LENGTH_LONG).show();
+            }
+        } else {
+            Toast.makeText(this, "La dirección de correo está vacía.", Toast.LENGTH_SHORT).show();
         }
     }
 }
