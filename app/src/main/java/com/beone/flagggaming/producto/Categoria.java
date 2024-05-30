@@ -45,6 +45,7 @@ public class Categoria {
         }
     }
 
+
     @Override
     public String toString() {
         return desc_categoria; // Esto es importante para que el Spinner muestre la descripción de la categoría en lugar del objeto completo

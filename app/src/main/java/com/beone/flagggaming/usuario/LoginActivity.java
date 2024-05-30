@@ -1,9 +1,11 @@
 package com.beone.flagggaming.usuario;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -131,6 +133,8 @@ public class LoginActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(LoginActivity.this, "Mail y/o Contraseña incorrectos", Toast.LENGTH_SHORT).show();
             }
+            // Oculta el teclado virtual después de mostrar el Toast
+            hideKeyboard();
         }
     }
 
@@ -153,5 +157,12 @@ public class LoginActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-
+    // Método para ocultar el teclado virtual
+    private void hideKeyboard() {
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+    }
 }

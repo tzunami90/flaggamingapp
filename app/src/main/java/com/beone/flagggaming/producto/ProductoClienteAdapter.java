@@ -17,14 +17,17 @@ import com.beone.flagggaming.producto.Producto;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.List;
 public class ProductoClienteAdapter extends RecyclerView.Adapter<ProductoClienteAdapter.ProductoClienteViewHolder> {
     private List<Producto> productosList;
+    private List<Producto> productosListFull;
     private Context context;
 
     public ProductoClienteAdapter(List<Producto> productosList, Context context) {
         this.context = context;
         this.productosList = productosList;
+        this.productosListFull = new ArrayList<>(productosList); // Copia completa de los datos
     }
 
     @NonNull
@@ -86,33 +89,26 @@ public class ProductoClienteAdapter extends RecyclerView.Adapter<ProductoCliente
             imageViewCategoria.setImageResource(producto.getCategoria().getCategoriaImageResource());
         }
 
-        private int getCategoriaImageResource(int idCategoria) {
-            switch (idCategoria) {
-                case 1:
-                    return R.drawable.cat1;
-                case 2:
-                    return R.drawable.cat2;
-                case 3:
-                    return R.drawable.cat3;
-                case 4:
-                    return R.drawable.cat4;
-                case 5:
-                    return R.drawable.cat5;
-                case 6:
-                    return R.drawable.cat6;
-                case 7:
-                    return R.drawable.cat7;
-                case 8:
-                    return R.drawable.cat8;
-                case 9:
-                    return R.drawable.cat9;
-                case 10:
-                    return R.drawable.cat10;
-                case 11:
-                    return R.drawable.cat11;
-                default:
-                    return R.drawable.nopic;
+    }
+    public void updateList(List<Producto> newList) {
+        productosList = newList;
+        notifyDataSetChanged();
+    }
+
+    public void filterByTextAndCategory(String text, int categoryId) {
+        List<Producto> filteredList = new ArrayList<>();
+        for (Producto producto : productosListFull) {
+            boolean matchesText = producto.getSkuTienda().toLowerCase().contains(text.toLowerCase()) ||
+                    producto.getDescTienda().toLowerCase().contains(text.toLowerCase()) ||
+                    producto.getMarca().toLowerCase().contains(text.toLowerCase()) ||
+                    producto.getCategoria().getDesc_categoria().toLowerCase().contains(text.toLowerCase()) ||
+                    producto.getTiendaNombre().toLowerCase().contains(text.toLowerCase());
+            boolean matchesCategory = categoryId == 0 || producto.getIdCategoria() == categoryId;
+
+            if (matchesText && matchesCategory) {
+                filteredList.add(producto);
             }
         }
+        updateList(filteredList);
     }
 }
