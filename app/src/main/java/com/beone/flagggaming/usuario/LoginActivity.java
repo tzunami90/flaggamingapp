@@ -52,6 +52,9 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
     public void loginButtonClicked(View v) {
+        // Oculta el teclado virtual inmediatamente después de hacer clic en el botón
+        hideKeyboard();
+
         String email = editTextEmail.getText().toString().trim();
         String password = editTextPassword.getText().toString().trim();
 
@@ -133,8 +136,6 @@ public class LoginActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(LoginActivity.this, "Mail y/o Contraseña incorrectos", Toast.LENGTH_SHORT).show();
             }
-            // Oculta el teclado virtual después de mostrar el Toast
-            hideKeyboard();
         }
     }
 
