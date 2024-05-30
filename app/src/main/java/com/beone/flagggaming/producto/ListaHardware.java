@@ -70,7 +70,9 @@ public class ListaHardware extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                filtrarProductos(newText,  (Categoria) spinnerCategorias.getSelectedItem());
+                Categoria selectedCategory = (Categoria) spinnerCategorias.getSelectedItem();
+                int categoryId = selectedCategory != null ? selectedCategory.getId_categoria() : 0;
+                filtrarProductos(newText, categoryId);
                 return true;
             }
         });
@@ -78,11 +80,15 @@ public class ListaHardware extends AppCompatActivity {
         spinnerCategorias.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                filtrarProductos(searchView.getQuery().toString(), (Categoria) parent.getSelectedItem());
+                Categoria selectedCategory = (Categoria) parent.getSelectedItem();
+                int categoryId = selectedCategory != null ? selectedCategory.getId_categoria() : 0;
+                filtrarProductos(searchView.getQuery().toString(), categoryId);
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
+                // Filtrar productos con categoría por defecto (todas las categorías)
+                filtrarProductos(searchView.getQuery().toString(), 0);
             }
         });
 
@@ -94,22 +100,21 @@ public class ListaHardware extends AppCompatActivity {
         });
     }
 
-    private void filtrarProductos(String texto, Categoria categoria) {
-        filteredList.clear();
-        if (TextUtils.isEmpty(texto) && (categoria == null || categoria.getId_categoria() == 0)) {
-            filteredList.addAll(productoList);
-        } else {
-            for (Producto producto : productoList) {
-                boolean matchesText = producto.getDescTienda().toLowerCase().contains(texto.toLowerCase()) ||
-                        producto.getMarca().toLowerCase().contains(texto.toLowerCase());
-                boolean matchesCategory = categoria == null || producto.getIdCategoria() == categoria.getId_categoria();
+    private void filtrarProductos(String texto, int categoriaId) {
+        List<Producto> filteredList = new ArrayList<>();
+        for (Producto producto : productoList) {
+            boolean matchesText = producto.getSkuTienda().toLowerCase().contains(texto.toLowerCase()) ||
+                    producto.getDescTienda().toLowerCase().contains(texto.toLowerCase()) ||
+                    producto.getMarca().toLowerCase().contains(texto.toLowerCase()) ||
+                    producto.getCategoria().getDesc_categoria().toLowerCase().contains(texto.toLowerCase()) ||
+                    producto.getTiendaNombre().toLowerCase().contains(texto.toLowerCase());
+            boolean matchesCategory = categoriaId == 0 || producto.getIdCategoria() == categoriaId;
 
-                if (matchesText && matchesCategory) {
-                    filteredList.add(producto);
-                }
+            if (matchesText && matchesCategory) {
+                filteredList.add(producto);
             }
         }
-        productoClienteAdapter.notifyDataSetChanged();
+        productoClienteAdapter.updateList(filteredList);
     }
 
     private void showProgressBar() {
@@ -119,6 +124,8 @@ public class ListaHardware extends AppCompatActivity {
     private void hideProgressBar() {
         if (categoriesLoaded && productsLoaded) {
             progressBar.setVisibility(View.GONE);
+            // Llamar a filtrarProductos para mostrar todos los productos inicialmente
+            filtrarProductos("", 0);
         }
     }
     private class LoadCategoriesTask extends AsyncTask<Void, Void, List<Categoria>> {
@@ -218,6 +225,8 @@ public class ListaHardware extends AppCompatActivity {
             filteredList.clear();
             filteredList.addAll(productos);
             productoClienteAdapter.notifyDataSetChanged();
+            // Llamar a filtrarProductos para mostrar todos los productos inicialmente
+            filtrarProductos("", 0);
         }
     }
 }
