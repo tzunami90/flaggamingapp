@@ -43,6 +43,8 @@ dependencies {
     implementation(libs.glide)
     implementation(libs.jsoup)
     implementation(libs.bcrypt)
+    implementation(libs.maps)
+    implementation(libs.mapsUtils)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

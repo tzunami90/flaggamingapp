@@ -21,6 +21,15 @@ public class TiendaAdapter extends RecyclerView.Adapter<TiendaAdapter.TiendaView
 
     private List<Tienda> tiendaList;
     private List<Tienda> tiendaListFull;
+    private OnItemClickListener listener;
+
+    public interface OnItemClickListener {
+        void onItemClick(Tienda tienda);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
+    }
 
     public TiendaAdapter(List<Tienda> tiendaList) {
         this.tiendaList = tiendaList;
@@ -32,7 +41,7 @@ public class TiendaAdapter extends RecyclerView.Adapter<TiendaAdapter.TiendaView
     public TiendaViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.tienda_item, parent, false);
-        return new TiendaViewHolder(itemView);
+        return new TiendaViewHolder(itemView, this);
     }
 
     @Override
@@ -95,7 +104,7 @@ public class TiendaAdapter extends RecyclerView.Adapter<TiendaAdapter.TiendaView
     static class TiendaViewHolder extends RecyclerView.ViewHolder {
         TextView name, mail, dir, days, hr, insta;
 
-        TiendaViewHolder(View itemView) {
+        TiendaViewHolder(View itemView, final TiendaAdapter adapter) {
             super(itemView);
             name = itemView.findViewById(R.id.tienda_name);
             mail = itemView.findViewById(R.id.tienda_mail);
@@ -103,6 +112,18 @@ public class TiendaAdapter extends RecyclerView.Adapter<TiendaAdapter.TiendaView
             days = itemView.findViewById(R.id.tienda_days);
             hr = itemView.findViewById(R.id.tienda_hr);
             insta = itemView.findViewById(R.id.tienda_insta);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (adapter.listener != null) {
+                        int position = getAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION) {
+                            adapter.listener.onItemClick(adapter.tiendaList.get(position));
+                        }
+                    }
+                }
+            });
         }
     }
 }

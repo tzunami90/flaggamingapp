@@ -7,14 +7,16 @@ public class Tienda {
     private String days;
     private String hr;
     private String insta;
+    private String tel;
 
-    public Tienda(String name, String mail, String dir, String days, String hr, String insta) {
+    public Tienda(String name, String mail, String dir, String days, String hr, String insta, String tel) {
         this.name = name;
         this.mail = mail;
         this.dir = dir;
         this.days = days;
         this.hr = hr;
         this.insta = insta;
+        this.tel = tel;
     }
 
     public String getName() {
@@ -39,5 +41,9 @@ public class Tienda {
 
     public String getInsta() {
         return insta;
+    }
+
+    public String getTel() {
+        return tel;
     }
 }

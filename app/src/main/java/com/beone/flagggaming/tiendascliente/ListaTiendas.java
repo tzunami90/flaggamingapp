@@ -1,5 +1,6 @@
 package com.beone.flagggaming.tiendascliente;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -90,6 +91,21 @@ public class ListaTiendas extends AppCompatActivity {
             tiendaList = tiendas;
             tiendaAdapter = new TiendaAdapter(tiendaList);
             recyclerView.setAdapter(tiendaAdapter);
+
+            tiendaAdapter.setOnItemClickListener(new TiendaAdapter.OnItemClickListener() {
+                @Override
+                public void onItemClick(Tienda tienda) {
+                    Intent intent = new Intent(ListaTiendas.this, DetalleTiendaActivity.class);
+                    intent.putExtra("name", tienda.getName());
+                    intent.putExtra("mail", tienda.getMail());
+                    intent.putExtra("dir", tienda.getDir());
+                    intent.putExtra("hr", tienda.getHr());
+                    intent.putExtra("days", tienda.getDays());
+                    intent.putExtra("tel", tienda.getTel());
+                    intent.putExtra("insta", tienda.getInsta());
+                    startActivity(intent);
+                }
+            });
         }
     }
 
@@ -97,7 +113,7 @@ public class ListaTiendas extends AppCompatActivity {
         List<Tienda> tiendaList = new ArrayList<>();
 
         try (Connection connection = DBHelper.conDB(this)) {
-            String query = "SELECT [name], [mail], [dir], [days], [hr], [insta] FROM [tiendas]";
+            String query = "SELECT [name], [mail], [dir], [days], [hr], [insta], [tel] FROM [tiendas]";
             PreparedStatement statement = connection.prepareStatement(query);
             ResultSet resultSet = statement.executeQuery();
 
@@ -108,8 +124,9 @@ public class ListaTiendas extends AppCompatActivity {
                 String days = resultSet.getString("days");
                 String hr = resultSet.getString("hr");
                 String insta = resultSet.getString("insta");
+                String tel = resultSet.getString("tel");
 
-                tiendaList.add(new Tienda(name, mail, dir, days, hr, insta));
+                tiendaList.add(new Tienda(name, mail, dir, days, hr, insta, tel));
             }
 
             resultSet.close();

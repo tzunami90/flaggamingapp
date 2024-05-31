@@ -13,6 +13,8 @@ interceptor = "4.12.0"
 glide = "4.12.0"
 jsoup = "1.14.3"
 bcrypt = "0.4"
+maps = "18.0.2"
+mapsUtils = "2.3.0"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -29,6 +31,8 @@ jtds = { group = "net.sourceforge.jtds", name = "jtds", version.ref = "jtds"}
 glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
 jsoup = { group = "org.jsoup", name = "jsoup", version.ref = "jsoup" }
 bcrypt = { group = "org.mindrot", name = "jbcrypt", version.ref = "bcrypt" }
+maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "maps" }
+mapsUtils = { group = "com.google.maps.android", name = "android-maps-utils", version.ref = "mapsUtils" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

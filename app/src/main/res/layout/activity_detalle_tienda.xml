@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:id="@+id/detalletienda"
+    android:layout_margin="18dp"
+    tools:context=".tiendascliente.DetalleTiendaActivity">
+
+    <TextView
+        android:id="@+id/tv_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="36dp"
+        android:text="Nombre de la Tienda"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_mail"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Correo Electrónico"
+        android:textSize="18sp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintTop_toBottomOf="@id/tv_name"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_dir"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Dirección"
+        android:textSize="18sp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintTop_toBottomOf="@id/tv_mail"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_days"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Días de Atención"
+        android:textSize="18sp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintTop_toBottomOf="@id/tv_dir"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_hr"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Horario de Atención"
+        android:textSize="18sp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintTop_toBottomOf="@id/tv_days"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_tel"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Teléfono"
+        android:textSize="18sp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintTop_toBottomOf="@id/tv_hr"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_insta"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Instagram"
+        android:textSize="18sp"
+        app:layout_constraintTop_toBottomOf="@id/tv_tel"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+
+    <Button
+        android:id="@+id/btn_ver_productos"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="VER PRODUCTOS DE LA TIENDA"
+        android:background="@drawable/button_background"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="16dp"
+        android:padding="16dp"
+        app:layout_constraintTop_toBottomOf="@id/tv_insta"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5" />
+
+    <fragment
+        android:id="@+id/map_container"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="0dp"
+        android:layout_height="200dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btn_ver_productos"
+        app:layout_constraintVertical_bias="0.083" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:layout_margin="15dp"
+        android:padding="15dp"
+        app:layout_constraintTop_toBottomOf="@id/map_container"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/iconAbrirEnMaps"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/icgooglemaps"
+            android:contentDescription="@string/abrir_en_google_maps"
+            android:clickable="true"
+            android:layout_marginEnd="16dp" />
+
+        <ImageView
+            android:id="@+id/iconAbrirInsta"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/icinsta"
+            android:contentDescription="@string/abrir_en_instagram"
+            android:clickable="true"
+            android:layout_marginEnd="16dp" />
+
+        <ImageView
+            android:id="@+id/iconAbrirMail"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/icmail"
+            android:contentDescription="@string/abrir_mail"
+            android:clickable="true"
+            android:layout_marginEnd="16dp" />
+
+        <ImageView
+            android:id="@+id/iconAbrirTel"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/icphone"
+            android:contentDescription="@string/abrir_telefono"
+            android:clickable="true" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
