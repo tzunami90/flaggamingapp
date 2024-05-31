@@ -26,6 +26,11 @@
             android:title="Hardware"/>
 
         <item
+            android:id="@+id/nav_tiendaslist"
+            android:icon="@drawable/ictienda"
+            android:title="Tiendas Gamer"/>
+
+        <item
             android:id="@+id/nav_registro_tiendas"
             android:icon="@drawable/nav_registrotienda"
             android:title="Registro de Tienda"/>

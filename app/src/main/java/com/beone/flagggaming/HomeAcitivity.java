@@ -29,6 +29,7 @@ import com.beone.flagggaming.navbar.PerfilUsuarioFragment;
 import com.beone.flagggaming.navbar.RegisterTiendaFragment;
 import com.beone.flagggaming.producto.ListaHardware;
 import com.beone.flagggaming.steamapi.ListaJuegosSteam;
+import com.beone.flagggaming.tiendascliente.ListaTiendas;
 import com.beone.flagggaming.usuario.LoginActivity;
 import com.beone.flagggaming.usuario.RegisterActivity;
 import com.google.android.material.navigation.NavigationView;
@@ -124,6 +125,8 @@ public class HomeAcitivity extends AppCompatActivity implements NavigationView.O
             startActivity(new Intent(this, ListaJuegosEpic.class));
         } else if(itemId == R.id.nav_hardware) {
             startActivity(new Intent(this, ListaHardware.class));
+        } else if(itemId == R.id.nav_tiendaslist) {
+            startActivity(new Intent(this, ListaTiendas.class));
         } else if((itemId == R.id.nav_registro_tiendas) && (rol == 0)) {
             Bundle bundleR = new Bundle();
             bundleR.putInt("idU",idU);

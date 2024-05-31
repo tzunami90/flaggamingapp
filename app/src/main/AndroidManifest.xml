@@ -20,6 +20,9 @@
         android:theme="@style/Base.Theme.FLAGGgaming"
         tools:targetApi="31">
         <activity
+            android:name=".tiendascliente.ListaTiendas"
+            android:exported="false" />
+        <activity
             android:name=".producto.ProductoDetalle"
             android:exported="false" />
         <activity
