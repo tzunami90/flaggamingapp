@@ -8,8 +8,10 @@ public class Tienda {
     private String hr;
     private String insta;
     private String tel;
+    private int id;
 
-    public Tienda(String name, String mail, String dir, String days, String hr, String insta, String tel) {
+    public Tienda(int id, String name, String mail, String dir, String days, String hr, String insta, String tel) {
+        this.id = id;
         this.name = name;
         this.mail = mail;
         this.dir = dir;
@@ -19,6 +21,9 @@ public class Tienda {
         this.tel = tel;
     }
 
+    public int getId() {
+        return id;
+    }
     public String getName() {
         return name;
     }

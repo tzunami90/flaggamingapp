@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -41,6 +42,9 @@ public class DetalleTiendaActivity extends AppCompatActivity implements OnMapRea
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private ImageView iconAbrirEnMaps, iconAbrirInsta, iconAbrirMail, iconAbrirTel ;
     private String address, subject;
+    private Button btn_ver_productos;
+    private int idT;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +63,7 @@ public class DetalleTiendaActivity extends AppCompatActivity implements OnMapRea
         iconAbrirInsta = findViewById(R.id.iconAbrirInsta);
         iconAbrirMail = findViewById(R.id.iconAbrirMail);
         iconAbrirTel = findViewById(R.id.iconAbrirTel);
+        btn_ver_productos = findViewById(R.id.btn_ver_productos);
 
         // Recibir los datos de la tienda
         Bundle extras = getIntent().getExtras();
@@ -72,8 +77,10 @@ public class DetalleTiendaActivity extends AppCompatActivity implements OnMapRea
             tvInsta.setText("Instagram: "+extras.getString("insta"));
             dir = extras.getString("dir");
             address = extras.getString("mail");
+            idT = extras.getInt("id");
             Log.d("TAG", "Dirección recibida: " + dir);
             Log.d("MAIL", "Mail recibido: " + address);
+            Log.d("ID", "ID recibido: " + idT);
         }
 
         // Verificar y solicitar permisos
@@ -107,6 +114,13 @@ public class DetalleTiendaActivity extends AppCompatActivity implements OnMapRea
             @Override
             public void onClick(View v) {
                 abrirTelefono();
+            }
+        });
+
+        btn_ver_productos.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                verProductos();
             }
         });
 
@@ -241,5 +255,12 @@ public class DetalleTiendaActivity extends AppCompatActivity implements OnMapRea
         } else {
             Toast.makeText(this, "El número de teléfono está vacío.", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    //Metodo para ver los productos de la tienda
+    public void verProductos() {
+        Intent intent = new Intent(DetalleTiendaActivity.this, ListaProductosTienda.class);
+        intent.putExtra("id", idT);
+        startActivity(intent);
     }
 }

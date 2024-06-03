@@ -96,6 +96,7 @@ public class ListaTiendas extends AppCompatActivity {
                 @Override
                 public void onItemClick(Tienda tienda) {
                     Intent intent = new Intent(ListaTiendas.this, DetalleTiendaActivity.class);
+                    intent.putExtra("id", tienda.getId());
                     intent.putExtra("name", tienda.getName());
                     intent.putExtra("mail", tienda.getMail());
                     intent.putExtra("dir", tienda.getDir());
@@ -103,6 +104,7 @@ public class ListaTiendas extends AppCompatActivity {
                     intent.putExtra("days", tienda.getDays());
                     intent.putExtra("tel", tienda.getTel());
                     intent.putExtra("insta", tienda.getInsta());
+                    intent.putExtra("id", tienda.getId());
                     startActivity(intent);
                 }
             });
@@ -113,11 +115,12 @@ public class ListaTiendas extends AppCompatActivity {
         List<Tienda> tiendaList = new ArrayList<>();
 
         try (Connection connection = DBHelper.conDB(this)) {
-            String query = "SELECT [name], [mail], [dir], [days], [hr], [insta], [tel] FROM [tiendas]";
+            String query = "SELECT [id], [name], [mail], [dir], [days], [hr], [insta], [tel] FROM [tiendas]";
             PreparedStatement statement = connection.prepareStatement(query);
             ResultSet resultSet = statement.executeQuery();
 
             while (resultSet.next()) {
+                int id = resultSet.getInt("id");
                 String name = resultSet.getString("name");
                 String mail = resultSet.getString("mail");
                 String dir = resultSet.getString("dir");
@@ -126,7 +129,7 @@ public class ListaTiendas extends AppCompatActivity {
                 String insta = resultSet.getString("insta");
                 String tel = resultSet.getString("tel");
 
-                tiendaList.add(new Tienda(name, mail, dir, days, hr, insta, tel));
+                tiendaList.add(new Tienda(id, name, mail, dir, days, hr, insta, tel));
             }
 
             resultSet.close();
