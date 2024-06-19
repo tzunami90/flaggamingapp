@@ -208,6 +208,12 @@ public class ProductoDetalle extends AppCompatActivity {
     // Método para abrir Instagram con el nombre de usuario
     private void abrirEnInstagram() {
         String username = textViewTiendaInsta.getText().toString().replace("Instagram: ", "").trim();
+
+        // Si el nombre de usuario empieza con '@', lo eliminamos
+        if (username.startsWith("@")) {
+            username = username.substring(1);
+        }
+
         if (!username.isEmpty()) {
             Uri uri = Uri.parse("https://www.instagram.com/" + username);
             Intent instagramIntent = new Intent(Intent.ACTION_VIEW, uri);
@@ -231,17 +237,27 @@ public class ProductoDetalle extends AppCompatActivity {
         Intent mail = new Intent(Intent.ACTION_SENDTO, uri);
         startActivity(mail);
     }
-    //Metodo para hacer llamada a la tienda
+    // Método para hacer llamada a la tienda
     public void abrirTelefono() {
         Log.d("ProductoDetalle", "Método abrirTelefono llamado");
-        String telefono = textViewTiendaTel.getText().toString();
+        String telefono = textViewTiendaTel.getText().toString().trim();
+
+        // Verificar que el número de teléfono no esté vacío
         if (!telefono.isEmpty()) {
+            // Crear el intent para marcar el teléfono
             Intent callIntent = new Intent(Intent.ACTION_DIAL);
             callIntent.setData(Uri.parse("tel:" + telefono));
-            if (callIntent.resolveActivity(getPackageManager()) != null) {
+
+            // Verificar si hay alguna aplicación que pueda manejar el intent
+            PackageManager packageManager = getPackageManager();
+            List<ResolveInfo> activities = packageManager.queryIntentActivities(callIntent, 0);
+            boolean isIntentSafe = activities.size() > 0;
+
+            // Si hay al menos una aplicación que puede manejar el intent, iniciar la actividad
+            if (isIntentSafe) {
                 startActivity(callIntent);
             } else {
-                Toast.makeText(this, "No se encontró ninguna aplicación para manejar el Intent.", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "No se encontró ninguna aplicación para manejar la llamada.", Toast.LENGTH_LONG).show();
             }
         } else {
             Toast.makeText(this, "El número de teléfono está vacío.", Toast.LENGTH_SHORT).show();

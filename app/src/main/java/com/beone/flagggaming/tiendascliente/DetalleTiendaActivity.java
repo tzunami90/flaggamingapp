@@ -217,6 +217,12 @@ public class DetalleTiendaActivity extends AppCompatActivity implements OnMapRea
     // Método para abrir Instagram con el nombre de usuario
     private void abrirEnInstagram() {
         String username = tvInsta.getText().toString().replace("Instagram: ", "").trim();
+
+        // Si el nombre de usuario empieza con '@', lo eliminamos
+        if (username.startsWith("@")) {
+            username = username.substring(1);
+        }
+
         if (!username.isEmpty()) {
             Uri uri = Uri.parse("https://www.instagram.com/" + username);
             Intent instagramIntent = new Intent(Intent.ACTION_VIEW, uri);
