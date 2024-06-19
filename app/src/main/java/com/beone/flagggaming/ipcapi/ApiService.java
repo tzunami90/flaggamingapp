@@ -7,7 +7,7 @@ public interface ApiService {
     @GET("series")
     Call<ApiResponse> getSeriesData(
             @Query("ids") String ids,
-            @Query("start_date") String startDate,
+            @Query("limit") String limit,
             @Query("format") String format
     );
 }

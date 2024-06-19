@@ -57,6 +57,7 @@ public class MostrarJuegoSteam extends AppCompatActivity {
     boolean isDolarDataFetched = false;
     boolean isInflationDataFetched = false;
     double precioFinalDouble;
+    double precioEnARS;
 
 
     @Override
@@ -82,64 +83,13 @@ public class MostrarJuegoSteam extends AppCompatActivity {
         // Llama al método para obtener los detalles del juego
         obtenerDetallesJuego(id);
 
+        //Configurar la API de Dolar TC
         dolarAPIManager = new DolarAPIManager();
 
-        // Obtener el mes actual y el mes anterior en el formato requerido (YYYY-MM-DD)
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        Calendar calendar = Calendar.getInstance();
-
-        // Fecha del primer día del mes actual
-        calendar.set(Calendar.DAY_OF_MONTH, 1);
-        String currentDate = sdf.format(calendar.getTime());
-
-        // Fecha del primer día del mes anterior
-        calendar.add(Calendar.MONTH, -1);
-        calendar.set(Calendar.DAY_OF_MONTH, 1);  // Asegurar que es el primer día del mes
-        String previousMonthDate = sdf.format(calendar.getTime());
-
-        // Fecha del primer día del mes anterior al mes anterior
-        calendar.add(Calendar.MONTH, -1);
-        calendar.set(Calendar.DAY_OF_MONTH, 1);  // Asegurar que es el primer día del mes
-        String secondPreviousMonthDate = sdf.format(calendar.getTime());
-
-        Log.d("Fechas", "Current Date: " + currentDate);
-        Log.d("Fechas", "Previous Month Date: " + previousMonthDate);
-        Log.d("Fechas", "Second Previous Month Date: " + secondPreviousMonthDate);
-
-
-        // Ajuste de fechas para la solicitud de API
-        calendar.add(Calendar.MONTH, 2); // Volver al mes actual después de restar dos meses
-        String endDate = sdf.format(calendar.getTime());
-
-// Configurar Retrofit y hacer la llamada a la API
-        Retrofit retrofit = IPCApiManager.getClient("https://apis.datos.gob.ar/series/api/");
-        ApiService apiService = retrofit.create(ApiService.class);
-        Call<ApiResponse> call = apiService.getSeriesData("148.3_INIVELNAL_DICI_M_26", secondPreviousMonthDate, "json");
-
-        call.enqueue(new Callback<ApiResponse>() {
-            @Override
-            public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    List<List<Object>> data = response.body().getData();
-                    Log.d("Datos API", "Total de datos recibidos: " + data.size());
-                    for (List<Object> observation : data) {
-                        String date = (String) observation.get(0);
-                        Double value = ((Number) observation.get(1)).doubleValue();
-                        Log.d("Datos API", "Fecha: " + date + ", Valor: " + value);
-                    }
-                    processObservations(data, previousMonthDate, secondPreviousMonthDate);
-                } else {
-                    mostrarMensaje("Error en la respuesta de la API: " + response.code());
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ApiResponse> call, Throwable t) {
-                mostrarMensaje("Error al obtener datos de IPC: " + t.getMessage());
-            }
-        });
-
         fetchDataFromAPI();
+
+        // Configurar la API de inflación
+        configurarIPCApi();
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -222,7 +172,7 @@ public class MostrarJuegoSteam extends AppCompatActivity {
                 precioFinalDouble = precioFinalInt / 100.0;
 
                 // Recalcular el precio si ya se obtuvieron los datos necesarios
-                if (isDolarDataFetched && isInflationDataFetched) {
+                if (isDolarDataFetched || isInflationDataFetched) {
                     recalcularPrecios();
                 }
                 } else {
@@ -234,9 +184,6 @@ public class MostrarJuegoSteam extends AppCompatActivity {
             cargarImagenJuego(data.getHeaderImage());
         });
     }
-
-
-
 
     private void mostrarMensaje(String mensaje){
         Log.d("MostrarJuegoSteam", mensaje);
@@ -276,72 +223,98 @@ public class MostrarJuegoSteam extends AppCompatActivity {
                 isDolarDataFetched = true;
                 Log.d("Dolar Data", "Compra: " + dolarCompra + " Venta: " + dolarVenta);
 
-                // Recalcular el precio si ya se obtuvieron los datos de inflación
-                if (isInflationDataFetched) {
-                    recalcularPrecios();
-                }
+                recalcularPrecios();
             }
 
             @Override
             public void onDolarDataError(String errorMessage) {
                 mostrarMensaje(errorMessage);
+                // Permitir que la aplicación siga funcionando sin los datos de dolar
+                isDolarDataFetched = false;
+                recalcularPrecios();
             }
         });
     }
 
-    private void processObservations(List<List<Object>> data, String previousMonthDate, String secondPreviousMonthDate) {
-        Double previousMonthValue = null;
-        Double secondPreviousMonthValue = null;
+    private void configurarIPCApi() {
+        Retrofit retrofit = IPCApiManager.getClient("https://apis.datos.gob.ar/series/api/");
+        ApiService apiService = retrofit.create(ApiService.class);
 
-        Log.d("Fechas", "Previous Month Date: " + previousMonthDate + ", Second Previous Month Date: " + secondPreviousMonthDate);
+        String ids = "148.3_INIVELNAL_DICI_M_26";
+        String format = "json";
+        int maxResults = 5000; // Número máximo de resultados para obtener todos los datos desde 2016
 
-        for (List<Object> observation : data) {
-            String date = (String) observation.get(0);
-            Double value = ((Number) observation.get(1)).doubleValue();
+        String url = "https://apis.datos.gob.ar/series/api/series?ids=" + ids + "&limit=" + maxResults + "&format=" + format;
+        Log.d("URL Construida", url);
 
-            Log.d("Datos IPC", "Fecha: " + date + ", Valor: " + value);
+        Call<ApiResponse> call = apiService.getSeriesData(ids, String.valueOf(maxResults), format);
+        call.enqueue(new Callback<ApiResponse>() {
+            @Override
+            public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
+                Log.d("Datos API", "Response code: " + response.code());
+                if (response.isSuccessful() && response.body() != null) {
+                    List<List<Object>> data = response.body().getData();
+                    Log.d("Datos API", "Total de datos recibidos: " + (data != null ? data.size() : 0));
+                    if (data != null && data.size() >= 2) {
+                        // Obtener los últimos dos valores
+                        List<Object> lastObservation = data.get(data.size() - 1);
+                        List<Object> secondLastObservation = data.get(data.size() - 2);
 
-            // Comparar fechas con los valores requeridos
-            if (date.equals(previousMonthDate)) {
-                previousMonthValue = value;
-                Log.d("Datos IPC", "Valor del mes anterior encontrado: " + value);
-            } else if (date.equals(secondPreviousMonthDate)) {
-                secondPreviousMonthValue = value;
-                Log.d("Datos IPC", "Valor del segundo mes anterior encontrado: " + value);
+                        String lastDate = (String) lastObservation.get(0);
+                        double lastValue = ((Number) lastObservation.get(1)).doubleValue();
+                        String secondLastDate = (String) secondLastObservation.get(0);
+                        double secondLastValue = ((Number) secondLastObservation.get(1)).doubleValue();
+
+                        Log.d("Datos API", "Última observación - Fecha: " + lastDate + ", Valor: " + lastValue);
+                        Log.d("Datos API", "Penúltima observación - Fecha: " + secondLastDate + ", Valor: " + secondLastValue);
+
+                        inflacion = ((lastValue - secondLastValue) / secondLastValue) * 100;
+                        Log.d("Inflacion", inflacion + "%");
+                        isInflationDataFetched = true;
+                    } else {
+                        mostrarMensaje("No hay suficientes datos de inflación para calcular.");
+                        isInflationDataFetched = false;
+                    }
+
+                    recalcularPrecios(); // Asegurar que se recalculan los precios después de procesar los datos de inflación
+                } else {
+                    mostrarMensaje("Error en la respuesta de la API: " + response.code());
+                    isInflationDataFetched = false;
+                    recalcularPrecios();
+                }
             }
-        }
 
-        // Verificar si ambos valores han sido encontrados
-        if (previousMonthValue != null && secondPreviousMonthValue != null) {
-            // Calcular la inflación
-            inflacion = ((previousMonthValue / secondPreviousMonthValue) - 1) * 100;
-            isInflationDataFetched = true;
-            Log.d("Inflación Calculada", "Inflación: " + inflacion + "%");
-            // Recalcular el precio si ya se obtuvieron los datos del dólar
-            if (isDolarDataFetched) {
-                recalcularPrecios();
+            @Override
+            public void onFailure(Call<ApiResponse> call, Throwable t) {
+                Log.d("Datos API", "Error al obtener datos de IPC: " + t.getMessage());
+                mostrarMensaje("Error al obtener datos de IPC: " + t.getMessage());
+                isInflationDataFetched = false;
+                recalcularPrecios(); // Asegurar que se recalculan los precios incluso si la API de inflación falla
             }
-        } else {
-            mostrarMensaje("No se encontraron datos suficientes para calcular la inflación.");
-        }
+        });
     }
 
     private void recalcularPrecios() {
         runOnUiThread(() -> {
-            // No realizar cálculos si el juego es gratuito
-            if (precioFinalDouble == 0) {
-                return;
+            DecimalFormat decimalFormat = new DecimalFormat("#.##");
+            // Mostrar precios en ARS y precio proyectado
+            if (isDolarDataFetched) {
+                precioEnARS = precioFinalDouble + (precioFinalDouble * dolarVenta);
+                Log.d("Dolar API", "Precio  ARS: " + decimalFormat.format(precioEnARS));
+                textView_priceARS.setText("Precio en ARS: $" + decimalFormat.format(precioEnARS));
+            } else {
+                textView_priceARS.setText("Precio en ARS: No disponible");
             }
 
-            double precioFinal = precioFinalDouble * dolarVenta;
-            DecimalFormat decimalFormat = new DecimalFormat("#,###,##0.00");
-            String precioFinalFormateado = decimalFormat.format(precioFinal);
-            textView_priceARS.setText("Precio Posta: " + precioFinalFormateado + " ARS");
-
-            double precioSufrir = precioFinal * (1 + (inflacion / 100));
-            String precioPareFormateado = decimalFormat.format(precioSufrir);
-            textView_price3m.setText("Precio Pare de Sufrir (próximo mes): " + precioPareFormateado + " ARS");
+            if (isInflationDataFetched && isDolarDataFetched) {
+                double precioSufrir = precioEnARS + (precioEnARS * (inflacion / 100));
+                Log.d("IPC API", "Precio  Futuro: " + decimalFormat.format(precioSufrir));
+                textView_price3m.setText("Precio proyectado prox. mes: $" + decimalFormat.format(precioSufrir));
+            } else {
+                textView_price3m.setText("Precio proyectado prox. mes: No disponible");
+            }
         });
     }
+
 
 }
