@@ -128,7 +128,7 @@ public class MisProductosFragment extends Fragment {
                     "FROM productos p " +
                     "JOIN categorias c ON p.id_categoria = c.id_categoria " +
                     "WHERE p.id_tienda = ?";
-            statement = conection.prepareStatement(query);
+            statement = connection.prepareStatement(query);
             statement.setInt(1, idT); // Asignar el valor de idT al parámetro de la consulta
             resultSet = statement.executeQuery();
 

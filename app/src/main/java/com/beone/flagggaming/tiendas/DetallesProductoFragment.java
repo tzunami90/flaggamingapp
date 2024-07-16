@@ -101,12 +101,16 @@ public class DetallesProductoFragment extends Fragment {
 
     private class LoadDataAsyncTask extends AsyncTask<Void, Void, Void> {
 
-        private List<Categoria> categoriasList = new ArrayList<>(); // Inicializamos la lista aquí
+        private List<Categoria> categoriasListTemp = new ArrayList<>();
+        private String sku, descripcion, marca;
+        private double precio;
+        private boolean estatus;
+        private int idCategoria;
 
 
         @Override
         protected Void doInBackground(Void... voids) {
-            cargarCategoriasDesdeBaseDeDatos();
+            cargarCategoriasDesdeBaseDeDatos(categoriasListTemp);
             cargarDatosProducto();
             return null;
         }
@@ -116,9 +120,9 @@ public class DetallesProductoFragment extends Fragment {
             // Ocultar ProgressBar después de cargar los datos
             progressBar.setVisibility(View.GONE);
 
-            if (categoriasList != null && !categoriasList.isEmpty()) {
+            if (categoriasListTemp != null && !categoriasListTemp.isEmpty()) {
                 // Configurar el ArrayAdapter para el Spinner
-                categoriaArrayAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, categoriasList);
+                categoriaArrayAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, categoriasListTemp);
                 categoriaArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerModifCategoria.setAdapter(categoriaArrayAdapter);
 
@@ -129,63 +133,9 @@ public class DetallesProductoFragment extends Fragment {
                 errorMessage = "No se encontraron categorías";
                 Log.e("Error", "No se encontraron categorías");
             }
-        }
-    }
-    private void cargarCategoriasDesdeBaseDeDatos() {
-        try (Connection connection = DBHelper.conDB(getContext())) {
-            if (connection == null) {
-                errorMessage = "Error al conectar con la base de datos.";
-                Log.e("Error", errorMessage);
-                return;
-            }
 
-            // Consulta SQL para obtener las categorías
-            String query = "SELECT id_categoria, desc_categoria FROM categorias";
-            PreparedStatement statement = connection.prepareStatement(query);
-            ResultSet resultSet = statement.executeQuery();
-
-            // Recorrer los resultados y agregar las categorías a la lista
-            while (resultSet.next()) {
-                int idCategoria = resultSet.getInt("id_categoria");
-                String descCategoria = resultSet.getString("desc_categoria");
-                Categoria categoria = new Categoria(idCategoria, descCategoria);
-                categoriasList.add(categoria);
-            }
-
-            // Cerrar recursos
-            resultSet.close();
-            statement.close();
-        } catch (SQLException e) {
-            errorMessage = "Error al cargar las categorías: " + e.getMessage();
-            Log.e("Error", "Error al cargar las categorías", e);
-        }
-    }
-    private void cargarDatosProducto() {
-        try (Connection connection = DBHelper.conDB(getContext())) {
-            if (connection == null) {
-                errorMessage = "Error al conectar con la base de datos.";
-                Log.e("Error", errorMessage);
-                return;
-            }
-
-            // Consulta SQL para obtener los detalles del producto
-            String query = "SELECT sku_tienda, desc_tienda, marca, precio_vta, estatus, id_categoria FROM productos WHERE id_interno_producto = ? AND id_tienda = ?";
-            PreparedStatement statement = connection.prepareStatement(query);
-            statement.setInt(1, idP);
-            statement.setInt(2, idT);
-            ResultSet resultSet = statement.executeQuery();
-
-            // Verificar si se encontró el producto
-            if (resultSet.next()) {
-                // Obtener datos del producto
-                String sku = resultSet.getString("sku_tienda");
-                String descripcion = resultSet.getString("desc_tienda");
-                String marca = resultSet.getString("marca");
-                double precio = resultSet.getDouble("precio_vta");
-                boolean estatus = resultSet.getBoolean("estatus");
-                int idCategoria = resultSet.getInt("id_categoria");
-
-                // Mostrar los datos en las vistas correspondientes
+            // Mostrar los datos del producto en las vistas correspondientes
+            if (sku != null && descripcion != null) {
                 editTextModifSkuTienda.setText(sku);
                 editTextModifDescTienda.setText(descripcion);
                 editTextModifMarca.setText(marca);
@@ -193,24 +143,89 @@ public class DetallesProductoFragment extends Fragment {
                 checkBoxModifEstatus.setChecked(estatus);
 
                 // Buscar la categoría correspondiente en la lista de categorías
-                for (int i = 0; i < categoriasList.size(); i++) {
-                    if (categoriasList.get(i).getId_categoria() == idCategoria) {
+                for (int i = 0; i < categoriasListTemp.size(); i++) {
+                    if (categoriasListTemp.get(i).getId_categoria() == idCategoria) {
                         // Establecer la categoría correspondiente como la opción seleccionada en el Spinner
                         spinnerModifCategoria.setSelection(i);
                         break;
                     }
                 }
-            } else {
-                Toast.makeText(getContext(), "Producto no encontrado", Toast.LENGTH_SHORT).show();
             }
+        }
+        private void cargarCategoriasDesdeBaseDeDatos(List<Categoria> categoriasListTemp) {
+            try (Connection connection = DBHelper.conDB(getContext())) {
+                if (connection == null) {
+                    errorMessage = "Error al conectar con la base de datos.";
+                    Log.e("Error", errorMessage);
+                    return;
+                }
 
-            // Cerrar conexión y recursos
-            resultSet.close();
-            statement.close();
-        } catch (SQLException e) {
-            Toast.makeText(getContext(),e.getMessage(), Toast.LENGTH_SHORT).show();
-            System.out.println(e.getMessage());
-            Log.d("Error", e.getMessage());
+                // Consulta SQL para obtener las categorías
+                String query = "SELECT id_categoria, desc_categoria FROM categorias";
+                PreparedStatement statement = connection.prepareStatement(query);
+                ResultSet resultSet = statement.executeQuery();
+
+                // Recorrer los resultados y agregar las categorías a la lista
+                while (resultSet.next()) {
+                    int idCategoria = resultSet.getInt("id_categoria");
+                    String descCategoria = resultSet.getString("desc_categoria");
+                    Categoria categoria = new Categoria(idCategoria, descCategoria);
+                    categoriasListTemp.add(categoria);
+                }
+
+                // Cerrar recursos
+                resultSet.close();
+                statement.close();
+            } catch (SQLException e) {
+                errorMessage = "Error al cargar las categorías: " + e.getMessage();
+                Log.e("Error", "Error al cargar las categorías", e);
+            }
+        }
+        private void cargarDatosProducto() {
+            try (Connection connection = DBHelper.conDB(getContext())) {
+                if (connection == null) {
+                    errorMessage = "Error al conectar con la base de datos.";
+                    Log.e("Error", errorMessage);
+                    return;
+                }
+
+                // Consulta SQL para obtener los detalles del producto
+                String query = "SELECT sku_tienda, desc_tienda, marca, precio_vta, estatus, id_categoria FROM productos WHERE id_interno_producto = ? AND id_tienda = ?";
+                PreparedStatement statement = connection.prepareStatement(query);
+                statement.setInt(1, idP);
+                statement.setInt(2, idT);
+                ResultSet resultSet = statement.executeQuery();
+
+                // Verificar si se encontró el producto
+                if (resultSet.next()) {
+                    // Obtener datos del producto
+                    sku = resultSet.getString("sku_tienda");
+                    descripcion = resultSet.getString("desc_tienda");
+                    marca = resultSet.getString("marca");
+                    precio = resultSet.getDouble("precio_vta");
+                    estatus = resultSet.getBoolean("estatus");
+                    idCategoria = resultSet.getInt("id_categoria");
+                } else {
+                    requireActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(getContext(), "Producto no encontrado", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+
+                // Cerrar conexión y recursos
+                resultSet.close();
+                statement.close();
+            } catch (SQLException e) {
+                requireActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+                Log.d("Error", e.getMessage());
+            }
         }
     }
 
@@ -268,7 +283,7 @@ public class DetallesProductoFragment extends Fragment {
             // Cerrar conexión y recursos
             statementUpdate.close();
         } catch (SQLException e) {
-            Toast.makeText(getContext(),e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
             System.out.println(e.getMessage());
             Log.d("Error", e.getMessage());
         }
@@ -293,12 +308,12 @@ public class DetallesProductoFragment extends Fragment {
             if (rowsDeleted > 0) {
                 Toast.makeText(getContext(), "Producto eliminado correctamente", Toast.LENGTH_SHORT).show();
                 Bundle bundleMP = new Bundle();
-                bundleMP.putInt("idU",idU);
-                bundleMP.putInt("idT",idT);
+                bundleMP.putInt("idU", idU);
+                bundleMP.putInt("idT", idT);
                 MisProductosFragment misProductosFragment = new MisProductosFragment();
                 misProductosFragment.setArguments(bundleMP);
                 getActivity().getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container,misProductosFragment)
+                        .replace(R.id.fragment_container, misProductosFragment)
                         .addToBackStack(null)
                         .commit();
             } else {

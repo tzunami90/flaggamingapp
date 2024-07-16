@@ -26,6 +26,7 @@ import android.widget.Toast;
 import com.beone.flagggaming.HomeAcitivity;
 import com.beone.flagggaming.R;
 import com.beone.flagggaming.db.DBHelper;
+import com.beone.flagggaming.tiendas.Tienda;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -85,182 +86,121 @@ public class RegisterTiendaFragment extends Fragment {
         String tel = edtTel.getText().toString().trim();
         String insta = edtInsta.getText().toString().trim();
 
-        //Validaciones de campos
-        if (TextUtils.isEmpty(rs)) {
-            edtRazonsocial.setError("Ingrese Razón Social de la Tienda");
-            edtRazonsocial.requestFocus();
-            return;
-        }
-        if (containsSqlInjection(rs)) {
-            edtRazonsocial.setError("Dato inválido");
-            edtRazonsocial.requestFocus();
-            return;
-        }
-        if (TextUtils.isEmpty(cuit)) {
-            edtCuit.setError("Ingrese CUIT de la Tienda");
-            edtCuit.requestFocus();
-            return;
-        }
-        if (containsSqlInjection(cuit)) {
-            edtCuit.setError("Dato inválido");
-            edtCuit.requestFocus();
-            return;
-        }
-        if (TextUtils.isEmpty(name)) {
-            edtName.setError("Ingrese Nombre de Fantasía de la Tienda");
-            edtName.requestFocus();
-            return;
-        }
-        if (containsSqlInjection(name)) {
-            edtName.setError("Dato inválido");
-            edtName.requestFocus();
-            return;
-        }
-        if (TextUtils.isEmpty(mail)) {
-            edtMail.setError("Ingrese E-Mail de la Tienda");
-            edtMail.requestFocus();
-            return;
-        }
-        if (!Patterns.EMAIL_ADDRESS.matcher(mail).matches()) {
-            edtMail.setError("Ingrese un correo electrónico válido");
-            edtMail.requestFocus();
-            return;
-        }
-        if (containsSqlInjection(mail)) {
-            edtMail.setError("Dato inválido");
-            edtMail.requestFocus();
-            return;
-        }
-        if (TextUtils.isEmpty(pass)) {
-            edtPass.setError("Ingrese una contraseña para su Tienda");
-            edtPass.requestFocus();
-            return;
-        }
-        if (pass.length() < 6) {
-            edtPass.setError("La contraseña debe tener al menos 6 caracteres");
-            edtPass.requestFocus();
-            return;
-        }
-        if (containsSqlInjection(pass)) {
-            edtPass.setError("Dato inválido");
-            edtPass.requestFocus();
-            return;
-        }
-        if (TextUtils.isEmpty(dir)) {
-            edtDir.setError("Ingrese dirección de su Tienda");
-            edtDir.requestFocus();
-            return;
-        }
-        if (containsSqlInjection(dir)) {
-            edtDir.setError("Dato inválido");
-            edtDir.requestFocus();
-            return;
-        }
-        if (TextUtils.isEmpty(hr)) {
-            edtHr.setError("Ingrese horarios de atención");
-            edtHr.requestFocus();
-            return;
-        }
-        if (containsSqlInjection(hr)) {
-            edtHr.setError("Dato inválido");
-            edtHr.requestFocus();
-            return;
-        }
-        if (TextUtils.isEmpty(days)) {
-            edtDays.setError("Ingrese dias de atención");
-            edtDays.requestFocus();
-            return;
-        }
-        if (containsSqlInjection(days)) {
-            edtDays.setError("Dato inválido");
-            edtDays.requestFocus();
-            return;
-        }
-        if (TextUtils.isEmpty(tel)) {
-            edtTel.setError("Ingrese teléfono de su Tienda");
-            edtTel.requestFocus();
-            return;
-        }
-        if (containsSqlInjection(tel)) {
-            edtTel.setError("Dato inválido");
-            edtTel.requestFocus();
-            return;
-        }
-        if (TextUtils.isEmpty(insta)) {
-            edtInsta.setError("Ingrese Instagram de su Tienda");
-            edtInsta.requestFocus();
-            return;
-        }
-        if (containsSqlInjection(insta)) {
-            edtInsta.setError("Dato inválido");
-            edtInsta.requestFocus();
-            return;
-        }
+        if (!validarCampos(rs, cuit, name, mail, pass, dir, hr, days, tel, insta)) return;
 
+        Tienda tienda = new Tienda(0, name, mail, dir, days, hr, insta, tel);
 
-        // LOGICA REGISTRO SQL - Tabla Tiendas
         try (Connection connection = DBHelper.conDB(getContext())) {
             if (connection == null) {
                 Toast.makeText(getContext(), "ERROR DE CONEXION - Por favor reintente en unos momentos", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            String insertQuery = "INSERT INTO tiendas (razonSocial, cuit, name, mail, password, dir, hr, days, tel, insta) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            try (PreparedStatement pstTienda = connection.prepareStatement(insertQuery)) {
-                pstTienda.setString(1, rs);
-                pstTienda.setString(2, cuit);
-                pstTienda.setString(3, name);
-                pstTienda.setString(4, mail);
-                pstTienda.setString(5, pass);
-                pstTienda.setString(6, dir);
-                pstTienda.setString(7, hr);
-                pstTienda.setString(8, days);
-                pstTienda.setString(9, tel);
-                pstTienda.setString(10, insta);
-               // pstTienda.setInt(11,0);
-
-                int rowsAffected = pstTienda.executeUpdate();
-
-                if (rowsAffected == 1) {
-                    String selectQuery = "SELECT id FROM tiendas WHERE mail = ?";
-                    try (PreparedStatement pstSelect = connection.prepareStatement(selectQuery)) {
-                        pstSelect.setString(1, mail);
-                        try (ResultSet resultSet = pstSelect.executeQuery()) {
-                            if (resultSet.next()) {
-                                idT = resultSet.getInt("id");
-                                String insertUsuariosTiendas = "INSERT INTO usuarios_tiendas (idU, idT, active) VALUES (?, ?, ?)";
-                                try (PreparedStatement pstUsuariosTiendas = connection.prepareStatement(insertUsuariosTiendas)) {
-                                    pstUsuariosTiendas.setInt(1, idU);
-                                    pstUsuariosTiendas.setInt(2, idT);
-                                    pstUsuariosTiendas.setInt(3, 0);
-                                    pstUsuariosTiendas.executeUpdate();
-
-                                    Toast.makeText(getContext(), "Solicitud Recibida. Número tienda: " + idT, Toast.LENGTH_SHORT).show();
-
-                                    // Redireccion a Fragment HOME
-                                    getActivity().getSupportFragmentManager().beginTransaction()
-                                            .replace(R.id.fragment_container, new HomeFragment())
-                                            .addToBackStack(null)
-                                            .commit();
-                                }
-                            }
-                        }
-                    }
-                }
+            if (registrarTienda(connection, tienda, rs, cuit, pass)) {
+                Toast.makeText(getContext(), "Solicitud Recibida. Número tienda: " + idT, Toast.LENGTH_SHORT).show();
+                getActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, new HomeFragment())
+                        .addToBackStack(null)
+                        .commit();
             }
         } catch (SQLException e) {
             Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
-            Log.d("Error", e.getMessage());
+            e.printStackTrace();
         }
     }
 
-    private boolean containsSqlInjection(String input) {
-        // Implementación simple para detectar inyecciones SQL básicas
-        String[] sqlKeywords = {"SELECT", "INSERT", "UPDATE", "DELETE", "DROP", "CREATE", "ALTER", "TRUNCATE"};
-        input = input.toUpperCase();
-        for (String keyword : sqlKeywords) {
-            if (input.contains(keyword)) {
-                return true;
+    private boolean validarCampos(String rs, String cuit, String name, String mail, String pass, String dir, String hr, String days, String tel, String insta) {
+        if (TextUtils.isEmpty(rs)) {
+            edtRazonsocial.setError("Ingrese Razón Social de la Tienda");
+            edtRazonsocial.requestFocus();
+            return false;
+        }
+        if (TextUtils.isEmpty(cuit)) {
+            edtCuit.setError("Ingrese CUIT de la Tienda");
+            edtCuit.requestFocus();
+            return false;
+        }
+        if (TextUtils.isEmpty(name)) {
+            edtName.setError("Ingrese Nombre de Fantasía de la Tienda");
+            edtName.requestFocus();
+            return false;
+        }
+        if (TextUtils.isEmpty(mail) || !Patterns.EMAIL_ADDRESS.matcher(mail).matches()) {
+            edtMail.setError("Ingrese un correo electrónico válido");
+            edtMail.requestFocus();
+            return false;
+        }
+        if (TextUtils.isEmpty(pass) || pass.length() < 6) {
+            edtPass.setError("La contraseña debe tener al menos 6 caracteres");
+            edtPass.requestFocus();
+            return false;
+        }
+        if (TextUtils.isEmpty(dir)) {
+            edtDir.setError("Ingrese dirección de su Tienda");
+            edtDir.requestFocus();
+            return false;
+        }
+        if (TextUtils.isEmpty(hr)) {
+            edtHr.setError("Ingrese horarios de atención");
+            edtHr.requestFocus();
+            return false;
+        }
+        if (TextUtils.isEmpty(days)) {
+            edtDays.setError("Ingrese días de atención");
+            edtDays.requestFocus();
+            return false;
+        }
+        if (TextUtils.isEmpty(tel)) {
+            edtTel.setError("Ingrese teléfono de su Tienda");
+            edtTel.requestFocus();
+            return false;
+        }
+        if (TextUtils.isEmpty(insta)) {
+            edtInsta.setError("Ingrese Instagram de su Tienda");
+            edtInsta.requestFocus();
+            return false;
+        }
+        return true;
+    }
+
+    private boolean registrarTienda(Connection connection, Tienda tienda, String rs, String cuit, String pass) throws SQLException {
+        String insertQuery = "INSERT INTO tiendas (razonSocial, cuit, name, mail, password, dir, hr, days, tel, insta) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement pstTienda = connection.prepareStatement(insertQuery)) {
+            pstTienda.setString(1, rs);
+            pstTienda.setString(2, cuit);
+            pstTienda.setString(3, tienda.getName());
+            pstTienda.setString(4, tienda.getMail());
+            pstTienda.setString(5, pass);
+            pstTienda.setString(6, tienda.getDir());
+            pstTienda.setString(7, tienda.getHr());
+            pstTienda.setString(8, tienda.getDays());
+            pstTienda.setString(9, tienda.getTel());
+            pstTienda.setString(10, tienda.getInsta());
+
+            int rowsAffected = pstTienda.executeUpdate();
+            if (rowsAffected == 1) {
+                return vincularUsuarioTienda(connection, tienda.getMail());
+            }
+        }
+        return false;
+    }
+
+    private boolean vincularUsuarioTienda(Connection connection, String mail) throws SQLException {
+        String selectQuery = "SELECT id FROM tiendas WHERE mail = ?";
+        try (PreparedStatement pstSelect = connection.prepareStatement(selectQuery)) {
+            pstSelect.setString(1, mail);
+            try (ResultSet resultSet = pstSelect.executeQuery()) {
+                if (resultSet.next()) {
+                    idT = resultSet.getInt("id");
+                    String insertUsuariosTiendas = "INSERT INTO usuarios_tiendas (idU, idT, active) VALUES (?, ?, ?)";
+                    try (PreparedStatement pstUsuariosTiendas = connection.prepareStatement(insertUsuariosTiendas)) {
+                        pstUsuariosTiendas.setInt(1, idU);
+                        pstUsuariosTiendas.setInt(2, idT);
+                        pstUsuariosTiendas.setInt(3, 0);
+                        pstUsuariosTiendas.executeUpdate();
+                        return true;
+                    }
+                }
             }
         }
         return false;
