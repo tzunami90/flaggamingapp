@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
 import androidx.core.graphics.Insets;
 import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
@@ -44,6 +45,7 @@ public class HomeAcitivity extends AppCompatActivity implements NavigationView.O
     TextView textUserName, textUserMail;
     String name, mail;
     int idU, rol;
+    CardView cvJ1, cvJ2, cvJ3, cvJ4, cvP1, cvP2;
     private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
 
@@ -64,6 +66,12 @@ public class HomeAcitivity extends AppCompatActivity implements NavigationView.O
         drawerLayout = findViewById(R.id.drawer_layout);
         buttonDrawerToggle = findViewById(R.id.buttonDrawerToggle);
         navigationView = findViewById(R.id.nav_view);
+        cvJ1 = findViewById(R.id.cvJ1);
+        cvJ2 = findViewById(R.id.cvJ2);
+        cvJ3 = findViewById(R.id.cvJ3);
+        cvJ4 = findViewById(R.id.cvJ4);
+        cvP1 = findViewById(R.id.cvP1);
+        cvP2 = findViewById(R.id.cvP2);
 
         View headerView = navigationView.getHeaderView(0);
         textUserName = headerView.findViewById(R.id.textUserName);
