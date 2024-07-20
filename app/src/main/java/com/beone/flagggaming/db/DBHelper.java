@@ -27,6 +27,7 @@ public class DBHelper {
             Class.forName("net.sourceforge.jtds.jdbc.Driver").newInstance();
             // Conexion Servidor Remoto de AWS
             connection = DriverManager.getConnection("jdbc:jtds:sqlserver://13.50.158.9:1433;instance=SQLEXPRESS;databaseName=flagg_test3;user=sa;password=Flagg2024;");
+
             // Conexion Local PC
             //connection = DriverManager.getConnection("jdbc:jtds:sqlserver://10.0.2.2:1433;instance=SQLEXPRESS;databaseName=flagg_test3;user=sa;password=Alexx2003;");
         } catch (Exception e) {
