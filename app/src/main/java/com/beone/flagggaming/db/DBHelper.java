@@ -5,6 +5,7 @@ import android.os.StrictMode;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.beone.flagggaming.juegos.Juego;
 import com.beone.flagggaming.steamapi.Juegos;
 
 import java.sql.Connection;
@@ -12,6 +13,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -34,6 +36,40 @@ public class DBHelper {
             Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
         }
         return connection;
+    }
+
+    public static List<Juego> getJuegos(Context context) {
+        List<Juego> juegosList = new ArrayList<>();
+
+        try (Connection connection = conDB(context)) {
+            String query = "SELECT TOP (10000) [idFlagg], [idJuegoTienda], [nombre], [descripcionCorta], [tienda], [imagen], [imagenMini], [urlTienda], [requisitos], [estudio], [contadorVistas] FROM [flagg_test3].[dbo].[juegos]";
+            PreparedStatement statement = connection.prepareStatement(query);
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                Juego juego = new Juego(
+                        resultSet.getString("idFlagg"),
+                        resultSet.getInt("idJuegoTienda"),
+                        resultSet.getString("nombre"),
+                        resultSet.getString("descripcionCorta"),
+                        resultSet.getString("tienda"),
+                        resultSet.getString("imagen"),
+                        resultSet.getString("imagenMini"),
+                        resultSet.getString("urlTienda"),
+                        resultSet.getString("requisitos"),
+                        resultSet.getString("estudio"),
+                        resultSet.getInt("contadorVistas")
+                );
+                juegosList.add(juego);
+            }
+
+            resultSet.close();
+            statement.close();
+        } catch (SQLException e) {
+            Log.e("DBHelper", "Error al obtener la lista de juegos: " + e.getMessage());
+        }
+
+        return juegosList;
     }
 
     public static void saveAppList(Context context, List<Juegos> appList) {

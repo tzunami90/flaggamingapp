@@ -23,6 +23,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
 import com.beone.flagggaming.epicapi.ListaJuegosEpic;
+import com.beone.flagggaming.juegos.ListadoJuegos;
 import com.beone.flagggaming.navbar.AboutUsFragment;
 import com.beone.flagggaming.navbar.HomeFragment;
 import com.beone.flagggaming.navbar.PanelTiendaFragment;
@@ -127,6 +128,10 @@ public class HomeAcitivity extends AppCompatActivity implements NavigationView.O
             // Llamada a AsyncTask para cargar el fragmento de inicio
             loadFragment(new HomeFragment());
             navigationView.setCheckedItem(R.id.nav_home);
+        } else if(itemId == R.id.nav_juegos){
+            // Cargar el fragmento ListadoJuegos
+            loadFragment(new ListadoJuegos());
+            navigationView.setCheckedItem(R.id.nav_juegos);
         } else if(itemId == R.id.nav_steamList) {
             startActivity(new Intent(this, ListaJuegosSteam.class));
         } else if(itemId == R.id.nav_epicList) {

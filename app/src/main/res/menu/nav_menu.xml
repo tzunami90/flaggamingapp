@@ -9,16 +9,22 @@
             android:id="@+id/nav_home"
             android:icon="@drawable/nav_home"
             android:title="Home"/>
+        <item
+            android:id="@+id/nav_juegos"
+            android:icon="@drawable/juegoic2"
+            android:title="Juegos"/>
 
         <item
             android:id="@+id/nav_steamList"
             android:icon="@drawable/steamic2"
-            android:title="Listado Steam"/>
+            android:title="Listado Steam"
+            android:visible="false"/>
 
         <item
             android:id="@+id/nav_epicList"
             android:icon="@drawable/epicic"
-            android:title="Listado Epic"/>
+            android:title="Listado Epic"
+            android:visible="false"/>
 
         <item
             android:id="@+id/nav_hardware"
