@@ -72,6 +72,40 @@ public class DBHelper {
         return juegosList;
     }
 
+    public static Juego getJuegoByIdFlagg(Context context, String idFlagg) {
+        Juego juego = null;
+
+        try (Connection connection = conDB(context)) {
+            String query = "SELECT [idFlagg], [idJuegoTienda], [nombre], [descripcionCorta], [tienda], [imagen], [imagenMini], [urlTienda], [requisitos], [estudio], [contadorVistas] FROM [flagg_test3].[dbo].[juegos] WHERE [idFlagg] = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1, idFlagg);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                juego = new Juego(
+                        resultSet.getString("idFlagg"),
+                        resultSet.getInt("idJuegoTienda"),
+                        resultSet.getString("nombre"),
+                        resultSet.getString("descripcionCorta"),
+                        resultSet.getString("tienda"),
+                        resultSet.getString("imagen"),
+                        resultSet.getString("imagenMini"),
+                        resultSet.getString("urlTienda"),
+                        resultSet.getString("requisitos"),
+                        resultSet.getString("estudio"),
+                        resultSet.getInt("contadorVistas")
+                );
+            }
+
+            resultSet.close();
+            statement.close();
+        } catch (SQLException e) {
+            Log.e("DBHelper", "Error al obtener el juego por idFlagg: " + e.getMessage());
+        }
+
+        return juego;
+    }
+
     public static void saveAppList(Context context, List<Juegos> appList) {
         try (Connection connection = conDB(context)) {
             // Insertar los datos en la tabla (si no existen)

@@ -161,7 +161,7 @@ public class DetallesProductoFragment extends Fragment {
                 }
 
                 // Consulta SQL para obtener las categorías
-                String query = "SELECT id_categoria, desc_categoria FROM categorias";
+                String query = "SELECT id_categoria, desc_categoria, imagen_url FROM categorias";
                 PreparedStatement statement = connection.prepareStatement(query);
                 ResultSet resultSet = statement.executeQuery();
 
@@ -169,7 +169,8 @@ public class DetallesProductoFragment extends Fragment {
                 while (resultSet.next()) {
                     int idCategoria = resultSet.getInt("id_categoria");
                     String descCategoria = resultSet.getString("desc_categoria");
-                    Categoria categoria = new Categoria(idCategoria, descCategoria);
+                    String imagenUrl = resultSet.getString("imagen_url");
+                    Categoria categoria = new Categoria(idCategoria, descCategoria, imagenUrl);
                     categoriasListTemp.add(categoria);
                 }
 

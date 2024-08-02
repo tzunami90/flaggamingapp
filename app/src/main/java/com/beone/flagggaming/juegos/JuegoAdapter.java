@@ -21,27 +21,31 @@ public class JuegoAdapter extends RecyclerView.Adapter<JuegoAdapter.JuegoViewHol
     private Context context;
     private List<Juego> juegosList;
     private List<Juego> juegosListFiltered;
+    private OnJuegoClickListener onJuegoClickListener;
 
-    public JuegoAdapter(Context context, List<Juego> juegosList) {
+    public JuegoAdapter(Context context, List<Juego> juegosList, OnJuegoClickListener onJuegoClickListener) {
         this.context = context;
         this.juegosList = juegosList;
         this.juegosListFiltered = new ArrayList<>(juegosList);
+        this.onJuegoClickListener = onJuegoClickListener;
     }
 
     @NonNull
     @Override
     public JuegoViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.item_juego, parent, false);
-        return new JuegoViewHolder(view);
+        return new JuegoViewHolder(view, onJuegoClickListener);
     }
+
 
     @Override
     public void onBindViewHolder(@NonNull JuegoViewHolder holder, int position) {
-        Juego juego = juegosList.get(position);
+        Juego juego = juegosListFiltered.get(position);
         holder.nombreTextView.setText(juego.getNombre());
         holder.descripcionTextView.setText(juego.getDescripcionCorta());
         Glide.with(context).load(juego.getImagen()).into(holder.imagenImageView);
     }
+
 
     @Override
     public int getItemCount() {
@@ -64,16 +68,29 @@ public class JuegoAdapter extends RecyclerView.Adapter<JuegoAdapter.JuegoViewHol
         notifyDataSetChanged();
     }
 
-    class JuegoViewHolder extends RecyclerView.ViewHolder {
+
+    class JuegoViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView nombreTextView;
         TextView descripcionTextView;
         ImageView imagenImageView;
+        OnJuegoClickListener onJuegoClickListener;
 
-        public JuegoViewHolder(@NonNull View itemView) {
+        public JuegoViewHolder(@NonNull View itemView, OnJuegoClickListener onJuegoClickListener) {
             super(itemView);
             nombreTextView = itemView.findViewById(R.id.nombreTextView);
             descripcionTextView = itemView.findViewById(R.id.descripcionTextView);
             imagenImageView = itemView.findViewById(R.id.imagenImageView);
+            this.onJuegoClickListener = onJuegoClickListener;
+            itemView.setOnClickListener(this);
         }
+
+        @Override
+        public void onClick(View view) {
+            onJuegoClickListener.onJuegoClick(juegosListFiltered.get(getAdapterPosition()).getIdFlagg());
+        }
+    }
+
+    public interface OnJuegoClickListener {
+        void onJuegoClick(String idFlagg);
     }
 }

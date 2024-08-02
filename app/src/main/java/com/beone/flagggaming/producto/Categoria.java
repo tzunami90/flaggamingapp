@@ -3,13 +3,15 @@ import com.beone.flagggaming.R;
 public class Categoria {
     int id_categoria;
     String desc_categoria;
+    String imagenUrl;
 
     public Categoria(){
 
     }
-    public Categoria(int id_categoria, String desc_categoria) {
+    public Categoria(int id_categoria, String desc_categoria, String imagenUrl) {
         this.id_categoria = id_categoria;
         this.desc_categoria = desc_categoria;
+        this.imagenUrl = imagenUrl;
     }
 
     public int getId_categoria() {
@@ -26,6 +28,14 @@ public class Categoria {
 
     public void setDesc_categoria(String desc_categoria) {
         this.desc_categoria = desc_categoria;
+    }
+
+    public String getImagenUrl() {
+        return imagenUrl;
+    }
+
+    public void setImagenUrl(String imagenUrl) {
+        this.imagenUrl = imagenUrl;
     }
 
     public int getCategoriaImageResource() {

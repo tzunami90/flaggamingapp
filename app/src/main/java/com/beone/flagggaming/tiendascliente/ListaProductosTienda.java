@@ -145,16 +145,17 @@ public class ListaProductosTienda extends AppCompatActivity {
             try {
                 Connection connection = DBHelper.conDB(ListaProductosTienda.this);
                 if (connection != null) {
-                    String query = "SELECT id_categoria, desc_categoria FROM categorias";
+                    String query = "SELECT id_categoria, desc_categoria, imagen_url FROM categorias";
                     PreparedStatement statement = connection.prepareStatement(query);
                     ResultSet resultSet = statement.executeQuery();
 
-                    categorias.add(new Categoria(0, "Todas las categorías")); // Añadir opción por defecto
+                    categorias.add(new Categoria(0, "Todas las categorías", "")); // Añadir opción por defecto
 
                     while (resultSet.next()) {
                         int idCategoria = resultSet.getInt("id_categoria");
                         String descCategoria = resultSet.getString("desc_categoria");
-                        Categoria categoria = new Categoria(idCategoria, descCategoria);
+                        String imagenUrl = resultSet.getString("imagen_url");
+                        Categoria categoria = new Categoria(idCategoria, descCategoria, imagenUrl);
                         categorias.add(categoria);
                     }
 
@@ -188,7 +189,7 @@ public class ListaProductosTienda extends AppCompatActivity {
             try {
                 Connection connection = DBHelper.conDB(ListaProductosTienda.this);
                 if (connection != null) {
-                    String query = "SELECT p.id_interno_producto, p.id_tienda, p.id_categoria, p.sku_tienda, p.desc_tienda, p.marca, p.precio_vta, p.estatus, c.desc_categoria, t.name " +
+                    String query = "SELECT p.id_interno_producto, p.id_tienda, p.id_categoria, p.sku_tienda, p.desc_tienda, p.marca, p.precio_vta, p.estatus, c.desc_categoria, c.imagen_url, t.name " +
                             "FROM productos p INNER JOIN categorias c ON p.id_categoria = c.id_categoria JOIN tiendas t ON p.id_tienda = t.id " +
                             "WHERE p.estatus = 1 AND p.id_tienda = ?";
                     PreparedStatement statement = connection.prepareStatement(query);
@@ -206,8 +207,9 @@ public class ListaProductosTienda extends AppCompatActivity {
                         boolean estatus = resultSet.getBoolean("estatus");
                         String descCategoria = resultSet.getString("desc_categoria");
                         String tiendaNombre = resultSet.getString("name");
+                        String imagenUrl = resultSet.getString("imagen_url");
 
-                        Categoria categoria = new Categoria(idCategoria, descCategoria);
+                        Categoria categoria = new Categoria(idCategoria, descCategoria, imagenUrl);
                         Producto producto = new Producto(idInternoProducto, idTienda, idCategoria, skuTienda, descTienda, marca, precioVta, estatus);
                         producto.setCategoria(categoria);
                         producto.setTiendaNombre(tiendaNombre);

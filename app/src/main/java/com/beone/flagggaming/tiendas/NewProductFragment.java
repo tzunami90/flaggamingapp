@@ -88,7 +88,7 @@ public class NewProductFragment extends Fragment {
     private void cargarCategoriasDesdeBaseDeDatos() {
         categoriasList = obtenerCategoriasDesdeBaseDeDatos();
         // Agregar un elemento adicional para "Seleccione una categoría"
-        Categoria categoriaSeleccione = new Categoria(0, "Seleccione una categoría");
+        Categoria categoriaSeleccione = new Categoria(0, "Seleccione una categoría", "");
         categoriasList.add(0, categoriaSeleccione);
 
         // Configurar el ArrayAdapter para el Spinner
@@ -107,14 +107,15 @@ public class NewProductFragment extends Fragment {
             if(connection == null){
                 Toast.makeText(getContext(), "ERROR DE CONEXION - Por favor reintente en unos momentos", Toast.LENGTH_SHORT).show();
             }else {
-                String selectQuery = "SELECT id_categoria, desc_categoria FROM categorias";
+                String selectQuery = "SELECT id_categoria, desc_categoria, imagen_url FROM categorias";
                 PreparedStatement pstSelect = connection.prepareStatement(selectQuery);
                 ResultSet resultSet = pstSelect.executeQuery();
 
                 while (resultSet.next()) {
                     int idCategoria = resultSet.getInt("id_categoria");
                     String descCategoria = resultSet.getString("desc_categoria");
-                    Categoria categoria = new Categoria(idCategoria, descCategoria);
+                    String imagenUrl = resultSet.getString("imagen_url");
+                    Categoria categoria = new Categoria(idCategoria, descCategoria, imagenUrl);
                     categorias.add(categoria);
                 }
                 pstSelect.close();

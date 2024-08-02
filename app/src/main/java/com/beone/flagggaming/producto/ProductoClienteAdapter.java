@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.beone.flagggaming.R;
 import com.beone.flagggaming.producto.Producto;
+import com.bumptech.glide.Glide;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -52,6 +53,7 @@ public class ProductoClienteAdapter extends RecyclerView.Adapter<ProductoCliente
             intent.putExtra("categoriaDesc", producto.getCategoria().getDesc_categoria());
             intent.putExtra("tiendaNombre", producto.getTiendaNombre());
             intent.putExtra("idTienda", producto.getIdTienda());
+            intent.putExtra("imagenUrl", producto.getCategoria().getImagenUrl());
             context.startActivity(intent);
         });
     }
@@ -86,7 +88,13 @@ public class ProductoClienteAdapter extends RecyclerView.Adapter<ProductoCliente
             textViewProductPrice.setText("$" + producto.getPrecioVta());
             textViewCategoria.setText(producto.getCategoria().getDesc_categoria());
             textViewTiendaNombre.setText(producto.getTiendaNombre());
-            imageViewCategoria.setImageResource(producto.getCategoria().getCategoriaImageResource());
+
+            // Cargar la imagen de la categoría desde la URL usando Glide
+            Glide.with(itemView.getContext())
+                    .load(producto.getCategoria().getImagenUrl())  // Usa la URL de la imagen
+                    .placeholder(R.drawable.nopic)  // Puedes definir un placeholder mientras se carga la imagen
+                    .error(R.drawable.nopic)  // Imagen de error si no se puede cargar la URL
+                    .into(imageViewCategoria);
         }
 
     }

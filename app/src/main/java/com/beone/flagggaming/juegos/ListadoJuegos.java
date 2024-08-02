@@ -20,7 +20,7 @@ import com.beone.flagggaming.db.DBHelper;
 import java.util.List;
 
 
-public class ListadoJuegos extends Fragment {
+public class ListadoJuegos extends Fragment implements JuegoAdapter.OnJuegoClickListener{
 
     private RecyclerView recyclerView;
     private JuegoAdapter juegosAdapter;
@@ -65,6 +65,20 @@ public class ListadoJuegos extends Fragment {
         return view;
     }
 
+    public void onJuegoClick(String idFlagg) {
+        Bundle bundle = new Bundle();
+        bundle.putString("idFlagg", idFlagg);
+
+        DetalleJuego detalleJuegoFragment = new DetalleJuego();
+        detalleJuegoFragment.setArguments(bundle);
+
+        getFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, detalleJuegoFragment)
+                .addToBackStack(null)
+                .commit();
+    }
+
     private void loadJuegos() {
         progressBar.setVisibility(View.VISIBLE);
 
@@ -73,7 +87,7 @@ public class ListadoJuegos extends Fragment {
             List<Juego> juegosList = DBHelper.getJuegos(getContext());
             getActivity().runOnUiThread(() -> {
                 progressBar.setVisibility(View.GONE);
-                juegosAdapter = new JuegoAdapter(getContext(), juegosList);
+                juegosAdapter = new JuegoAdapter(getContext(), juegosList, ListadoJuegos.this); // Usar ListadoJuegos.this para pasar la instancia correcta
                 recyclerView.setAdapter(juegosAdapter);
             });
         }).start();

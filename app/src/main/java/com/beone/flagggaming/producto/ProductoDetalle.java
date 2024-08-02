@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 import com.beone.flagggaming.R;
 import com.beone.flagggaming.db.DBHelper;
+import com.bumptech.glide.Glide;
 
 import java.util.HashMap;
 import java.util.List;
@@ -81,6 +82,8 @@ public class ProductoDetalle extends AppCompatActivity {
             String categoriaDesc = getIntent().getStringExtra("categoriaDesc");
             String tiendaNombre = getIntent().getStringExtra("tiendaNombre");
             int idTienda = intent.getIntExtra("idTienda", -1);
+            String imagenUrl = intent.getStringExtra("imagenUrl"); // Añadir la URL de la imagen
+
 
 
             // Setear los datos en las vistas
@@ -90,7 +93,12 @@ public class ProductoDetalle extends AppCompatActivity {
             textViewPrecioVta.setText("$ "+precioVta);
             textViewCategoria.setText(categoriaDesc);
             textViewTiendaNombre.setText("Tienda: " + tiendaNombre);
-            imageViewCategoria.setImageResource(getCategoriaImageResource(idCategoria));
+            // Cargar la imagen de la categoría desde la URL usando Glide
+            Glide.with(this)
+                    .load(imagenUrl)
+                    .placeholder(R.drawable.nopic)
+                    .error(R.drawable.nopic)
+                    .into(imageViewCategoria);
 
             new ProductoDetalle.LoadTiendaTask().execute();
         }
