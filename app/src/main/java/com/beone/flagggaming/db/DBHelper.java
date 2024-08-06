@@ -49,7 +49,7 @@ public class DBHelper {
             while (resultSet.next()) {
                 Juego juego = new Juego(
                         resultSet.getString("idFlagg"),
-                        resultSet.getInt("idJuegoTienda"),
+                        resultSet.getString("idJuegoTienda"),
                         resultSet.getString("nombre"),
                         resultSet.getString("descripcionCorta"),
                         resultSet.getString("tienda"),
@@ -84,7 +84,7 @@ public class DBHelper {
             if (resultSet.next()) {
                 juego = new Juego(
                         resultSet.getString("idFlagg"),
-                        resultSet.getInt("idJuegoTienda"),
+                        resultSet.getString("idJuegoTienda"),
                         resultSet.getString("nombre"),
                         resultSet.getString("descripcionCorta"),
                         resultSet.getString("tienda"),

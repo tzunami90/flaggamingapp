@@ -1,19 +1,33 @@
 package com.beone.flagggaming.juegos;
 
 import android.os.Bundle;
-
 import androidx.fragment.app.Fragment;
-
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.beone.flagggaming.R;
 import com.beone.flagggaming.db.DBHelper;
+import com.beone.flagggaming.dolarapi.DolarAPIManager;
+import com.beone.flagggaming.dolarapi.DolarApiResponse;
+import com.beone.flagggaming.ipcapi.ApiResponse;
+import com.beone.flagggaming.ipcapi.ApiService;
+import com.beone.flagggaming.ipcapi.IPCApiManager;
+import com.beone.flagggaming.steamapi.AppDetailsResponse;
+import com.beone.flagggaming.steamapi.SteamDetailApiAdapter;
+import com.beone.flagggaming.steamapi.SteamDetailApiService;
+import com.beone.flagggaming.steamapi.details.Data;
 import com.bumptech.glide.Glide;
+import java.text.DecimalFormat;
+import java.util.List;
+import java.util.Map;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 
 public class DetalleJuego extends Fragment {
@@ -23,7 +37,13 @@ public class DetalleJuego extends Fragment {
     private TextView descripcionTextView;
     private ImageView imagenImageView;
     private ImageView icSteam, icEpic;
-    private TextView precioSteam, precioEpic, precioPareSteam, precioPareEpic, precioPostaSteam, precioPostaEpic;
+    private TextView precioSteam, precioEpic, precioPareSteam, precioPareEpic, precioPostaSteam, precioPostaEpic, estudioTextView, requisitosTextView;
+    private DolarAPIManager dolarAPIManager;
+    double dolarCompra, dolarVenta , inflacion = 0.0;
+    boolean isDolarDataFetched = false;
+    boolean isInflationDataFetched = false;
+    double precioFinalDouble;
+    double precioEnARS;
 
 
     public DetalleJuego() {
@@ -55,8 +75,18 @@ public class DetalleJuego extends Fragment {
         precioPareEpic = view.findViewById(R.id.precioPareEpic);
         precioPostaSteam = view.findViewById(R.id.precioPostaSteam);
         precioPostaEpic = view.findViewById(R.id.precioPostaEpic);
+        estudioTextView = view.findViewById(R.id.estudioTextView);
+        requisitosTextView = view.findViewById(R.id.requisitosTextView);
 
         cargarDetallesJuego();
+
+        // Configurar la API de Dolar TC
+        dolarAPIManager = new DolarAPIManager();
+        fetchDataFromAPI();
+
+        // Configurar la API de inflación
+        configurarIPCApi();
+
 
         return view;
     }
@@ -64,17 +94,210 @@ public class DetalleJuego extends Fragment {
         if (idFlagg != null) {
             new Thread(() -> {
                 Juego juego = DBHelper.getJuegoByIdFlagg(getContext(), idFlagg);
-                getActivity().runOnUiThread(() -> {
-                    if (juego != null) {
-                        nombreTextView.setText(juego.getNombre());
-                        descripcionTextView.setText(juego.getDescripcionCorta());
-                        Glide.with(getContext()).load(juego.getImagen()).into(imagenImageView);
-                        // Actualiza otros elementos de UI con los detalles del juego
-                    } else {
-                        Toast.makeText(getContext(), "Juego no encontrado", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                if (juego != null) {
+                    obtenerPrecio(juego);
+                } else {
+                    getActivity().runOnUiThread(() -> Toast.makeText(getContext(), "Juego no encontrado", Toast.LENGTH_SHORT).show());
+                }
             }).start();
         }
+    }
+
+    private void obtenerPrecio(Juego juego) {
+        // Obtener el servicio de la API de Steam
+        SteamDetailApiService apiService = SteamDetailApiAdapter.getApiService();
+
+        // Realizar la solicitud de detalles del juego
+        Call<Map<String, AppDetailsResponse.GameDetails>> call = apiService.getAppDetails(juego.getIdJuegoTienda(), "ar");
+
+        call.enqueue(new Callback<Map<String, AppDetailsResponse.GameDetails>>() {
+            @Override
+            public void onResponse(Call<Map<String, AppDetailsResponse.GameDetails>> call, Response<Map<String, AppDetailsResponse.GameDetails>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Map<String, AppDetailsResponse.GameDetails> appDetailsResponse = response.body();
+                    Log.d("Response Body", response.body().toString());
+
+                    // Obtener los detalles del juego y mostrarlos en la interfaz de usuario
+                    mostrarDetallesJuego(appDetailsResponse, juego);
+                } else {
+                    // Mostrar mensaje de error si la solicitud no fue exitosa
+                    mostrarMensaje("La solicitud no fue exitosa. Código de respuesta: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Map<String, AppDetailsResponse.GameDetails>> call, Throwable t) {
+                // Manejar el fallo de la solicitud
+                Log.e("Response", "Error de red", t);
+                mostrarMensaje("Error de red: " + t.getMessage());
+            }
+        });
+    }
+
+    private void mostrarDetallesJuego(Map<String, AppDetailsResponse.GameDetails> appDetailsResponse, Juego juego) {
+        if (appDetailsResponse == null) {
+            mostrarMensaje("La respuesta del servidor es nula. No se pudieron obtener los detalles del juego.");
+            return;
+        }
+
+        // Obtener los detalles específicos del juego
+        AppDetailsResponse.GameDetails gameDetails = appDetailsResponse.get(juego.getIdJuegoTienda());
+        if (gameDetails == null || !gameDetails.isSuccess()) {
+            mostrarMensaje("La solicitud para el juego con ID: " + juego.getIdJuegoTienda() + " no fue exitosa. Los detalles del juego no están disponibles.");
+            return;
+        }
+        Log.d("gameDetails", gameDetails.toString());
+
+        // Obtener los datos del juego
+        Data data = gameDetails.getData();
+        if (data == null) {
+            mostrarMensaje("Los datos del juego son nulos para el ID: " + juego.getIdJuegoTienda());
+            return;
+        }
+
+        // Mostrar los detalles del juego en la interfaz de usuario
+        getActivity().runOnUiThread(() -> {
+            nombreTextView.setText(juego.getNombre());
+            descripcionTextView.setText(juego.getDescripcionCorta());
+            Glide.with(getContext()).load(juego.getImagen()).into(imagenImageView);
+            estudioTextView.setText("Estudio: " + juego.getEstudio());
+            requisitosTextView.setText("Requisitos: " + juego.getRequisitos());
+
+            if (data.isIsFree()) {
+                precioSteam.setText("Precio: GRATIS");
+                precioPostaSteam.setText("");
+                precioPareSteam.setText("");
+            } else {
+                if (data.getPriceOverview() != null) {
+                    juego.setPrecioSteam(data.getPriceOverview().getFinalFormatted());
+                    precioSteam.setText("Precio: " + juego.getPrecioSteam());
+
+                    int precioFinalInt = data.getPriceOverview().getFinalPrice();
+                    precioFinalDouble = precioFinalInt / 100.0;
+
+                    // Recalcular el precio si ya se obtuvieron los datos necesarios
+                    if (isDolarDataFetched || isInflationDataFetched) {
+                        recalcularPrecios(juego);
+                    }
+                } else {
+                    precioSteam.setText("Precio: No disponible");
+                    precioPostaSteam.setText("");
+                    precioPareSteam.setText("");
+                }
+            }
+        });
+    }
+
+    private void fetchDataFromAPI() {
+        dolarAPIManager.getDolarData(new DolarAPIManager.DolarDataListener() {
+            @Override
+            public void onDolarDataReceived(DolarApiResponse dolarData) {
+                dolarCompra = dolarData.getCompra();
+                dolarVenta = dolarData.getVenta();
+                isDolarDataFetched = true;
+                Log.d("Dolar Data", "Compra: " + dolarCompra + " Venta: " + dolarVenta);
+
+                recalcularPrecios(null); // Recalcular precios con los datos de dolar
+            }
+
+            @Override
+            public void onDolarDataError(String errorMessage) {
+                mostrarMensaje(errorMessage);
+                isDolarDataFetched = false;
+                recalcularPrecios(null); // Permitir que la aplicación siga funcionando sin los datos de dolar
+            }
+        });
+    }
+
+    private void configurarIPCApi() {
+        Retrofit retrofit = IPCApiManager.getClient("https://apis.datos.gob.ar/series/api/");
+        ApiService apiService = retrofit.create(ApiService.class);
+
+        String ids = "148.3_INIVELNAL_DICI_M_26";
+        String format = "json";
+        int maxResults = 5000; // Número máximo de resultados para obtener todos los datos desde 2016
+
+        String url = "https://apis.datos.gob.ar/series/api/series?ids=" + ids + "&limit=" + maxResults + "&format=" + format;
+        Log.d("URL Construida", url);
+
+        Call<ApiResponse> call = apiService.getSeriesData(ids, String.valueOf(maxResults), format);
+        call.enqueue(new Callback<ApiResponse>() {
+            @Override
+            public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
+                Log.d("Datos API", "Response code: " + response.code());
+                if (response.isSuccessful() && response.body() != null) {
+                    List<List<Object>> data = response.body().getData();
+                    Log.d("Datos API", "Total de datos recibidos: " + (data != null ? data.size() : 0));
+                    if (data != null && data.size() >= 2) {
+                        // Obtener los últimos dos valores
+                        List<Object> lastObservation = data.get(data.size() - 1);
+                        List<Object> secondLastObservation = data.get(data.size() - 2);
+
+                        String lastDate = (String) lastObservation.get(0);
+                        double lastValue = ((Number) lastObservation.get(1)).doubleValue();
+                        String secondLastDate = (String) secondLastObservation.get(0);
+                        double secondLastValue = ((Number) secondLastObservation.get(1)).doubleValue();
+
+                        Log.d("Datos API", "Última observación - Fecha: " + lastDate + ", Valor: " + lastValue);
+                        Log.d("Datos API", "Penúltima observación - Fecha: " + secondLastDate + ", Valor: " + secondLastValue);
+
+                        inflacion = ((lastValue - secondLastValue) / secondLastValue) * 100;
+                        Log.d("Inflacion", inflacion + "%");
+                        isInflationDataFetched = true;
+                    } else {
+                        mostrarMensaje("No hay suficientes datos de inflación para calcular.");
+                        isInflationDataFetched = false;
+                    }
+
+                    recalcularPrecios(null); // Asegurar que se recalculan los precios después de procesar los datos de inflación
+                } else {
+                    mostrarMensaje("Error en la respuesta de la API: " + response.code());
+                    isInflationDataFetched = false;
+                    recalcularPrecios(null); // Asegurar que se recalculan los precios incluso si la API de inflación falla
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse> call, Throwable t) {
+                Log.d("Datos API", "Error al obtener datos de IPC: " + t.getMessage());
+                mostrarMensaje("Error al obtener datos de IPC: " + t.getMessage());
+                isInflationDataFetched = false;
+                recalcularPrecios(null); // Asegurar que se recalculan los precios incluso si la API de inflación falla
+            }
+        });
+    }
+
+    private void recalcularPrecios(Juego juego) {
+        getActivity().runOnUiThread(() -> {
+            DecimalFormat decimalFormat = new DecimalFormat("#.##");
+
+            // Mostrar precios en ARS y precio proyectado
+            if (isDolarDataFetched) {
+                precioEnARS = precioFinalDouble * dolarVenta;
+                Log.d("Dolar API", "Precio ARS: " + decimalFormat.format(precioEnARS));
+                precioPostaSteam.setText("Precio Posta ARS: $" + decimalFormat.format(precioEnARS));
+                if (juego != null) {
+                    juego.setPrecioPostaSteam("Precio Posta ARS: $" + decimalFormat.format(precioEnARS));
+                }
+            } else {
+                precioPostaSteam.setText("Precio Posta ARS: No disponible");
+            }
+
+            if (isInflationDataFetched && isDolarDataFetched) {
+                double precioSufrir = precioEnARS + (precioEnARS * (inflacion / 100));
+                Log.d("IPC API", "Precio Pare de Sufrir: " + decimalFormat.format(precioSufrir));
+                precioPareSteam.setText("Precio Pare de Sufrir prox. mes: $" + decimalFormat.format(precioSufrir));
+                if (juego != null) {
+                    juego.setPrecioPareSteam("Precio Pare de Sufrir prox. mes: $" + decimalFormat.format(precioSufrir));
+                }
+            } else {
+                precioPareSteam.setText("Precio Pare de Sufrir prox. mes: No disponible");
+            }
+        });
+    }
+
+    private void mostrarMensaje(String mensaje) {
+        Log.d("MostrarJuegoSteam", mensaje);
+        Toast.makeText(getContext(), mensaje, Toast.LENGTH_SHORT).show();
     }
 }

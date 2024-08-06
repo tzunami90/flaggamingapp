@@ -1,9 +1,12 @@
 package com.beone.flagggaming.juegos;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+
 public class Juego {
 
     private String idFlagg;
-    private int idJuegoTienda;
+    private String idJuegoTienda;
     private String nombre;
     private String descripcionCorta;
     private String tienda;
@@ -13,8 +16,11 @@ public class Juego {
     private String requisitos;
     private String estudio;
     private int contadorVistas;
+    private String precioSteam;
+    private String precioPostaSteam;
+    private String precioPareSteam;
 
-    public Juego(String idFlagg, int idJuegoTienda, String nombre, String descripcionCorta, String tienda, String imagen, String imagenMini, String urlTienda, String requisitos, String estudio, int contadorVistas) {
+    public Juego(String idFlagg, String idJuegoTienda, String nombre, String descripcionCorta, String tienda, String imagen, String imagenMini, String urlTienda, String requisitos, String estudio, int contadorVistas) {
         this.idFlagg = idFlagg;
         this.idJuegoTienda = idJuegoTienda;
         this.nombre = nombre;
@@ -36,11 +42,11 @@ public class Juego {
         this.idFlagg = idFlagg;
     }
 
-    public int getIdJuegoTienda() {
+    public String getIdJuegoTienda() {
         return idJuegoTienda;
     }
 
-    public void setIdJuegoTienda(int idJuegoTienda) {
+    public void setIdJuegoTienda(String idJuegoTienda) {
         this.idJuegoTienda = idJuegoTienda;
     }
 
@@ -93,7 +99,7 @@ public class Juego {
     }
 
     public String getRequisitos() {
-        return requisitos;
+        return stripHtml(requisitos);
     }
 
     public void setRequisitos(String requisitos) {
@@ -114,5 +120,47 @@ public class Juego {
 
     public void setContadorVistas(int contadorVistas) {
         this.contadorVistas = contadorVistas;
+    }
+
+    public String getPrecioSteam() {
+        return precioSteam;
+    }
+
+    public void setPrecioSteam(String precioSteam) {
+        this.precioSteam = precioSteam;
+    }
+
+    public String getPrecioPostaSteam() {
+        return precioPostaSteam;
+    }
+
+    public void setPrecioPostaSteam(String precioPostaSteam) {
+        this.precioPostaSteam = precioPostaSteam;
+    }
+
+    public String getPrecioPareSteam() {
+        return precioPareSteam;
+    }
+
+    public void setPrecioPareSteam(String precioPareSteam) {
+        this.precioPareSteam = precioPareSteam;
+    }
+
+    // Método para eliminar etiquetas HTML de un texto y reemplazar <br> con saltos de línea
+    private String stripHtml(String html) {
+        // Verificar si el HTML es nulo o vacío
+        if (html == null || html.isEmpty()) {
+            return "";
+        }
+
+        // Utilizar JSoup para parsear el HTML y extraer el texto sin etiquetas HTML
+        Document doc = Jsoup.parse(html);
+        String text = doc.text();
+
+        // Reemplazar <br> con saltos de línea reales
+        text = text.replaceAll("\\\\n", "\n");
+        text = text.replaceAll("(?i)<br[^>]*>", "\n"); // Expresión regular para reemplazar <br> con \n
+
+        return text;
     }
 }
