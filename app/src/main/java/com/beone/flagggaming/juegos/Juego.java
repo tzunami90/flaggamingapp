@@ -19,8 +19,9 @@ public class Juego {
     private String precioSteam;
     private String precioPostaSteam;
     private String precioPareSteam;
+    private String urlEpic;
 
-    public Juego(String idFlagg, String idJuegoTienda, String nombre, String descripcionCorta, String tienda, String imagen, String imagenMini, String urlTienda, String requisitos, String estudio, int contadorVistas) {
+    public Juego(String idFlagg, String idJuegoTienda, String nombre, String descripcionCorta, String tienda, String imagen, String imagenMini, String urlTienda, String urlEpic, String requisitos, String estudio, int contadorVistas) {
         this.idFlagg = idFlagg;
         this.idJuegoTienda = idJuegoTienda;
         this.nombre = nombre;
@@ -32,6 +33,7 @@ public class Juego {
         this.requisitos = requisitos;
         this.estudio = estudio;
         this.contadorVistas = contadorVistas;
+        this.urlEpic = urlEpic;
     }
 
     public String getIdFlagg() {
@@ -94,8 +96,15 @@ public class Juego {
         return urlTienda;
     }
 
-    public void setUrlTienda(String urlTienda) {
+    public void setUrlTienda(String urlEpic) {
         this.urlTienda = urlTienda;
+    }
+    public String getUrlEpic() {
+        return urlEpic;
+    }
+
+    public void setUrlEpic(String urlEpic) {
+        this.urlEpic = urlEpic;
     }
 
     public String getRequisitos() {

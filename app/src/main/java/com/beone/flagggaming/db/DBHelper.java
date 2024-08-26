@@ -42,7 +42,7 @@ public class DBHelper {
         List<Juego> juegosList = new ArrayList<>();
 
         try (Connection connection = conDB(context)) {
-            String query = "SELECT TOP (10000) [idFlagg], [idJuegoTienda], [nombre], [descripcionCorta], [tienda], [imagen], [imagenMini], [urlTienda], [requisitos], [estudio], [contadorVistas] FROM [flagg_test3].[dbo].[juegos]";
+            String query = "SELECT TOP (10000) [idFlagg], [idJuegoTienda], [nombre], [descripcionCorta], [tienda], [imagen], [imagenMini], [urlTienda], [urlEpic], [requisitos], [estudio], [contadorVistas] FROM [flagg_test3].[dbo].[juegos]";
             PreparedStatement statement = connection.prepareStatement(query);
             ResultSet resultSet = statement.executeQuery();
 
@@ -56,6 +56,7 @@ public class DBHelper {
                         resultSet.getString("imagen"),
                         resultSet.getString("imagenMini"),
                         resultSet.getString("urlTienda"),
+                        resultSet.getString("urlEpic"),
                         resultSet.getString("requisitos"),
                         resultSet.getString("estudio"),
                         resultSet.getInt("contadorVistas")
@@ -76,7 +77,7 @@ public class DBHelper {
         Juego juego = null;
 
         try (Connection connection = conDB(context)) {
-            String query = "SELECT [idFlagg], [idJuegoTienda], [nombre], [descripcionCorta], [tienda], [imagen], [imagenMini], [urlTienda], [requisitos], [estudio], [contadorVistas] FROM [flagg_test3].[dbo].[juegos] WHERE [idFlagg] = ?";
+            String query = "SELECT [idFlagg], [idJuegoTienda], [nombre], [descripcionCorta], [tienda], [imagen], [imagenMini], [urlTienda],  [urlEpic], [requisitos], [estudio], [contadorVistas] FROM [flagg_test3].[dbo].[juegos] WHERE [idFlagg] = ?";
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setString(1, idFlagg);
             ResultSet resultSet = statement.executeQuery();
@@ -91,6 +92,7 @@ public class DBHelper {
                         resultSet.getString("imagen"),
                         resultSet.getString("imagenMini"),
                         resultSet.getString("urlTienda"),
+                        resultSet.getString("urlEpic"),
                         resultSet.getString("requisitos"),
                         resultSet.getString("estudio"),
                         resultSet.getInt("contadorVistas")
