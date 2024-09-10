@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.beone.flagggaming.R;
@@ -44,6 +45,7 @@ public class DetalleJuego extends Fragment {
     boolean isInflationDataFetched = false;
     double precioFinalDouble;
     double precioEnARS;
+    private ProgressBar progressBar;
 
 
     public DetalleJuego() {
@@ -78,6 +80,11 @@ public class DetalleJuego extends Fragment {
         estudioTextView = view.findViewById(R.id.estudioTextView);
         requisitosTextView = view.findViewById(R.id.requisitosTextView);
 
+        progressBar = view.findViewById(R.id.progressBar); // Inicializar el ProgressBar
+
+        // Mostrar ProgressBar antes de comenzar la carga
+        progressBar.setVisibility(View.VISIBLE);
+
         cargarDetallesJuego();
 
         // Configurar la API de Dolar TC
@@ -97,7 +104,10 @@ public class DetalleJuego extends Fragment {
                 if (juego != null) {
                     obtenerPrecio(juego);
                 } else {
-                    getActivity().runOnUiThread(() -> Toast.makeText(getContext(), "Juego no encontrado", Toast.LENGTH_SHORT).show());
+                    getActivity().runOnUiThread(() -> {
+                        Toast.makeText(getContext(), "Juego no encontrado", Toast.LENGTH_SHORT).show();
+                        progressBar.setVisibility(View.GONE); // Ocultar cuando haya un error
+                    });
                 }
             }).start();
         }
@@ -123,6 +133,7 @@ public class DetalleJuego extends Fragment {
                     // Mostrar mensaje de error si la solicitud no fue exitosa
                     mostrarMensaje("La solicitud no fue exitosa. Código de respuesta: " + response.code());
                 }
+                progressBar.setVisibility(View.GONE);  // Ocultar cuando se terminen de cargar los datos
             }
 
             @Override
@@ -130,6 +141,7 @@ public class DetalleJuego extends Fragment {
                 // Manejar el fallo de la solicitud
                 Log.e("Response", "Error de red", t);
                 mostrarMensaje("Error de red: " + t.getMessage());
+                progressBar.setVisibility(View.GONE); // Ocultar cuando haya un fallo
             }
         });
     }
@@ -275,23 +287,23 @@ public class DetalleJuego extends Fragment {
             if (isDolarDataFetched) {
                 precioEnARS = precioFinalDouble * dolarVenta;
                 Log.d("Dolar API", "Precio ARS: " + decimalFormat.format(precioEnARS));
-                precioPostaSteam.setText("Precio Posta ARS: $" + decimalFormat.format(precioEnARS));
+                precioPostaSteam.setText("Precio Posta (ARS): $" + decimalFormat.format(precioEnARS));
                 if (juego != null) {
                     juego.setPrecioPostaSteam("Precio Posta ARS: $" + decimalFormat.format(precioEnARS));
                 }
             } else {
-                precioPostaSteam.setText("Precio Posta ARS: No disponible");
+                precioPostaSteam.setText("Precio Posta (ARS): No disponible");
             }
 
             if (isInflationDataFetched && isDolarDataFetched) {
                 double precioSufrir = precioEnARS + (precioEnARS * (inflacion / 100));
                 Log.d("IPC API", "Precio Pare de Sufrir: " + decimalFormat.format(precioSufrir));
-                precioPareSteam.setText("Precio Pare de Sufrir prox. mes: $" + decimalFormat.format(precioSufrir));
+                precioPareSteam.setText("Precio Pare de Sufrir (Prox mes): $" + decimalFormat.format(precioSufrir));
                 if (juego != null) {
                     juego.setPrecioPareSteam("Precio Pare de Sufrir prox. mes: $" + decimalFormat.format(precioSufrir));
                 }
             } else {
-                precioPareSteam.setText("Precio Pare de Sufrir prox. mes: No disponible");
+                precioPareSteam.setText("Precio Pare de Sufrir (Prox mes): No disponible");
             }
         });
     }
