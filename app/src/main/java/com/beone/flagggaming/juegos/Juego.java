@@ -19,6 +19,9 @@ public class Juego {
     private String precioSteam;
     private String precioPostaSteam;
     private String precioPareSteam;
+    private String precioEpic;
+    private String precioPostaEpic;
+    private String precioPareEpic;
     private String urlEpic;
 
     public Juego(String idFlagg, String idJuegoTienda, String nombre, String descripcionCorta, String tienda, String imagen, String imagenMini, String urlTienda, String urlEpic, String requisitos, String estudio, int contadorVistas) {
@@ -153,6 +156,30 @@ public class Juego {
 
     public void setPrecioPareSteam(String precioPareSteam) {
         this.precioPareSteam = precioPareSteam;
+    }
+
+    public String getPrecioEpic() {
+        return precioEpic;
+    }
+
+    public void setPrecioEpic(String precioEpic) {
+        this.precioEpic = precioEpic;
+    }
+
+    public String getPrecioPostaEpic() {
+        return precioPostaEpic;
+    }
+
+    public void setPrecioPostaEpic(String precioPostaEpic) {
+        this.precioPostaEpic = precioPostaEpic;
+    }
+
+    public String getPrecioPareEpic() {
+        return precioPareEpic;
+    }
+
+    public void setPrecioPareEpic(String precioPareEpic) {
+        this.precioPareEpic = precioPareEpic;
     }
 
     // Método para eliminar etiquetas HTML de un texto y reemplazar <br> con saltos de línea

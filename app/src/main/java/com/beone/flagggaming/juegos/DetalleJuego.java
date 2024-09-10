@@ -14,6 +14,10 @@ import com.beone.flagggaming.R;
 import com.beone.flagggaming.db.DBHelper;
 import com.beone.flagggaming.dolarapi.DolarAPIManager;
 import com.beone.flagggaming.dolarapi.DolarApiResponse;
+import com.beone.flagggaming.epicapi.EpicGamesApiAdapter;
+import com.beone.flagggaming.epicapi.EpicGamesApiService;
+import com.beone.flagggaming.epicapi.GraphQLRequest;
+import com.beone.flagggaming.epicapi.GraphQLResponse;
 import com.beone.flagggaming.ipcapi.ApiResponse;
 import com.beone.flagggaming.ipcapi.ApiService;
 import com.beone.flagggaming.ipcapi.IPCApiManager;
@@ -117,7 +121,10 @@ public class DetalleJuego extends Fragment {
         // Obtener el servicio de la API de Steam
         SteamDetailApiService apiService = SteamDetailApiAdapter.getApiService();
 
-        // Realizar la solicitud de detalles del juego
+        // Obtener el servicio de la API de Epic
+        EpicGamesApiService epicService = EpicGamesApiAdapter.getApiService();
+
+        // Realizar la solicitud de detalles del juego para Steam
         Call<Map<String, AppDetailsResponse.GameDetails>> call = apiService.getAppDetails(juego.getIdJuegoTienda(), "ar");
 
         call.enqueue(new Callback<Map<String, AppDetailsResponse.GameDetails>>() {
@@ -142,6 +149,63 @@ public class DetalleJuego extends Fragment {
                 Log.e("Response", "Error de red", t);
                 mostrarMensaje("Error de red: " + t.getMessage());
                 progressBar.setVisibility(View.GONE); // Ocultar cuando haya un fallo
+            }
+        });
+
+        // Realizar la solicitud de precio para Epic Games
+        String query = "{\n" +
+                "  \"query\": \"{ Catalog { searchStore(query: \\\"" + juego.getNombre() + "\\\", locale: \\\"en-US\\\", country: \\\"AR\\\", storeType: \\\"EPIC_GAMES_STORE\\\") { elements { title price { totalPrice { discountPrice } } } } } }\"\n" +
+                "}";
+
+        GraphQLRequest request = new GraphQLRequest(query);
+
+        Call<GraphQLResponse> epicCall = epicService.searchStoreQuery(request);
+
+        epicCall.enqueue(new Callback<GraphQLResponse>() {
+            @Override
+            public void onResponse(Call<GraphQLResponse> call, Response<GraphQLResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<GraphQLResponse.Element> elements = response.body().getData().getCatalog().getSearchStore().getElements();
+                    if (!elements.isEmpty()) {
+                        // Obtener el precio de descuento como string
+                        String discountPriceStr = elements.get(0).getPrice().getTotalPrice().getFmtPrice().getDiscountPrice();
+                        Log.d("Epic API Response", response.body().toString());
+                        Log.d("Precio en dólares Epic", discountPriceStr);
+                        if (discountPriceStr != null) {
+                            try {
+                                // Eliminar el símbolo de dólar y convertir a centavos
+                                String priceWithoutDollar = discountPriceStr.replace("$", "").trim();
+                                double priceInDollars = Double.parseDouble(priceWithoutDollar);
+                                int priceInCents = (int) Math.round(priceInDollars * 100);
+
+                                // Llamar a mostrarDetallesEpic con el precio en centavos
+                                mostrarDetallesEpic(priceInCents, juego);
+
+                            } catch (NumberFormatException e) {
+                                // Manejar el caso de que el precio no sea un número válido
+                                e.printStackTrace();
+                                mostrarMensaje("Error formateando el precio de Epic Games");
+                            }
+                        } else {
+                            // Manejar el caso donde el precio sea null
+                            precioEpic.setText("Precio: No disponible");
+                            precioPostaEpic.setText("");
+                            precioPareEpic.setText("");
+                        }
+                    } else {
+                        // No hay elementos en la lista
+                        precioEpic.setText("Precio: No disponible");
+                        precioPostaEpic.setText("");
+                        precioPareEpic.setText("");
+                    }
+                } else {
+                    mostrarMensaje("Error obteniendo precio de Epic Games");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<GraphQLResponse> call, Throwable t) {
+                mostrarMensaje("Error de red en Epic Games: " + t.getMessage());
             }
         });
     }
@@ -175,6 +239,7 @@ public class DetalleJuego extends Fragment {
             estudioTextView.setText("Estudio: " + juego.getEstudio());
             requisitosTextView.setText("Requisitos: " + juego.getRequisitos());
 
+            // Procesar el precio de Steam
             if (data.isIsFree()) {
                 precioSteam.setText("Precio: GRATIS");
                 precioPostaSteam.setText("");
@@ -199,6 +264,20 @@ public class DetalleJuego extends Fragment {
             }
         });
     }
+
+    private void mostrarDetallesEpic(double epicDiscountPrice, Juego juego) {
+        getActivity().runOnUiThread(() -> {
+            DecimalFormat decimalFormat = new DecimalFormat("#.##");
+
+            precioEpic.setText("Precio: $" + decimalFormat.format(epicDiscountPrice));
+            precioFinalDouble = epicDiscountPrice;
+
+            if (isDolarDataFetched || isInflationDataFetched) {
+                recalcularPreciosEpic(juego);
+            }
+        });
+    }
+
 
     private void fetchDataFromAPI() {
         dolarAPIManager.getDolarData(new DolarAPIManager.DolarDataListener() {
@@ -304,6 +383,27 @@ public class DetalleJuego extends Fragment {
                 }
             } else {
                 precioPareSteam.setText("Precio Pare de Sufrir (Prox mes): No disponible");
+            }
+        });
+    }
+    private void recalcularPreciosEpic(Juego juego) {
+        getActivity().runOnUiThread(() -> {
+            DecimalFormat decimalFormat = new DecimalFormat("#.##");
+
+            if (isDolarDataFetched) {
+                precioEnARS = precioFinalDouble * dolarVenta;
+                precioPostaEpic.setText("Precio Posta (ARS): $" + decimalFormat.format(precioEnARS));
+                juego.setPrecioPostaEpic("Precio Posta ARS: $" + decimalFormat.format(precioEnARS));
+            } else {
+                precioPostaEpic.setText("Precio Posta (ARS): No disponible");
+            }
+
+            if (isInflationDataFetched && isDolarDataFetched) {
+                double precioSufrir = precioEnARS + (precioEnARS * (inflacion / 100));
+                precioPareEpic.setText("Precio Pare de Sufrir (Prox mes): $" + decimalFormat.format(precioSufrir));
+                juego.setPrecioPareEpic("Precio Pare de Sufrir prox. mes: $" + decimalFormat.format(precioSufrir));
+            } else {
+                precioPareEpic.setText("Precio Pare de Sufrir (Prox mes): No disponible");
             }
         });
     }
