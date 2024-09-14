@@ -7,6 +7,9 @@
         <item name="colorPrimary">@color/flagg</item>
         <item name="colorPrimaryVariant">@color/flagg</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
+        <!-- Hacer la barra de estado transparente -->
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:fitsSystemWindows">false</item>
     </style>
     <style name="Widget.AppCompat.ProgressBar" parent="android:Widget.ProgressBar">
         <item name="android:indeterminateDrawable">@drawable/progress_medium</item>

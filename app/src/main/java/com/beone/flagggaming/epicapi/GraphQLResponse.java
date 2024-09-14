@@ -1,6 +1,7 @@
 package com.beone.flagggaming.epicapi;
 
 import java.util.List;
+import com.google.gson.annotations.SerializedName;
 
 public class GraphQLResponse {
     private Data data;
@@ -9,31 +10,21 @@ public class GraphQLResponse {
         return data;
     }
 
-    public void setData(Data data) {
-        this.data = data;
-    }
-
     public static class Data {
+        @SerializedName("Catalog")
         private Catalog catalog;
 
         public Catalog getCatalog() {
             return catalog;
         }
-
-        public void setCatalog(Catalog catalog) {
-            this.catalog = catalog;
-        }
     }
 
     public static class Catalog {
+        @SerializedName("searchStore")
         private SearchStore searchStore;
 
         public SearchStore getSearchStore() {
             return searchStore;
-        }
-
-        public void setSearchStore(SearchStore searchStore) {
-            this.searchStore = searchStore;
         }
     }
 
@@ -42,10 +33,6 @@ public class GraphQLResponse {
 
         public List<Element> getElements() {
             return elements;
-        }
-
-        public void setElements(List<Element> elements) {
-            this.elements = elements;
         }
     }
 
@@ -57,16 +44,8 @@ public class GraphQLResponse {
             return title;
         }
 
-        public void setTitle(String title) {
-            this.title = title;
-        }
-
         public Price getPrice() {
             return price;
-        }
-
-        public void setPrice(Price price) {
-            this.price = price;
         }
     }
 
@@ -76,10 +55,6 @@ public class GraphQLResponse {
         public TotalPrice getTotalPrice() {
             return totalPrice;
         }
-
-        public void setTotalPrice(TotalPrice totalPrice) {
-            this.totalPrice = totalPrice;
-        }
     }
 
     public static class TotalPrice {
@@ -88,10 +63,6 @@ public class GraphQLResponse {
         public FmtPrice getFmtPrice() {
             return fmtPrice;
         }
-
-        public void setFmtPrice(FmtPrice fmtPrice) {
-            this.fmtPrice = fmtPrice;
-        }
     }
 
     public static class FmtPrice {
@@ -99,10 +70,6 @@ public class GraphQLResponse {
 
         public String getDiscountPrice() {
             return discountPrice;
-        }
-
-        public void setDiscountPrice(String discountPrice) {
-            this.discountPrice = discountPrice;
         }
     }
 }
