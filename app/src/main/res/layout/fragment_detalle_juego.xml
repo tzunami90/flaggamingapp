@@ -61,6 +61,7 @@
             card_view:cardElevation="4dp">
 
             <LinearLayout
+                android:id="@+id/linearSteam"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -117,6 +118,7 @@
             card_view:cardElevation="4dp">
 
             <LinearLayout
+                android:id="@+id/linearEpic"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"

@@ -1,5 +1,7 @@
 package com.beone.flagggaming.juegos;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import android.util.Log;
@@ -7,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -55,6 +58,7 @@ public class DetalleJuego extends Fragment {
     double precioFinalDouble;
     double precioEnARS;
     private ProgressBar progressBar;
+    LinearLayout linearEpic, linearSteam;
 
 
     public DetalleJuego() {
@@ -75,6 +79,8 @@ public class DetalleJuego extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_detalle_juego, container, false);
 
+        linearEpic = view.findViewById(R.id.linearEpic);
+        linearSteam = view.findViewById(R.id.linearSteam);
         nombreTextView = view.findViewById(R.id.nombreTextView);
         descripcionTextView = view.findViewById(R.id.descripcionTextView);
         imagenImageView = view.findViewById(R.id.imagenImageView);
@@ -306,6 +312,10 @@ public class DetalleJuego extends Fragment {
             return;
         }
 
+        // Obtener las URLs del juego desde la base de datos
+        String urlTienda = juego.getUrlTienda();
+        String urlEpic = juego.getUrlEpic();
+
         // Mostrar los detalles del juego en la interfaz de usuario
         getActivity().runOnUiThread(() -> {
             nombreTextView.setText(juego.getNombre());
@@ -337,6 +347,9 @@ public class DetalleJuego extends Fragment {
                     precioPareSteam.setText("");
                 }
             }
+            // Configurar el LinearLayout para abrir el navegador con la URL
+            linearSteam.setOnClickListener(v -> abrirNavegador(urlTienda));
+            linearEpic.setOnClickListener(v -> abrirNavegador(urlEpic));
         });
     }
 
@@ -499,6 +512,16 @@ public class DetalleJuego extends Fragment {
         }
     }
 
+    // Método para abrir el navegador con la URL proporcionada
+    private void abrirNavegador(String url) {
+        if (url != null && !url.isEmpty()) {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse(url));
+            getContext().startActivity(intent);
+        } else {
+            mostrarMensaje("La URL no está disponible.");
+        }
+    }
 
     private void mostrarMensaje(String mensaje) {
         Log.d("MostrarJuegoSteam", mensaje);
