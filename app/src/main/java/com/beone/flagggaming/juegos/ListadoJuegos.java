@@ -66,6 +66,10 @@ public class ListadoJuegos extends Fragment implements JuegoAdapter.OnJuegoClick
     }
 
     public void onJuegoClick(String idFlagg) {
+        // Incrementar el contador de vistas en un hilo secundario
+        new Thread(() -> DBHelper.incrementarContadorVistas(getContext(), idFlagg)).start();
+
+        // Navegar al fragmento de detalles del juego
         Bundle bundle = new Bundle();
         bundle.putString("idFlagg", idFlagg);
 

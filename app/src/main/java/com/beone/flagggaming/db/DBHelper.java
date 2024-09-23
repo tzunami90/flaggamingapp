@@ -167,4 +167,37 @@ public class DBHelper {
         return tiendaData;
     }
 
+    public static void incrementarContadorVistas(Context context, String idFlagg) {
+        try (Connection connection = conDB(context)) {
+            // Consulta para obtener el valor actual del contadorVistas
+            String selectQuery = "SELECT contadorVistas FROM juegos WHERE idFlagg = ?";
+            PreparedStatement selectStatement = connection.prepareStatement(selectQuery);
+            selectStatement.setString(1, idFlagg);
+            ResultSet resultSet = selectStatement.executeQuery();
+
+            if (resultSet.next()) {
+                int contadorActual = resultSet.getInt("contadorVistas");
+
+                // Incrementar el contador
+                contadorActual++;
+
+                // Consulta para actualizar el contadorVistas
+                String updateQuery = "UPDATE juegos SET contadorVistas = ? WHERE idFlagg = ?";
+                PreparedStatement updateStatement = connection.prepareStatement(updateQuery);
+                updateStatement.setInt(1, contadorActual);
+                updateStatement.setString(2, idFlagg);
+
+                // Ejecutar la actualización
+                updateStatement.executeUpdate();
+
+                updateStatement.close();
+            }
+
+            resultSet.close();
+            selectStatement.close();
+        } catch (SQLException e) {
+            Log.e("DBHelper", "Error al incrementar contadorVistas: " + e.getMessage());
+        }
+    }
+
 }
