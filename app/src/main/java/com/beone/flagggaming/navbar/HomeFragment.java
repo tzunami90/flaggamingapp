@@ -11,6 +11,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -32,7 +35,8 @@ public class HomeFragment extends Fragment {
     private RecyclerView recyclerViewDestacados;
     private HomeJuegoAdapter juegoAdapterOfertas;
     private HomeJuegoAdapter juegoAdapterDestacados;
-    private ProgressBar progressBar;
+   // private ProgressBar progressBar;
+   private ImageView progressLogo;
     private ViewPager2 viewPagerCarrusel;
     private CarouselAdapter carouselAdapter;
 
@@ -49,7 +53,8 @@ public class HomeFragment extends Fragment {
         recyclerViewOfertas = view.findViewById(R.id.recyclerViewOfertas);
         recyclerViewDestacados = view.findViewById(R.id.recyclerViewDestacados);
         viewPagerCarrusel = view.findViewById(R.id.viewPagerCarrusel);
-        progressBar = view.findViewById(R.id.progressBar);
+        //progressBar = view.findViewById(R.id.progressBar);
+        progressLogo = view.findViewById(R.id.progressLogo);
 
         // Referencias a los títulos de "Ofertas" y "Los más buscados"
         TextView txTitulo = view.findViewById(R.id.txTitulo);
@@ -59,8 +64,10 @@ public class HomeFragment extends Fragment {
         recyclerViewOfertas.setLayoutManager(new GridLayoutManager(getContext(), 2));
         recyclerViewDestacados.setLayoutManager(new GridLayoutManager(getContext(), 2));
 
-        // Mostrar el ProgressBar y cargar los datos en segundo plano
-        progressBar.setVisibility(View.VISIBLE);
+        // Mostrar el logo y ejecutar la animación
+        Animation rotation = AnimationUtils.loadAnimation(getContext(), R.anim.rotate_animation);
+        progressLogo.startAnimation(rotation);
+        progressLogo.setVisibility(View.VISIBLE);
         new Thread(() -> cargarDatos(txTitulo, txTitulo2)).start(); // Pasamos los TextViews a cargarDatos
 
         // Configurar el cambio automático del carrusel
@@ -98,8 +105,9 @@ public class HomeFragment extends Fragment {
 
         // Volver al hilo principal para actualizar la UI
         getActivity().runOnUiThread(() -> {
-            // Ocultar el ProgressBar
-            progressBar.setVisibility(View.GONE);
+            // Ocultar el logo giratorio
+            progressLogo.clearAnimation();  // Detener la animación
+            progressLogo.setVisibility(View.GONE);
 
             // Hacer visibles los títulos una vez cargados los datos
             txTitulo.setVisibility(View.VISIBLE);
