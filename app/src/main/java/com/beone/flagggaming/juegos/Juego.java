@@ -23,6 +23,7 @@ public class Juego {
     private String precioPostaEpic;
     private String precioPareEpic;
     private String urlEpic;
+    private String discount;
 
     public Juego(String idFlagg, String idJuegoTienda, String nombre, String descripcionCorta, String tienda, String imagen, String imagenMini, String urlTienda, String urlEpic, String requisitos, String estudio, int contadorVistas) {
         this.idFlagg = idFlagg;
@@ -38,6 +39,28 @@ public class Juego {
         this.contadorVistas = contadorVistas;
         this.urlEpic = urlEpic;
     }
+
+    public Juego(String idFlagg, String nombre, String imagen, String discount) {
+        this.idFlagg = idFlagg;
+        this.nombre = nombre;
+        this.imagen = imagen;
+        this.discount = discount;
+        // Aquí puedes asignar otros valores predeterminados o null para los campos restantes
+        this.descripcionCorta = ""; // Valor predeterminado
+        this.tienda = ""; // Valor predeterminado
+        this.urlTienda = ""; // Valor predeterminado
+        this.requisitos = ""; // Valor predeterminado
+        this.estudio = ""; // Valor predeterminado
+        this.contadorVistas = 0; // Valor predeterminado
+        this.precioSteam = ""; // Valor predeterminado
+        this.precioPostaSteam = ""; // Valor predeterminado
+        this.precioPareSteam = ""; // Valor predeterminado
+        this.precioEpic = ""; // Valor predeterminado
+        this.precioPostaEpic = ""; // Valor predeterminado
+        this.precioPareEpic = ""; // Valor predeterminado
+        this.urlEpic = ""; // Valor predeterminado
+    }
+
 
     public String getIdFlagg() {
         return idFlagg;
@@ -176,6 +199,14 @@ public class Juego {
 
     public String getPrecioPareEpic() {
         return precioPareEpic;
+    }
+
+    public String getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(String discount) {
+        this.discount = discount;
     }
 
     public void setPrecioPareEpic(String precioPareEpic) {

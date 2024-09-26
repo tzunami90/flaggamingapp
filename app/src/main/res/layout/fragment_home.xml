@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     tools:context=".navbar.HomeFragment">
 
     <!-- Título "OFERTAS DESTACADAS" -->
@@ -22,102 +21,48 @@
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="16dp"/>
 
-    <!-- Primera fila de CardViews para ofertas -->
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cvJ1"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:layout_marginTop="16dp"
-        app:cardBackgroundColor="#F4F2F4"
-        app:cardCornerRadius="20dp"
-        app:cardPreventCornerOverlap="true"
-        app:cardUseCompatPadding="true"
-        app:layout_constraintEnd_toStartOf="@+id/cvJ2"
-        app:layout_constraintHorizontal_chainStyle="spread"
+    <!-- ProgressBar para mostrar mientras se cargan los datos -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txTitulo"/>
+        app:layout_constraintEnd_toEndOf="parent"/>
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cvJ2"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:layout_marginTop="16dp"
-        app:cardBackgroundColor="#F4F2F4"
-        app:cardCornerRadius="20dp"
-        app:cardPreventCornerOverlap="true"
-        app:cardUseCompatPadding="true"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/cvJ1"
-        app:layout_constraintTop_toBottomOf="@+id/txTitulo"/>
+    <!-- RecyclerView para Ofertas -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewOfertas"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/txTitulo"
+        android:layout_marginTop="16dp"/>
 
-    <!-- Segunda fila de CardViews para ofertas -->
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cvJ3"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:layout_marginTop="16dp"
-        app:cardBackgroundColor="#F4F2F4"
-        app:cardCornerRadius="20dp"
-        app:cardPreventCornerOverlap="true"
-        app:cardUseCompatPadding="true"
-        app:layout_constraintEnd_toStartOf="@+id/cvJ4"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cvJ1"/>
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cvJ4"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:layout_marginTop="16dp"
-        app:cardBackgroundColor="#F4F2F4"
-        app:cardCornerRadius="20dp"
-        app:cardPreventCornerOverlap="true"
-        app:cardUseCompatPadding="true"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/cvJ3"
-        app:layout_constraintTop_toBottomOf="@+id/cvJ2"/>
-
-    <!-- Título "PRODUCTOS DESTACADOS" -->
+    <!-- Título "LOS MÁS BUSCADOS" -->
     <TextView
         android:id="@+id/txTitulo2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="JUEGOS DESTACADOS"
+        android:text="LOS MÁS BUSCADOS"
         android:textAlignment="center"
         android:textSize="25sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cvJ4"
+        app:layout_constraintTop_toBottomOf="@+id/recyclerViewOfertas"
         android:layout_marginTop="32dp"/>
 
-    <!-- Primera fila de CardViews para productos -->
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cvP1"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:layout_marginTop="16dp"
-        app:cardBackgroundColor="#F4F2F4"
-        app:cardCornerRadius="20dp"
-        app:cardPreventCornerOverlap="true"
-        app:cardUseCompatPadding="true"
-        app:layout_constraintEnd_toStartOf="@+id/cvP2"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txTitulo2"/>
+    <!-- RecyclerView para Los Más Buscados -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewDestacados"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/txTitulo2"
+        android:layout_marginTop="16dp"/>
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cvP2"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:layout_marginTop="16dp"
-        app:cardBackgroundColor="#F4F2F4"
-        app:cardCornerRadius="20dp"
-        app:cardPreventCornerOverlap="true"
-        app:cardUseCompatPadding="true"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/cvP1"
-        app:layout_constraintTop_toBottomOf="@+id/txTitulo2"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
+

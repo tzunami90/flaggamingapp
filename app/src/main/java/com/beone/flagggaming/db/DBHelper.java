@@ -14,6 +14,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -199,5 +200,77 @@ public class DBHelper {
             Log.e("DBHelper", "Error al incrementar contadorVistas: " + e.getMessage());
         }
     }
+
+    public static List<Juego> getOfertasDestacadas(Context context) {
+        List<Juego> juegosList = new ArrayList<>();
+
+        try (Connection connection = conDB(context)) {
+            String query = "SELECT TOP (100) j.[idFlagg], j.[nombre], j.[imagen], o.[discount_percent] " +
+                    "FROM [juegos] j " +
+                    "INNER JOIN [ofertas] o ON j.[idOferta] = o.[idOferta] " +
+                    "WHERE j.[imagen] IS NOT NULL AND j.[idOferta] IS NOT NULL";
+
+            PreparedStatement statement = connection.prepareStatement(query);
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                Juego juego = new Juego(
+                        resultSet.getString("idFlagg"),
+                        resultSet.getString("nombre"),
+                        resultSet.getString("imagen"),
+                        resultSet.getString("discount_percent")
+                );
+                juegosList.add(juego);
+            }
+
+            resultSet.close();
+            statement.close();
+        } catch (SQLException e) {
+            Log.e("DBHelper", "Error al obtener juegos con ofertas destacadas: " + e.getMessage());
+        }
+
+        Log.d("DBHelper", "Ofertas destacadas obtenidas: " + juegosList.size());
+
+        // Seleccionar aleatoriamente 8 juegos
+        Collections.shuffle(juegosList);
+        return juegosList.size() > 8 ? juegosList.subList(0, 8) : juegosList;
+    }
+
+    public static List<Juego> getJuegosDestacados(Context context) {
+        List<Juego> juegosList = new ArrayList<>();
+
+        try (Connection connection = conDB(context)) {
+            String query = "SELECT TOP (8) [idFlagg], [nombre], [imagen] " +
+                    "FROM [juegos] " +
+                    "WHERE [imagen] IS NOT NULL " +
+                    "ORDER BY [contadorVistas] DESC";
+
+            PreparedStatement statement = connection.prepareStatement(query);
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                Juego juego = new Juego(
+                        resultSet.getString("idFlagg"),
+                        resultSet.getString("nombre"),
+                        resultSet.getString("imagen"),
+                        null // o un valor predeterminado
+                );
+                juegosList.add(juego);
+            }
+
+            resultSet.close();
+            statement.close();
+        } catch (SQLException e) {
+            Log.e("DBHelper", "Error al obtener juegos destacados: " + e.getMessage());
+        }
+
+        Log.d("DBHelper", "Juegos destacados obtenidos: " + juegosList.size());
+
+        return juegosList;
+    }
+
+
+
+
 
 }
