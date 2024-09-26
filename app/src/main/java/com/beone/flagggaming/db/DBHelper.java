@@ -269,7 +269,47 @@ public class DBHelper {
         return juegosList;
     }
 
+    public static List<Juego> getJuegosAleatorios(Context context, int cantidad) {
+        List<Juego> juegosList = new ArrayList<>();
 
+        try (Connection connection = conDB(context)) {
+            // Consulta para obtener una cantidad específica de juegos aleatorios
+            String query = "SELECT TOP (?) [idFlagg], [idJuegoTienda], [nombre], [descripcionCorta], [tienda], [imagen], [imagenMini], [urlTienda], [urlEpic], [requisitos], [estudio], [contadorVistas] " +
+                    "FROM [flagg_test3].[dbo].[juegos] " +
+                    "ORDER BY NEWID()"; // NEWID() genera un GUID aleatorio para cada fila, lo que permite seleccionar de manera aleatoria
+
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, cantidad);  // Pasar la cantidad de juegos aleatorios que queremos seleccionar
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                Juego juego = new Juego(
+                        resultSet.getString("idFlagg"),
+                        resultSet.getString("idJuegoTienda"),
+                        resultSet.getString("nombre"),
+                        resultSet.getString("descripcionCorta"),
+                        resultSet.getString("tienda"),
+                        resultSet.getString("imagen"),
+                        resultSet.getString("imagenMini"),
+                        resultSet.getString("urlTienda"),
+                        resultSet.getString("urlEpic"),
+                        resultSet.getString("requisitos"),
+                        resultSet.getString("estudio"),
+                        resultSet.getInt("contadorVistas")
+                );
+                juegosList.add(juego);
+            }
+
+            resultSet.close();
+            statement.close();
+        } catch (SQLException e) {
+            Log.e("DBHelper", "Error al obtener juegos aleatorios: " + e.getMessage());
+        }
+
+        Log.d("DBHelper", "Juegos aleatorios obtenidos: " + juegosList.size());
+
+        return juegosList;
+    }
 
 
 
