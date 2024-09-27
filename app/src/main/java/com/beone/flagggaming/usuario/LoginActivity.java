@@ -94,6 +94,7 @@ public class LoginActivity extends AppCompatActivity {
         private String name;
         private String mail;
         private int rol;
+        private boolean connectionFailed = false;
 
         @Override
         protected void onPreExecute() {
@@ -123,9 +124,12 @@ public class LoginActivity extends AppCompatActivity {
                             return true;
                         }
                     }
+                } else {
+                    connectionFailed = true; // No hay conexión con el servidor
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
+                connectionFailed = true; // Error de conexión detectado
             }
 
             return false;
@@ -135,7 +139,11 @@ public class LoginActivity extends AppCompatActivity {
         protected void onPostExecute(Boolean success) {
             progressLogin.setVisibility(View.GONE);
             buttonLogin.setEnabled(true); // Re-enable login button
-            if (success) {
+
+            if (connectionFailed) {
+                // Muestra un toast si no pudo conectar con el servidor
+                Toast.makeText(LoginActivity.this, "No se pudo conectar con el servidor. Por favor, reintente más tarde.", Toast.LENGTH_LONG).show();
+            } else if (success) {
                 Toast.makeText(LoginActivity.this, "Inicio de sesión exitoso.", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(LoginActivity.this, HomeAcitivity.class);
                 intent.putExtra("name", name);

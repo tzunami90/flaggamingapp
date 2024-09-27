@@ -151,6 +151,8 @@ public class RegisterActivity extends AppCompatActivity {
         startActivity(intent);
     }
     private class RegisterTask extends AsyncTask<String, Void, Boolean> {
+        private boolean connectionFailed = false; // Variable para detectar fallos de conexión
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -175,18 +177,27 @@ public class RegisterActivity extends AppCompatActivity {
                     pst.setString(4, hashedPassword);
                     int rowsAffected = pst.executeUpdate();
                     return rowsAffected > 0;
+                } else {
+                    connectionFailed = true; // No hay conexión con el servidor
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
+                connectionFailed = true; // Error de conexión detectado
             }
+
             return false;
         }
+
 
         @Override
         protected void onPostExecute(Boolean success) {
             progressRegister.setVisibility(View.GONE);
             buttonRegister.setEnabled(true); // Re-enable register button
-            if (success) {
+
+            if (connectionFailed) {
+                // Muestra un toast si no pudo conectar con el servidor
+                Toast.makeText(RegisterActivity.this, "No se pudo conectar con el servidor. Por favor, reintente más tarde.", Toast.LENGTH_LONG).show();
+            } else if (success) {
                 Toast.makeText(RegisterActivity.this, "Registro exitoso.", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
                 startActivity(intent);
