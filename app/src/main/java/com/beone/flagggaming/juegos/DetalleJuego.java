@@ -29,6 +29,9 @@ import com.beone.flagggaming.steamapi.SteamDetailApiAdapter;
 import com.beone.flagggaming.steamapi.SteamDetailApiService;
 import com.beone.flagggaming.steamapi.details.Data;
 import com.bumptech.glide.Glide;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -59,6 +62,7 @@ public class DetalleJuego extends Fragment {
     double precioEnARS;
     private ProgressBar progressBar;
     LinearLayout linearEpic, linearSteam;
+    private AdView adView;
 
 
     public DetalleJuego() {
@@ -94,8 +98,16 @@ public class DetalleJuego extends Fragment {
         precioPostaEpic = view.findViewById(R.id.precioPostaEpic);
         estudioTextView = view.findViewById(R.id.estudioTextView);
         requisitosTextView = view.findViewById(R.id.requisitosTextView);
+        adView = view.findViewById(R.id.adView);
 
         progressBar = view.findViewById(R.id.progressBar); // Inicializar el ProgressBar
+
+        // Configurar el AdMob
+        MobileAds.initialize(getContext(), initializationStatus -> {});
+
+        // Crear y cargar el anuncio
+        AdRequest adRequest = new AdRequest.Builder().build();
+        adView.loadAd(adRequest);
 
         // Mostrar ProgressBar antes de comenzar la carga
         progressBar.setVisibility(View.VISIBLE);

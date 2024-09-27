@@ -15,6 +15,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.beone.flagggaming.R;
 import com.beone.flagggaming.db.DBHelper;
 import com.beone.flagggaming.tiendas.Tienda;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -30,6 +32,7 @@ public class ListaTiendas extends AppCompatActivity {
     private List<Tienda> tiendaList;
     private ProgressBar progressBar;
     private SearchView searchView;
+    private AdView adView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +42,11 @@ public class ListaTiendas extends AppCompatActivity {
         recyclerView = findViewById(R.id.recycler_view);
         progressBar = findViewById(R.id.progressBar);
         searchView = findViewById(R.id.search_view);
+        adView = findViewById(R.id.adView);
+
+        // Crear y cargar el anuncio
+        AdRequest adRequest = new AdRequest.Builder().build();
+        adView.loadAd(adRequest);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
