@@ -27,6 +27,10 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyBDLSJ81ClOpduOexIRgbW9xO8d6nB5YrM" />
 
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-7063815326064970~2570986382"/>
+
         <activity android:name=".tiendascliente.DetalleTiendaActivity" />
         <activity
             android:name=".tiendascliente.ListaTiendas"

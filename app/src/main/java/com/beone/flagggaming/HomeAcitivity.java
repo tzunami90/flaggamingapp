@@ -1,7 +1,6 @@
 package com.beone.flagggaming;
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,7 +13,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.cardview.widget.CardView;
 import androidx.core.graphics.Insets;
 import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
@@ -33,7 +31,6 @@ import com.beone.flagggaming.producto.ListaHardware;
 import com.beone.flagggaming.steamapi.ListaJuegosSteam;
 import com.beone.flagggaming.tiendascliente.ListaTiendas;
 import com.beone.flagggaming.usuario.LoginActivity;
-import com.beone.flagggaming.usuario.RegisterActivity;
 import com.google.android.material.navigation.NavigationView;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

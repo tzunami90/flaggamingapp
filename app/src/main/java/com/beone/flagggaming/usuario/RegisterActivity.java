@@ -3,7 +3,6 @@ package com.beone.flagggaming.usuario;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.StrictMode;
 import android.text.TextUtils;
 import android.util.Patterns;
 import android.view.View;
@@ -18,17 +17,13 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.beone.flagggaming.HomeAcitivity;
 import com.beone.flagggaming.R;
 import com.beone.flagggaming.db.DBHelper;
-import com.beone.flagggaming.usuario.LoginActivity;
 
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class RegisterActivity extends AppCompatActivity {

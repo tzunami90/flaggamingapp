@@ -15,6 +15,7 @@ jsoup = "1.14.3"
 bcrypt = "0.4"
 maps = "18.0.2"
 mapsUtils = "2.3.0"
+admob = "22.0.0"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -33,6 +34,7 @@ jsoup = { group = "org.jsoup", name = "jsoup", version.ref = "jsoup" }
 bcrypt = { group = "org.mindrot", name = "jbcrypt", version.ref = "bcrypt" }
 maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "maps" }
 mapsUtils = { group = "com.google.maps.android", name = "android-maps-utils", version.ref = "mapsUtils" }
+admob = { group = "com.google.android.gms", name = "play-services-ads", version.ref = "admob" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

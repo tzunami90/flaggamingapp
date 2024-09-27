@@ -3,18 +3,15 @@ package com.beone.flagggaming.navbar;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.beone.flagggaming.R;
@@ -22,8 +19,7 @@ import com.beone.flagggaming.db.DBHelper;
 import com.beone.flagggaming.juegos.CarouselAdapter;
 import com.beone.flagggaming.juegos.DetalleJuego;
 import com.beone.flagggaming.juegos.Juego;
-import com.beone.flagggaming.juegos.HomeJuegoAdapter; // Asegúrate de importar el nuevo adaptador
-import com.beone.flagggaming.juegos.JuegoAdapter;
+import com.beone.flagggaming.juegos.HomeJuegoAdapter;
 import java.util.Collections;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.viewpager2.widget.ViewPager2;
@@ -41,7 +37,7 @@ public class HomeFragment extends Fragment {
     private CarouselAdapter carouselAdapter;
 
     // Variables para el carrusel automático
-    private Handler handler = new Handler();
+    private final Handler handler = new Handler();
     private int currentPage = 0;
     private Runnable carruselRunnable;
 

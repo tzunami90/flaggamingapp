@@ -21,7 +21,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.beone.flagggaming.R;
 import com.beone.flagggaming.db.DBHelper;
 import com.beone.flagggaming.producto.Categoria;
-import com.beone.flagggaming.producto.ListaHardware;
 import com.beone.flagggaming.producto.Producto;
 import com.beone.flagggaming.producto.ProductoClienteAdapter;
 

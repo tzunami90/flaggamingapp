@@ -210,10 +210,6 @@ public class DetalleJuego extends Fragment {
 
                                                 try {
                                                     String priceWithoutDollar = discountPriceStr.replace("$", "").trim();
-
-                                                    //double priceInDollars = Double.parseDouble(priceWithoutDollar);
-                                                    //int priceInCents = (int) Math.round(priceInDollars * 100);
-
                                                     mostrarDetallesEpic(priceWithoutDollar, juego);
 
                                                 } catch (NumberFormatException e) {

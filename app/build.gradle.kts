@@ -47,6 +47,7 @@ dependencies {
     implementation(libs.bcrypt)
     implementation(libs.maps)
     implementation(libs.mapsUtils)
+    implementation(libs.admob)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

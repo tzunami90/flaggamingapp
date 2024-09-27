@@ -16,6 +16,9 @@ import android.widget.Toast;
 
 import com.beone.flagggaming.R;
 import com.beone.flagggaming.db.DBHelper;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 
 import java.util.List;
 
@@ -27,6 +30,7 @@ public class ListadoJuegos extends Fragment implements JuegoAdapter.OnJuegoClick
     private List<Juego> juegosList;
     private SearchView searchView;
     private ProgressBar progressBar;
+    private AdView adView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -42,6 +46,14 @@ public class ListadoJuegos extends Fragment implements JuegoAdapter.OnJuegoClick
         recyclerView = view.findViewById(R.id.recyclerViewJuegos);
         searchView = view.findViewById(R.id.searchViewJuegos);
         progressBar = view.findViewById(R.id.progressBarJ);
+        adView = view.findViewById(R.id.adView);
+
+        // Configurar el AdMob
+        MobileAds.initialize(getContext(), initializationStatus -> {});
+
+        // Crear y cargar el anuncio
+        AdRequest adRequest = new AdRequest.Builder().build();
+        adView.loadAd(adRequest);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 

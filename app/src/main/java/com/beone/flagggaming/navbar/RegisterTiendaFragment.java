@@ -1,41 +1,27 @@
 package com.beone.flagggaming.navbar;
 
-import static android.content.Context.LAYOUT_INFLATER_SERVICE;
-import static androidx.core.content.ContextCompat.getSystemService;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
-import android.os.StrictMode;
-import android.text.Layout;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.PopupWindow;
 import android.widget.Toast;
 
-import com.beone.flagggaming.HomeAcitivity;
 import com.beone.flagggaming.R;
 import com.beone.flagggaming.db.DBHelper;
 import com.beone.flagggaming.tiendas.Tienda;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-
-import javax.xml.transform.Result;
 
 public class RegisterTiendaFragment extends Fragment {
     int idU,idT;

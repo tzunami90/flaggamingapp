@@ -3,7 +3,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 
-import android.os.StrictMode;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Patterns;
@@ -19,7 +18,6 @@ import com.beone.flagggaming.db.DBHelper;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
