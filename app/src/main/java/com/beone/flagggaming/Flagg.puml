@@ -1,0 +1,438 @@
+@startuml
+class Juego {
+    - String idFlagg
+    - String idJuegoTienda
+    - String nombre
+    - String descripcionCorta
+    - String tienda
+    - String imagen
+    - String imagenMini
+    - String urlTienda
+    - String requisitos
+    - String estudio
+    - int contadorVistas
+    - String precioSteam
+    - String precioPostaSteam
+    - String precioPareSteam
+    - String precioEpic
+    - String precioPostaEpic
+    - String precioPareEpic
+    - String urlEpic
+    - String discount
+
+    + Juego(String idFlagg, String idJuegoTienda, String nombre, String descripcionCorta, String tienda, String imagen, String imagenMini, String urlTienda, String urlEpic, String requisitos, String estudio, int contadorVistas)
+    + Juego(String idFlagg, String nombre, String imagen, String discount)
+
+    + String getIdFlagg()
+    + void setIdFlagg(String idFlagg)
+    + String getIdJuegoTienda()
+    + void setIdJuegoTienda(String idJuegoTienda)
+    + String getNombre()
+    + void setNombre(String nombre)
+    + String getDescripcionCorta()
+    + void setDescripcionCorta(String descripcionCorta)
+    + String getTienda()
+    + void setTienda(String tienda)
+    + String getImagen()
+    + void setImagen(String imagen)
+    + String getImagenMini()
+    + void setImagenMini(String imagenMini)
+    + String getUrlTienda()
+    + void setUrlTienda(String urlTienda)
+    + String getUrlEpic()
+    + void setUrlEpic(String urlEpic)
+    + String getRequisitos()
+    + void setRequisitos(String requisitos)
+    + String getEstudio()
+    + void setEstudio(String estudio)
+    + int getContadorVistas()
+    + void setContadorVistas(int contadorVistas)
+    + String getPrecioSteam()
+    + void setPrecioSteam(String precioSteam)
+    + String getPrecioPostaSteam()
+    + void setPrecioPostaSteam(String precioPostaSteam)
+    + String getPrecioPareSteam()
+    + void setPrecioPareSteam(String precioPareSteam)
+    + String getPrecioEpic()
+    + void setPrecioEpic(String precioEpic)
+    + String getPrecioPostaEpic()
+    + void setPrecioPostaEpic(String precioPostaEpic)
+    + String getPrecioPareEpic()
+    + void setPrecioPareEpic(String precioPareEpic)
+    + String getDiscount()
+    + void setDiscount(String discount)
+    - String stripHtml(String html)
+}
+
+class DBHelper {
+    + conDB(Context context): Connection
+    + getJuegos(Context context): List<Juego>
+    + getJuegoByIdFlagg(Context context, String idFlagg): Juego
+    + saveAppList(Context context, List<Juegos> appList): void
+    + getTiendaById(Context context, int idTienda): HashMap<String, String>
+    + incrementarContadorVistas(Context context, String idFlagg): void
+    + getOfertasDestacadas(Context context): List<Juego>
+    + getJuegosDestacados(Context context): List<Juego>
+    + getJuegosAleatorios(Context context, int cantidad): List<Juego>
+}
+
+class Categoria {
+    -int id_categoria
+    -String desc_categoria
+    -String imagenUrl
+
+    +Categoria()
+    +Categoria(int id_categoria, String desc_categoria, String imagenUrl)
+
+    +int getId_categoria()
+    +void setId_categoria(int id_categoria)
+
+    +String getDesc_categoria()
+    +void setDesc_categoria(String desc_categoria)
+
+    +String getImagenUrl()
+    +void setImagenUrl(String imagenUrl)
+
+    +int getCategoriaImageResource()
+
+    +String toString()
+}
+
+class Producto {
+    -int idInternoProducto
+    -int idTienda
+    -int idCategoria
+    -String skuTienda
+    -String descTienda
+    -String marca
+    -BigDecimal precioVta
+    -boolean estatus
+    -Categoria categoria
+    -String tiendaNombre
+
+    +Producto(int idInternoProducto, int idTienda, int idCategoria, String skuTienda, String descTienda, String marca, BigDecimal precioVta, boolean estatus)
+
+    +int getIdInternoProducto()
+    +void setIdInternoProducto(int idInternoProducto)
+
+    +int getIdTienda()
+    +void setIdTienda(int idTienda)
+
+    +int getIdCategoria()
+    +void setIdCategoria(int idCategoria)
+
+    +String getSkuTienda()
+    +void setSkuTienda(String skuTienda)
+
+    +String getDescTienda()
+    +void setDescTienda(String descTienda)
+
+    +String getMarca()
+    +void setMarca(String marca)
+
+    +BigDecimal getPrecioVta()
+    +void setPrecioVta(BigDecimal precioVta)
+
+    +boolean isEstatus()
+    +void setEstatus(boolean estatus)
+
+    +Categoria getCategoria()
+    +void setCategoria(Categoria categoria)
+
+    +String getTiendaNombre()
+    +void setTiendaNombre(String tiendaNombre)
+}
+
+
+class ProductoAdapter {
+    - List<Producto> productosList
+    - ProductoAdapter.OnItemClickListener mListener
+
+    + ProductoAdapter(List<Producto> productosList)
+    + void setOnItemClickListener(ProductoAdapter.OnItemClickListener listener)
+    + ProductoViewHolder onCreateViewHolder(ViewGroup parent, int viewType): ProductoViewHolder
+    + void onBindViewHolder(ProductoViewHolder holder, int position)
+    + int getItemCount(): int
+}
+
+class ProductoClienteAdapter {
+    - List<Producto> productosList
+    - List<Producto> productosListFull
+    - Context context
+
+    + ProductoClienteAdapter(List<Producto> productosList, Context context)
+    + ProductoClienteViewHolder onCreateViewHolder(ViewGroup parent, int viewType): ProductoClienteViewHolder
+    + void onBindViewHolder(ProductoClienteViewHolder holder, int position)
+    + int getItemCount(): int
+    + void updateList(List<Producto> newList)
+    + void filterByTextAndCategory(String text, int categoryId)
+}
+
+class ProductoDetalle {
+    - TextView textViewSkuTienda
+    - TextView textViewDescTienda
+    - TextView textViewMarca
+    - TextView textViewPrecioVta
+    - TextView textViewCategoria
+    - TextView textViewTiendaNombre
+    - TextView textViewTiendaDireccion
+    - TextView textViewTiendaDias
+    - TextView textViewTiendaHorario
+    - TextView textViewTiendaMail
+    - TextView textViewTiendaTel
+    - TextView textViewTiendaInsta
+    - ImageView iconAbrirEnMaps
+    - ImageView iconAbrirInsta
+    - ImageView iconAbrirMail
+    - ImageView iconAbrirTel
+    - String address
+    - String subject
+
+    + void onCreate(Bundle savedInstanceState)
+    + void abrirEnMaps()
+    + void abrirEnInstagram()
+    + void abrirCorreo(String address, String subject)
+    + void abrirTelefono()
+}
+
+
+class Tienda {
+    -int id
+    -String name
+    -String mail
+    -String dir
+    -String days
+    -String hr
+    -String insta
+    -String tel
+
+    +Tienda(int id, String name, String mail, String dir, String days, String hr, String insta, String tel)
+
+    +int getId()
+    +String getName()
+    +String getMail()
+    +String getDir()
+    +String getDays()
+    +String getHr()
+    +String getInsta()
+    +String getTel()
+}
+
+class LoginActivity {
+    -EditText editTextEmail
+    -EditText editTextPassword
+    -Button buttonLogin
+    -ProgressBar progressLogin
+    -AdView adView
+
+    +onCreate(Bundle savedInstanceState)
+    +loginButtonClicked(View v)
+    +openRegisterActivity(View v)
+    -hideKeyboard()
+    -isValidEmail(String email): boolean
+    -containsSqlInjection(String input): boolean
+
+    class LoginTask {
+        -int id
+        -String name
+        -String mail
+        -int rol
+        -boolean connectionFailed
+
+        +onPreExecute()
+        +doInBackground(String... params): Boolean
+        +onPostExecute(Boolean success)
+    }
+
+    class RegisterActivity {
+        - EditText editTextFirstName
+        - EditText editTextLastName
+        - EditText editTextEmail
+        - EditText editTextPassword
+        - EditText editTextRepeatPassword
+        - Button buttonRegister
+        - ProgressBar progressRegister
+
+        + void onCreate(Bundle savedInstanceState)
+        - void registerButtonClicked(View v)
+        - boolean containsSqlInjection(String input)
+        + void openLoginActivity(View v)
+    }
+
+class DolarAPIManager {
+    - static final String BASE_URL = "https://dolarapi.com/"
+    - DolarAPIService dolarAPIService
+
+    + DolarAPIManager()
+    + getDolarData(DolarDataListener listener)
+
+    interface DolarDataListener {
+        + onDolarDataReceived(DolarApiResponse dolarData)
+        + onDolarDataError(String errorMessage)
+    }
+
+class DolarApiResponse {
+    - String moneda
+    - String casa
+    - String nombre
+    - double compra
+    - double venta
+    - String fechaActualizacion
+
+    + String getMoneda()
+    + void setMoneda(String moneda)
+    + String getCasa()
+    + void setCasa(String casa)
+    + String getNombre()
+    + void setNombre(String nombre)
+    + double getCompra()
+    + void setCompra(double compra)
+    + double getVenta()
+    + void setVenta(double venta)
+    + String getFechaActualizacion()
+    + void setFechaActualizacion(String fechaActualizacion)
+}
+
+interface DolarAPIService {
+    + getDolarData(): Call<DolarApiResponse>
+}
+
+class IPCApiManager {
+    - static Retrofit retrofit = null
+
+    + Retrofit getClient(String baseUrl)
+}
+
+class ApiResponse {
+    - List<List<Object>> data
+
+    + List<List<Object>> getData()
+    + void setData(List<List<Object>> data)
+}
+
+interface ApiService {
+    + getSeriesData(ids: String, limit: String, format: String): Call<ApiResponse>
+}
+
+class EpicGamesApiAdapter {
+    - static final String BASE_URL = "https://graphql.epicgames.com/"
+    - static Retrofit retrofit
+
+    + EpicGamesApiService getApiService()
+}
+
+interface EpicGamesApiService {
+    + searchStoreQuery(request: GraphQLRequest): Call<GraphQLResponse>
+}
+
+class GraphQLRequest {
+    - String query
+    - Variables variables
+
+    + GraphQLRequest(String title)
+    + Variables getVariables()
+    + void setVariables(Variables variables)
+}
+
+GraphQLRequest --> Variables
+
+ class Variables {
+        - String allowCountries
+        - boolean withPrice
+
+        + Variables(String allowCountries, boolean withPrice)
+        + String getAllowCountries()
+        + void setAllowCountries(String allowCountries)
+        + boolean isWithPrice()
+        + void setWithPrice(boolean withPrice)
+    }
+class GraphQLResponse {
+    - Data data
+
+    + Data getData()
+    }
+
+class SteamDetailApiAdapter {
+    - static final String BASE_URL = "https://store.steampowered.com/api/"
+
+    + SteamDetailApiService getApiService()
+}
+
+interface SteamDetailApiService {
+    + getAppDetails(appids: String, cc: String): Call<Map<String, AppDetailsResponse.GameDetails>>
+}
+
+class AppDetailsResponse {
+    - Map<String, GameDetails> gameDetailsMap
+
+    + Map<String, GameDetails> getGameDetailsMap()
+
+}
+
+class DetalleJuego {
+    - String idFlagg
+    - TextView nombreTextView
+    - TextView descripcionTextView
+    - ImageView imagenImageView
+    - ImageView icSteam, icEpic
+    - TextView precioSteam, precioEpic, precioPareSteam, precioPareEpic, precioPostaSteam, precioPostaEpic, estudioTextView, requisitosTextView
+    - DolarAPIManager dolarAPIManager
+    - double dolarCompra, dolarVenta, inflacion
+    - boolean isDolarDataFetched, isInflationDataFetched
+    - double precioFinalDouble, precioEnARS
+    - ProgressBar progressBar
+    - LinearLayout linearEpic, linearSteam
+    - AdView adView
+
+    + DetalleJuego()
+    + void onCreate(Bundle savedInstanceState)
+    + View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    - void cargarDetallesJuego()
+    - void obtenerPrecio(Juego juego)
+    - void mostrarDetallesJuego(Map<String, AppDetailsResponse.GameDetails> appDetailsResponse, Juego juego)
+    - void mostrarDetallesEpic(String epicDiscountPrice, Juego juego)
+    - void fetchDataFromAPI()
+    - void configurarIPCApi()
+    - void recalcularPrecios(Juego juego)
+    - void abrirNavegador(String url)
+    - void mostrarMensaje(String mensaje)
+}
+
+Producto --> Categoria : has a
+Producto --> Tienda : belongs to
+
+ProductoAdapter --> Producto : retrieves from
+ProductoClienteAdapter --> Producto : uses
+ProductoClienteAdapter --> ProductoDetalle : uses
+ProductoDetalle --> Tienda : uses
+ProductoDetalle --> DBHelper : uses
+
+DetalleJuego --> DolarAPIManager : uses
+DetalleJuego --> IPCApiManager : uses
+DetalleJuego --> SteamDetailApiAdapter : uses
+DetalleJuego --> EpicGamesApiAdapter : uses
+DetalleJuego --> Juego : uses
+DetalleJuego --> DBHelper : uses
+
+LoginActivity --> DBHelper : uses
+RegisterActivity --> DBHelper : uses
+
+DolarAPIService --> DolarApiResponse : returns
+DolarAPIManager --> DolarAPIService : uses
+
+SteamDetailApiService --> AppDetailsResponse : returns
+SteamDetailApiAdapter --> SteamDetailApiService : uses
+
+EpicGamesApiAdapter --> EpicGamesApiService : uses
+EpicGamesApiService --> GraphQLRequest
+EpicGamesApiService --> GraphQLResponse : returns
+
+IPCApiManager --> ApiService : uses
+ApiService --> ApiResponse : returns
+
+DBHelper --> Juego : manages
+}
+@enduml
+
+
+
