@@ -3,10 +3,9 @@ package com.beone.flagggaming.steamapi;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+
 import java.util.List;
-import java.util.Locale;
+
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,7 +31,7 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 
 import com.beone.flagggaming.R;
-import com.google.gson.Gson;
+
 import java.text.DecimalFormat;
 
 import java.util.Map;

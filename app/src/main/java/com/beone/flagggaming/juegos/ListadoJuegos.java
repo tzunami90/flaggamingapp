@@ -1,6 +1,5 @@
 package com.beone.flagggaming.juegos;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -12,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import androidx.appcompat.widget.SearchView;
-import android.widget.Toast;
 
 import com.beone.flagggaming.R;
 import com.beone.flagggaming.db.DBHelper;
