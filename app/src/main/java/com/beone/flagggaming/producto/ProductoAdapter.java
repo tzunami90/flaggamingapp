@@ -1,6 +1,7 @@
 package com.beone.flagggaming.producto;
 
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,39 +15,29 @@ import com.beone.flagggaming.R;
 import java.util.List;
 
 public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.ProductoViewHolder> {
+    private Context context;
     private List<Producto> productosList;
-    private ProductoAdapter.OnItemClickListener mListener; // Define el listener
-    public ProductoAdapter(List<Producto> productosList) {
-        this.productosList = productosList;
-    }
-    public interface OnItemClickListener {
-        void onItemClick(int productId);
-    }
+    private OnProductoClickListener onProductoClickListener;
 
+    public ProductoAdapter(Context context, List<Producto> productosList, OnProductoClickListener onProductoClickListener) {
+        this.context = context;
+        this.productosList = productosList;
+        this.onProductoClickListener = onProductoClickListener;
+    }
     @NonNull
     @Override
     public ProductoViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_productos, parent, false);
-        return new ProductoViewHolder(itemView);
+        View view = LayoutInflater.from(context).inflate(R.layout.item_productos, parent, false);
+        return new ProductoViewHolder(view, onProductoClickListener);
     }
-    public void setOnItemClickListener(ProductoAdapter.OnItemClickListener listener) {
-        mListener = listener;
-    }
+
     @Override
     public void onBindViewHolder(@NonNull ProductoViewHolder holder, int position) {
         Producto producto = productosList.get(position);
-        holder.bind(producto);
-        // Agregar el listener de clic al item
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                int clickedPosition = holder.getAdapterPosition();
-                if (mListener != null && clickedPosition != RecyclerView.NO_POSITION) {
-                    int productId = productosList.get(clickedPosition).getIdInternoProducto(); // Obtener el ID del producto
-                    mListener.onItemClick(productId); // Pasar el ID del producto al listener
-                }
-            }
-        });
+        holder.textViewIDProducto.setText(String.valueOf(producto.getSkuTienda()));
+        holder.textViewProductDescription.setText(producto.getDescTienda());
+        holder.textViewProductPrice.setText("$" + producto.getPrecioVta());
+        holder.textViewCategoria.setText(producto.getCategoria().getDesc_categoria());
     }
 
     @Override
@@ -54,27 +45,30 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.Produc
         return productosList.size();
     }
 
-    public static class ProductoViewHolder extends RecyclerView.ViewHolder {
-        private TextView textViewIDProducto;
-        private TextView textViewProductDescription;
-        private TextView textViewProductPrice;
-        private TextView textViewCategoria;
+    class ProductoViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        TextView textViewIDProducto;
+        TextView textViewProductDescription;
+        TextView textViewProductPrice;
+        TextView textViewCategoria;
+        OnProductoClickListener onProductoClickListener;
 
-        public ProductoViewHolder(@NonNull View itemView) {
+        public ProductoViewHolder(@NonNull View itemView, OnProductoClickListener onProductoClickListener) {
             super(itemView);
             textViewIDProducto = itemView.findViewById(R.id.textViewIDProducto);
             textViewProductDescription = itemView.findViewById(R.id.textViewProductDescription);
             textViewProductPrice = itemView.findViewById(R.id.textViewProductPrice);
             textViewCategoria = itemView.findViewById(R.id.textViewCategoria);
-
+            this.onProductoClickListener = onProductoClickListener;
+            itemView.setOnClickListener(this);
         }
 
-        public void bind(Producto producto) {
-            textViewIDProducto.setText(String.valueOf(producto.getSkuTienda())); // Convertir el ID de tienda a String
-            textViewProductDescription.setText(producto.getDescTienda());
-            textViewProductPrice.setText("$" + producto.getPrecioVta());
-            textViewCategoria.setText(producto.getCategoria().getDesc_categoria());
+        @Override
+        public void onClick(View view) {
+            onProductoClickListener.onProductoClick(productosList.get(getAdapterPosition()).getIdInternoProducto());
         }
+    }
 
+    public interface OnProductoClickListener {
+        void onProductoClick(int productId);
     }
 }

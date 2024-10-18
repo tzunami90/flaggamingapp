@@ -1,8 +1,10 @@
 package com.beone.flagggaming.producto;
-
+import androidx.fragment.app.Fragment;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
@@ -28,7 +30,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ListaHardware extends AppCompatActivity {
+public class ListaHardware extends Fragment {
     private RecyclerView recyclerView;
     private ProductoClienteAdapter productoClienteAdapter;
     private List<Producto> productoList;
@@ -37,15 +39,14 @@ public class ListaHardware extends AppCompatActivity {
     private boolean categoriesLoaded = false;
     private boolean productsLoaded = false;
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_lista_hardware);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.activity_lista_hardware, container, false);
 
-        recyclerView = findViewById(R.id.recyclerViewProductos);
-        SearchView searchView = findViewById(R.id.searchView);
-        Spinner spinnerCategorias = findViewById(R.id.spinnerCategorias);
-        progressBar = findViewById(R.id.progressBar);
+
+        recyclerView = view.findViewById(R.id.recyclerViewProductos);
+        SearchView searchView = view.findViewById(R.id.searchView);
+        Spinner spinnerCategorias = view.findViewById(R.id.spinnerCategorias);
+        progressBar = view.findViewById(R.id.progressBar);
 
         productoList = new ArrayList<>();
         filteredList = new ArrayList<>();
@@ -57,8 +58,29 @@ public class ListaHardware extends AppCompatActivity {
         new LoadCategoriesTask().execute();
 
         filteredList.addAll(productoList);
-        productoClienteAdapter = new ProductoClienteAdapter(filteredList, this);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        // Configurar el RecyclerView y el adaptador con el listener de clics
+        productoClienteAdapter = new ProductoClienteAdapter(getActivity(), filteredList, new ProductoClienteAdapter.OnProductoClickListener() {
+            @Override
+            public void onProductoClick(Producto producto) {
+                // Aquí puedes manejar el clic sobre un producto
+                // Redirigir a otro Fragment o Activity, por ejemplo:
+                Fragment fragment = new ProductoDetalle();
+                Bundle args = new Bundle();
+                args.putSerializable("producto", producto);  // Pasar el objeto Producto al fragment
+                // Ahora también puedes pasar idTienda si no está en el objeto Producto
+                args.putInt("idTienda", producto.getIdTienda()); // Pasa el idTienda
+
+                fragment.setArguments(args);
+
+                getActivity().getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, fragment) // Reemplaza con tu container
+                        .addToBackStack(null)
+                        .commit();
+            }
+        });
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(productoClienteAdapter);
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -91,12 +113,13 @@ public class ListaHardware extends AppCompatActivity {
             }
         });
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.listahardware), (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(view.findViewById(R.id.listahardware), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
-
         });
+
+        return view;
     }
 
     private void filtrarProductos(String texto, int categoriaId) {
@@ -132,13 +155,13 @@ public class ListaHardware extends AppCompatActivity {
         protected List<Categoria> doInBackground(Void... voids) {
             List<Categoria> categorias = new ArrayList<>();
             try {
-                Connection connection = DBHelper.conDB(ListaHardware.this);
+                Connection connection = DBHelper.conDB(getActivity());
                 if (connection != null) {
-                    String query = "SELECT id_categoria, desc_categoria, imagen_url FROM categorias";  // Incluye la URL de la imagen en la consulta
+                    String query = "SELECT id_categoria, desc_categoria, imagen_url FROM categorias";
                     PreparedStatement statement = connection.prepareStatement(query);
                     ResultSet resultSet = statement.executeQuery();
 
-                    categorias.add(new Categoria(0, "Todas las categorías", null)); // Añadir opción por defecto sin imagen
+                    categorias.add(new Categoria(0, "Todas las categorías", null));
 
                     while (resultSet.next()) {
                         int idCategoria = resultSet.getInt("id_categoria");
@@ -160,26 +183,24 @@ public class ListaHardware extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(List<Categoria> categorias) {
-            Spinner spinnerCategorias = findViewById(R.id.spinnerCategorias);
-            ArrayAdapter<Categoria> adapter = new ArrayAdapter<>(ListaHardware.this, android.R.layout.simple_spinner_item, categorias);
+            Spinner spinnerCategorias = getView().findViewById(R.id.spinnerCategorias);
+            ArrayAdapter<Categoria> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, categorias);
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spinnerCategorias.setAdapter(adapter);
 
             categoriesLoaded = true;
             hideProgressBar();
 
-            // Cargar los productos después de configurar el Spinner
             new LoadProductsTask().execute();
         }
     }
-
 
     private class LoadProductsTask extends AsyncTask<Void, Void, List<Producto>> {
         @Override
         protected List<Producto> doInBackground(Void... voids) {
             List<Producto> productos = new ArrayList<>();
             try {
-                Connection connection = DBHelper.conDB(ListaHardware.this);
+                Connection connection = DBHelper.conDB(getActivity());
                 if (connection != null) {
                     String query = "SELECT p.id_interno_producto, p.id_tienda, p.id_categoria, p.sku_tienda, p.desc_tienda, p.marca, p.precio_vta, p.estatus, c.desc_categoria, c.imagen_url, t.name " +
                             "FROM productos p INNER JOIN categorias c ON p.id_categoria = c.id_categoria JOIN tiendas t ON p.id_tienda = t.id " +
@@ -227,7 +248,6 @@ public class ListaHardware extends AppCompatActivity {
             filteredList.clear();
             filteredList.addAll(productos);
             productoClienteAdapter.notifyDataSetChanged();
-            // Llamar a filtrarProductos para mostrar todos los productos inicialmente
             filtrarProductos("", 0);
         }
     }

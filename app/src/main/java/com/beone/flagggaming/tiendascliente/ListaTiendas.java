@@ -4,11 +4,17 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -25,7 +31,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ListaTiendas extends AppCompatActivity {
+public class ListaTiendas extends Fragment {
 
     private RecyclerView recyclerView;
     private TiendaAdapter tiendaAdapter;
@@ -34,21 +40,21 @@ public class ListaTiendas extends AppCompatActivity {
     private SearchView searchView;
     private AdView adView;
 
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_lista_tiendas);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.activity_lista_tiendas, container, false);
 
-        recyclerView = findViewById(R.id.recycler_view);
-        progressBar = findViewById(R.id.progressBar);
-        searchView = findViewById(R.id.search_view);
-        adView = findViewById(R.id.adView);
+        recyclerView = view.findViewById(R.id.recycler_view);
+        progressBar = view.findViewById(R.id.progressBar);
+        searchView = view.findViewById(R.id.search_view);
+        adView = view.findViewById(R.id.adView);
 
         // Crear y cargar el anuncio
         AdRequest adRequest = new AdRequest.Builder().build();
         adView.loadAd(adRequest);
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         // Cargar las tiendas desde la base de datos
         new LoadTiendasTask().execute();
@@ -71,6 +77,7 @@ public class ListaTiendas extends AppCompatActivity {
                 return true;
             }
         });
+        return view;
     }
 
     private class LoadTiendasTask extends AsyncTask<Void, Void, List<Tienda>> {
@@ -96,17 +103,25 @@ public class ListaTiendas extends AppCompatActivity {
             tiendaAdapter.setOnItemClickListener(new TiendaAdapter.OnItemClickListener() {
                 @Override
                 public void onItemClick(Tienda tienda) {
-                    Intent intent = new Intent(ListaTiendas.this, DetalleTiendaActivity.class);
-                    intent.putExtra("id", tienda.getId());
-                    intent.putExtra("name", tienda.getName());
-                    intent.putExtra("mail", tienda.getMail());
-                    intent.putExtra("dir", tienda.getDir());
-                    intent.putExtra("hr", tienda.getHr());
-                    intent.putExtra("days", tienda.getDays());
-                    intent.putExtra("tel", tienda.getTel());
-                    intent.putExtra("insta", tienda.getInsta());
-                    intent.putExtra("id", tienda.getId());
-                    startActivity(intent);
+                    DetalleTiendaActivity detalleTiendaFragment = new DetalleTiendaActivity();
+
+                    // Pasar los datos al fragmento de detalle
+                    Bundle bundle = new Bundle();
+                    bundle.putInt("id", tienda.getId());
+                    bundle.putString("name", tienda.getName());
+                    bundle.putString("mail", tienda.getMail());
+                    bundle.putString("dir", tienda.getDir());
+                    bundle.putString("hr", tienda.getHr());
+                    bundle.putString("days", tienda.getDays());
+                    bundle.putString("tel", tienda.getTel());
+                    bundle.putString("insta", tienda.getInsta());
+                    detalleTiendaFragment.setArguments(bundle);
+
+                    // Reemplazar el fragmento actual con el de detalle
+                    getActivity().getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.fragment_container, detalleTiendaFragment) // Asegúrate de que "fragment_container" es el id correcto del contenedor en tu layout
+                            .addToBackStack(null) // Añadir a la pila para poder volver atrás
+                            .commit();
                 }
             });
         }
@@ -115,7 +130,7 @@ public class ListaTiendas extends AppCompatActivity {
     private List<Tienda> loadTiendasFromDatabase() {
         List<Tienda> tiendaList = new ArrayList<>();
 
-        try (Connection connection = DBHelper.conDB(this)) {
+        try (Connection connection = DBHelper.conDB(getActivity())) {
             String query = "SELECT [id], [name], [mail], [dir], [days], [hr], [insta], [tel] FROM [tiendas]";
             PreparedStatement statement = connection.prepareStatement(query);
             ResultSet resultSet = statement.executeQuery();

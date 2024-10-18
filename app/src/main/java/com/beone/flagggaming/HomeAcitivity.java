@@ -128,9 +128,11 @@ public class HomeAcitivity extends AppCompatActivity implements NavigationView.O
         } else if(itemId == R.id.nav_epicList) {
             startActivity(new Intent(this, ListaJuegosEpic.class));
         } else if(itemId == R.id.nav_hardware) {
-            startActivity(new Intent(this, ListaHardware.class));
+            loadFragment(new ListaHardware());
+            navigationView.setCheckedItem(R.id.nav_hardware);
         } else if(itemId == R.id.nav_tiendaslist) {
-            startActivity(new Intent(this, ListaTiendas.class));
+            loadFragment(new ListaTiendas());
+            navigationView.setCheckedItem(R.id.nav_tiendaslist);
         } else if((itemId == R.id.nav_registro_tiendas) && (rol == 0)) {
             Bundle bundleR = new Bundle();
             bundleR.putInt("idU",idU);

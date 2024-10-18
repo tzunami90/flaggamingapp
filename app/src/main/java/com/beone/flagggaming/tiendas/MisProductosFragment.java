@@ -18,6 +18,7 @@ import com.beone.flagggaming.db.DBHelper;
 import com.beone.flagggaming.producto.Categoria;
 import com.beone.flagggaming.producto.Producto;
 import com.beone.flagggaming.producto.ProductoAdapter;
+import com.beone.flagggaming.producto.ProductoDetalle;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -81,16 +82,11 @@ public class MisProductosFragment extends Fragment {
                 progressBarMisProductos.setVisibility(View.GONE);
 
                 // Crea y establece el adaptador para el RecyclerView
-                ProductoAdapter productosAdapter = new ProductoAdapter(productosList);
-                RecyclerView recyclerViewProductos = root.findViewById(R.id.recyclerViewProducts);
-                recyclerViewProductos.setAdapter(productosAdapter);
-
-                // Establecer el listener de clic en el adaptador
-                productosAdapter.setOnItemClickListener(new ProductoAdapter.OnItemClickListener() {
+                ProductoAdapter productosAdapter = new ProductoAdapter(getContext(), productosList, new ProductoAdapter.OnProductoClickListener() {
                     @Override
-                    public void onItemClick(int productId) {
+                    public void onProductoClick(int productId) {
                         // Crear el fragmento de detalles del producto y pasar el ID del producto
-                        DetallesProductoFragment detallesFragment = new DetallesProductoFragment();
+                        ProductoDetalle detallesFragment = new ProductoDetalle();
                         Bundle bundle = new Bundle();
                         bundle.putInt("idP", productId); // Pasar el ID del producto al fragmento
                         bundle.putInt("idU", idU);
@@ -104,6 +100,9 @@ public class MisProductosFragment extends Fragment {
                                 .commit();
                     }
                 });
+
+                RecyclerView recyclerViewProductos = root.findViewById(R.id.recyclerViewProducts);
+                recyclerViewProductos.setAdapter(productosAdapter);
             }
         }.execute();
     }

@@ -1,8 +1,9 @@
 package com.beone.flagggaming.producto;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class Producto {
+public class Producto implements Serializable {
     private int idInternoProducto;
     private int idTienda;
     private int idCategoria;

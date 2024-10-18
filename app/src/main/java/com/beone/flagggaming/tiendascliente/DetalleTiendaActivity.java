@@ -8,7 +8,9 @@ import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -16,12 +18,15 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.beone.flagggaming.R;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -34,7 +39,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.io.IOException;
 import java.util.List;
 
-public class DetalleTiendaActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class DetalleTiendaActivity extends Fragment implements OnMapReadyCallback {
 
     private TextView tvName, tvMail, tvDir, tvHr, tvDays, tvTel, tvInsta;
     private GoogleMap mMap;
@@ -46,27 +51,26 @@ public class DetalleTiendaActivity extends AppCompatActivity implements OnMapRea
     private int idT;
 
 
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_detalle_tienda);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.activity_detalle_tienda, container, false);
 
-        tvName = findViewById(R.id.tv_name);
-        tvMail = findViewById(R.id.tv_mail);
-        tvDir = findViewById(R.id.tv_dir);
-        tvHr = findViewById(R.id.tv_hr);
-        tvDays = findViewById(R.id.tv_days);
-        tvTel = findViewById(R.id.tv_tel);
-        tvInsta = findViewById(R.id.tv_insta);
-        iconAbrirEnMaps = findViewById(R.id.iconAbrirEnMaps);
-        iconAbrirInsta = findViewById(R.id.iconAbrirInsta);
-        iconAbrirMail = findViewById(R.id.iconAbrirMail);
-        iconAbrirTel = findViewById(R.id.iconAbrirTel);
-        btn_ver_productos = findViewById(R.id.btn_ver_productos);
+        tvName = view.findViewById(R.id.tv_name);
+        tvMail = view.findViewById(R.id.tv_mail);
+        tvDir = view.findViewById(R.id.tv_dir);
+        tvHr = view.findViewById(R.id.tv_hr);
+        tvDays = view.findViewById(R.id.tv_days);
+        tvTel = view.findViewById(R.id.tv_tel);
+        tvInsta = view.findViewById(R.id.tv_insta);
+        iconAbrirEnMaps = view.findViewById(R.id.iconAbrirEnMaps);
+        iconAbrirInsta = view.findViewById(R.id.iconAbrirInsta);
+        iconAbrirMail = view.findViewById(R.id.iconAbrirMail);
+        iconAbrirTel = view.findViewById(R.id.iconAbrirTel);
+        btn_ver_productos = view.findViewById(R.id.btn_ver_productos);
 
         // Recibir los datos de la tienda
-        Bundle extras = getIntent().getExtras();
+        Bundle extras = getArguments();
         if (extras != null) {
             tvName.setText(extras.getString("name"));
             tvMail.setText("Correo Electrónico: " + extras.getString("mail"));
@@ -83,56 +87,35 @@ public class DetalleTiendaActivity extends AppCompatActivity implements OnMapRea
             Log.d("ID", "ID recibido: " + idT);
         }
 
-        // Verificar y solicitar permisos
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
+        // Verificar y solicitar permisos de ubicación
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
         } else {
-            // Inicializar el mapa
             initMap();
         }
 
-        iconAbrirEnMaps.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                abrirEnMaps();
-            }
+        // Listeners de los íconos
+        iconAbrirEnMaps.setOnClickListener(v -> abrirEnMaps());
+        iconAbrirInsta.setOnClickListener(v -> abrirEnInstagram());
+        iconAbrirMail.setOnClickListener(v -> {
+            subject = "Contacto desde Flagg Gaming";
+            abrirCorreo(address, subject);
         });
-        iconAbrirInsta.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                abrirEnInstagram();
-            }
-        });
-        iconAbrirMail.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                subject = "Contacto desde Flagg Gaming";
-                abrirCorreo(address, subject);
-            }
-        });
-        iconAbrirTel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                abrirTelefono();
-            }
-        });
+        iconAbrirTel.setOnClickListener(v -> abrirTelefono());
 
-        btn_ver_productos.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                verProductos();
-            }
-        });
+        btn_ver_productos.setOnClickListener(view1 -> verProductos());
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.detalletienda), (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(view.findViewById(R.id.detalletienda), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        return view;
     }
 
     private void initMap() {
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.map_container);
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
@@ -142,22 +125,18 @@ public class DetalleTiendaActivity extends AppCompatActivity implements OnMapRea
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                initMap();
-            } else {
-                Toast.makeText(this, "Permiso de ubicación denegado", Toast.LENGTH_SHORT).show();
-            }
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            initMap();
+        } else {
+            Toast.makeText(getActivity(), "Permiso de ubicación denegado", Toast.LENGTH_SHORT).show();
         }
     }
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true);
             mMap.getUiSettings().setMyLocationButtonEnabled(true);
-        } else {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
         }
 
         // Convertir la dirección a coordenadas y mostrarla en el mapa
@@ -165,60 +144,43 @@ public class DetalleTiendaActivity extends AppCompatActivity implements OnMapRea
         if (location != null) {
             mMap.addMarker(new MarkerOptions().position(location).title("Ubicación de la Tienda"));
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15));
-            Log.d("TAG", "Ubicación de la tienda: " + location.toString());
         } else {
-            Log.e("TAG", "No se pudo obtener la ubicación de la dirección proporcionada");
-            // Manejo de errores: ubicación por defecto
-            LatLng defaultLocation = new LatLng(-34.6037, -58.3816); // Coordenadas de Buenos Aires, por ejemplo
+            LatLng defaultLocation = new LatLng(-34.6037, -58.3816); // Coordenadas de Buenos Aires
             mMap.addMarker(new MarkerOptions().position(defaultLocation).title("Ubicación no encontrada"));
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultLocation, 15));
         }
     }
 
     private LatLng getLocationFromAddress(String strAddress) {
-        Geocoder coder = new Geocoder(this);
-        List<Address> address;
+        Geocoder coder = new Geocoder(getActivity());
+        List<Address> addressList;
         LatLng p1 = null;
 
         try {
-            address = coder.getFromLocationName(strAddress, 5);
-            if (address == null || address.isEmpty()) {
-                Log.e("TAG", "Geocodificación fallida: dirección no encontrada");
-                return null;
+            addressList = coder.getFromLocationName(strAddress, 5);
+            if (addressList != null && !addressList.isEmpty()) {
+                Address location = addressList.get(0);
+                p1 = new LatLng(location.getLatitude(), location.getLongitude());
             }
-            Address location = address.get(0);
-            p1 = new LatLng(location.getLatitude(), location.getLongitude());
-            Log.d("TAG", "Geocodificación exitosa: " + p1.toString());
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            Log.e("TAG", "Error en la geocodificación", ex);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         return p1;
     }
 
     public void abrirEnMaps() {
-        Log.d("ProductoDetalle", "Método abrirEnMaps llamado");
-        String direccion = dir;
-        Log.d("ProductoDetalle", "Dirección obtenida: " + direccion);
-        if (!direccion.isEmpty()) {
-            Uri gmmIntentUri = Uri.parse("geo:0,0?q=" + Uri.encode(direccion));
-
-            // Crear Intent para Google Maps
+        if (!dir.isEmpty()) {
+            Uri gmmIntentUri = Uri.parse("geo:0,0?q=" + Uri.encode(dir));
             Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
             startActivity(mapIntent);
-
         } else {
-            Log.d("ProductoDetalle", "La dirección está vacía.");
-            Toast.makeText(this, "La dirección está vacía.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "La dirección está vacía.", Toast.LENGTH_SHORT).show();
         }
     }
 
-    // Método para abrir Instagram con el nombre de usuario
     private void abrirEnInstagram() {
         String username = tvInsta.getText().toString().replace("Instagram: ", "").trim();
-
-        // Si el nombre de usuario empieza con '@', lo eliminamos
         if (username.startsWith("@")) {
             username = username.substring(1);
         }
@@ -228,45 +190,40 @@ public class DetalleTiendaActivity extends AppCompatActivity implements OnMapRea
             Intent instagramIntent = new Intent(Intent.ACTION_VIEW, uri);
             startActivity(instagramIntent);
         } else {
-            Toast.makeText(this, "La tienda no tiene Instagram o no la registró.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "La tienda no tiene Instagram o no la registró.", Toast.LENGTH_SHORT).show();
         }
     }
 
-    //Metodo para enviar un correo a la tienda
     public void abrirCorreo(String address, String subject) {
-        Log.d("Correo", "Mail destinatario: " + address);
-        Log.d("Correo", "Subject: " + subject);
-
-        // Sanitizar los valores y codificarlos para que sean seguros en la URI
-        String sanitizedAddress = Uri.encode(address.trim());
-        String sanitizedSubject = Uri.encode(subject.trim());
-
-        Uri uri = Uri.parse("mailto:" + sanitizedAddress + "?subject=" + sanitizedSubject);
-
-        Intent mail = new Intent(Intent.ACTION_SENDTO, uri);
-        startActivity(mail);
+        Uri uri = Uri.parse("mailto:" + Uri.encode(address) + "?subject=" + Uri.encode(subject));
+        Intent mailIntent = new Intent(Intent.ACTION_SENDTO, uri);
+        startActivity(mailIntent);
     }
-    //Metodo para hacer llamada a la tienda
+
     public void abrirTelefono() {
-        Log.d("ProductoDetalle", "Método abrirTelefono llamado");
         String telefono = tvTel.getText().toString();
         if (!telefono.isEmpty()) {
-            Intent callIntent = new Intent(Intent.ACTION_DIAL);
-            callIntent.setData(Uri.parse("tel:" + telefono));
-            if (callIntent.resolveActivity(getPackageManager()) != null) {
-                startActivity(callIntent);
-            } else {
-                Toast.makeText(this, "No se encontró ninguna aplicación para manejar el Intent.", Toast.LENGTH_LONG).show();
-            }
+            Intent callIntent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + telefono));
+            startActivity(callIntent);
         } else {
-            Toast.makeText(this, "El número de teléfono está vacío.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "El número de teléfono está vacío.", Toast.LENGTH_SHORT).show();
         }
     }
 
     //Metodo para ver los productos de la tienda
     public void verProductos() {
-        Intent intent = new Intent(DetalleTiendaActivity.this, ListaProductosTienda.class);
-        intent.putExtra("id", idT);
-        startActivity(intent);
+        // Crear una instancia del Fragment
+        ListaProductosTienda fragment = new ListaProductosTienda();
+
+// Crear el bundle con el ID que quieres pasar
+        Bundle bundle = new Bundle();
+        bundle.putInt("id", idT); // Pasar el ID de la tienda
+        fragment.setArguments(bundle);
+
+// Reemplazar el contenido actual con el nuevo Fragment
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, fragment); // R.id.fragment_container es el ID del contenedor de Fragmentos
+        transaction.addToBackStack(null); // Opcional: Si quieres que pueda volver atrás
+        transaction.commit();
     }
 }

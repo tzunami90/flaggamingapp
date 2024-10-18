@@ -25,7 +25,6 @@ public class ListadoJuegos extends Fragment implements JuegoAdapter.OnJuegoClick
 
     private RecyclerView recyclerView;
     private JuegoAdapter juegosAdapter;
-    private List<Juego> juegosList;
     private SearchView searchView;
     private ProgressBar progressBar;
     private AdView adView;

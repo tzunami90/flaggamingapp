@@ -16,41 +16,30 @@ import com.bumptech.glide.Glide;
 import java.util.ArrayList;
 import java.util.List;
 public class ProductoClienteAdapter extends RecyclerView.Adapter<ProductoClienteAdapter.ProductoClienteViewHolder> {
+
     private List<Producto> productosList;
     private List<Producto> productosListFull;
     private Context context;
+    private OnProductoClickListener onProductoClickListener;
 
-    public ProductoClienteAdapter(List<Producto> productosList, Context context) {
+    public ProductoClienteAdapter(Context context, List<Producto> productosList, OnProductoClickListener onProductoClickListener) {
         this.context = context;
         this.productosList = productosList;
         this.productosListFull = new ArrayList<>(productosList); // Copia completa de los datos
+        this.onProductoClickListener = onProductoClickListener;
     }
 
     @NonNull
     @Override
     public ProductoClienteViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_producto, parent, false);
-        return new ProductoClienteViewHolder(itemView);
+        return new ProductoClienteViewHolder(itemView, onProductoClickListener);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ProductoClienteViewHolder holder, int position) {
         Producto producto = productosList.get(position);
         holder.bind(producto);
-
-        holder.itemView.setOnClickListener(view -> {
-            Intent intent = new Intent(context, ProductoDetalle.class);
-            intent.putExtra("skuTienda", producto.getSkuTienda());
-            intent.putExtra("descTienda", producto.getDescTienda());
-            intent.putExtra("marca", producto.getMarca());
-            intent.putExtra("precioVta", producto.getPrecioVta().toString());
-            intent.putExtra("idCategoria", producto.getIdCategoria());
-            intent.putExtra("categoriaDesc", producto.getCategoria().getDesc_categoria());
-            intent.putExtra("tiendaNombre", producto.getTiendaNombre());
-            intent.putExtra("idTienda", producto.getIdTienda());
-            intent.putExtra("imagenUrl", producto.getCategoria().getImagenUrl());
-            context.startActivity(intent);
-        });
     }
 
     @Override
@@ -58,16 +47,16 @@ public class ProductoClienteAdapter extends RecyclerView.Adapter<ProductoCliente
         return productosList.size();
     }
 
-    public static class ProductoClienteViewHolder extends RecyclerView.ViewHolder {
+    class ProductoClienteViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private TextView textViewIDProducto;
         private TextView textViewProductDescription;
         private TextView textViewProductPrice;
         private TextView textViewCategoria;
         private TextView textViewTiendaNombre;
         private ImageView imageViewCategoria;
+        OnProductoClickListener onProductoClickListener;
 
-
-        public ProductoClienteViewHolder(@NonNull View itemView) {
+        public ProductoClienteViewHolder(@NonNull View itemView, OnProductoClickListener onProductoClickListener) {
             super(itemView);
             textViewIDProducto = itemView.findViewById(R.id.textViewIDProducto);
             textViewProductDescription = itemView.findViewById(R.id.textViewProductDescription);
@@ -75,6 +64,8 @@ public class ProductoClienteAdapter extends RecyclerView.Adapter<ProductoCliente
             textViewCategoria = itemView.findViewById(R.id.textViewCategoria);
             textViewTiendaNombre = itemView.findViewById(R.id.textViewTiendaNombre);
             imageViewCategoria = itemView.findViewById(R.id.imageViewCategoria);
+            this.onProductoClickListener = onProductoClickListener;
+            itemView.setOnClickListener(this);
         }
 
         public void bind(Producto producto) {
@@ -86,13 +77,22 @@ public class ProductoClienteAdapter extends RecyclerView.Adapter<ProductoCliente
 
             // Cargar la imagen de la categoría desde la URL usando Glide
             Glide.with(itemView.getContext())
-                    .load(producto.getCategoria().getImagenUrl())  // Usa la URL de la imagen
-                    .placeholder(R.drawable.nopic)  // Puedes definir un placeholder mientras se carga la imagen
-                    .error(R.drawable.nopic)  // Imagen de error si no se puede cargar la URL
+                    .load(producto.getCategoria().getImagenUrl())
+                    .placeholder(R.drawable.nopic)
+                    .error(R.drawable.nopic)
                     .into(imageViewCategoria);
         }
 
+        @Override
+        public void onClick(View view) {
+            onProductoClickListener.onProductoClick(productosList.get(getAdapterPosition()));
+        }
     }
+
+    public interface OnProductoClickListener {
+        void onProductoClick(Producto producto);
+    }
+
     public void updateList(List<Producto> newList) {
         productosList = newList;
         notifyDataSetChanged();
