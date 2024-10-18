@@ -27,6 +27,8 @@ import com.beone.flagggaming.producto.Categoria;
 import com.beone.flagggaming.producto.Producto;
 import com.beone.flagggaming.producto.ProductoClienteAdapter;
 import com.beone.flagggaming.producto.ProductoDetalle;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -235,6 +237,11 @@ public class ListaProductosTienda extends Fragment {
                         Producto producto = new Producto(idInternoProducto, idTienda, idCategoria, skuTienda, descTienda, marca, precioVta, estatus);
                         producto.setCategoria(categoria);
                         producto.setTiendaNombre(tiendaNombre);
+                        // Precargar imágenes para un rendimiento más fluido
+                        Glide.with(getActivity())
+                                .load(imagenUrl)
+                                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                .preload();
                         productos.add(producto);
                     }
 

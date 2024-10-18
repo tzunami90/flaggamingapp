@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.beone.flagggaming.R;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,6 +79,7 @@ public class ProductoClienteAdapter extends RecyclerView.Adapter<ProductoCliente
             // Cargar la imagen de la categoría desde la URL usando Glide
             Glide.with(itemView.getContext())
                     .load(producto.getCategoria().getImagenUrl())
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .placeholder(R.drawable.nopic)
                     .error(R.drawable.nopic)
                     .into(imageViewCategoria);

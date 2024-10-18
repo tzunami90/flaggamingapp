@@ -18,6 +18,8 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.beone.flagggaming.R;
 import com.beone.flagggaming.db.DBHelper;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -53,6 +55,9 @@ public class ListaHardware extends Fragment {
 
         // Mostrar el ProgressBar al inicio
         showProgressBar();
+
+        // Deshabilitar la interacción hasta que los productos estén cargados
+        recyclerView.setEnabled(false);
 
         // Cargar las categorías y productos
         new LoadCategoriesTask().execute();
@@ -114,8 +119,10 @@ public class ListaHardware extends Fragment {
         });
 
         ViewCompat.setOnApplyWindowInsetsListener(view.findViewById(R.id.listahardware), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            v.setPadding(insets.getInsets(WindowInsetsCompat.Type.systemBars()).left,
+                    insets.getInsets(WindowInsetsCompat.Type.systemBars()).top,
+                    insets.getInsets(WindowInsetsCompat.Type.systemBars()).right,
+                    insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom);
             return insets;
         });
 
@@ -225,6 +232,11 @@ public class ListaHardware extends Fragment {
                         Producto producto = new Producto(idInternoProducto, idTienda, idCategoria, skuTienda, descTienda, marca, precioVta, estatus);
                         producto.setCategoria(categoria);
                         producto.setTiendaNombre(tiendaNombre);
+                        // Precargar imágenes para un rendimiento más fluido
+                        Glide.with(getActivity())
+                                .load(imagenUrl)
+                                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                .preload();
                         productos.add(producto);
                     }
 

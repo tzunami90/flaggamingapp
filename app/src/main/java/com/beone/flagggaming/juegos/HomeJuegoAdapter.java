@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.beone.flagggaming.R;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import java.util.List;
 
@@ -44,7 +45,10 @@ public class HomeJuegoAdapter extends RecyclerView.Adapter<HomeJuegoAdapter.Home
 
         Glide.with(context)
                 .load(imagenUrl)
-                .placeholder(R.drawable.placeholder_image) // placeholder en caso de que no cargue la imagen
+                .thumbnail(0.1f) // Carga una versión de baja calidad mientras se carga la imagen completa
+                .placeholder(R.drawable.placeholder_image) // placeholder
+                .error(R.drawable.placeholder_image) // imagen de error si falla la carga
+                .diskCacheStrategy(DiskCacheStrategy.ALL) // usar caché de disco
                 .into(holder.imagenImageView);
 
         // Mostrar u ocultar el descuento según el tipo de juego (Ofertas o Los Más Buscados)

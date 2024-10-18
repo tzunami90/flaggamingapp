@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.beone.flagggaming.R;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import java.util.List;
 
@@ -38,7 +39,10 @@ public class CarouselAdapter extends RecyclerView.Adapter<CarouselAdapter.Carous
         // Cargar la imagen del juego en el ImageView usando Glide o similar
         Glide.with(holder.itemView.getContext())
                 .load(imagenUrl)
-                .placeholder(R.drawable.placeholder_image)
+                .thumbnail(0.1f) // Carga una versión de baja calidad primero
+                .placeholder(R.drawable.placeholder_image) // placeholder
+                .error(R.drawable.placeholder_image) // imagen de error si falla la carga
+                .diskCacheStrategy(DiskCacheStrategy.ALL) // usar caché de disco
                 .into(holder.imagenJuego);
     }
 

@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.beone.flagggaming.R;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +44,14 @@ public class JuegoAdapter extends RecyclerView.Adapter<JuegoAdapter.JuegoViewHol
         Juego juego = juegosListFiltered.get(position);
         holder.nombreTextView.setText(juego.getNombre());
         holder.descripcionTextView.setText(juego.getDescripcionCorta());
-        Glide.with(context).load(juego.getImagen()).into(holder.imagenImageView);
+        // Cargar la imagen del juego en el ImageView usando Glide
+        Glide.with(context)
+                .load(juego.getImagen())
+                .thumbnail(0.1f) // Carga una versión de baja calidad primero
+                .placeholder(R.drawable.placeholder_image) // placeholder
+                .error(R.drawable.placeholder_image) // imagen de error si falla la carga
+                .diskCacheStrategy(DiskCacheStrategy.ALL) // usar caché de disco
+                .into(holder.imagenImageView);
     }
 
 

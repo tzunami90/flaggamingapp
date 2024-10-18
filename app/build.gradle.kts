@@ -48,6 +48,7 @@ dependencies {
     implementation(libs.maps)
     implementation(libs.mapsUtils)
     implementation(libs.admob)
+    implementation(libs.hikariCP)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

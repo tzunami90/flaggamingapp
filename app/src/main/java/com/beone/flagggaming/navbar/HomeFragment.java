@@ -1,5 +1,6 @@
 package com.beone.flagggaming.navbar;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -31,7 +32,6 @@ public class HomeFragment extends Fragment {
     private RecyclerView recyclerViewDestacados;
     private HomeJuegoAdapter juegoAdapterOfertas;
     private HomeJuegoAdapter juegoAdapterDestacados;
-   // private ProgressBar progressBar;
    private ImageView progressLogo;
     private ViewPager2 viewPagerCarrusel;
     private CarouselAdapter carouselAdapter;
@@ -49,7 +49,6 @@ public class HomeFragment extends Fragment {
         recyclerViewOfertas = view.findViewById(R.id.recyclerViewOfertas);
         recyclerViewDestacados = view.findViewById(R.id.recyclerViewDestacados);
         viewPagerCarrusel = view.findViewById(R.id.viewPagerCarrusel);
-        //progressBar = view.findViewById(R.id.progressBar);
         progressLogo = view.findViewById(R.id.progressLogo);
 
         // Referencias a los títulos de "Ofertas" y "Los más buscados"
@@ -64,7 +63,9 @@ public class HomeFragment extends Fragment {
         Animation rotation = AnimationUtils.loadAnimation(getContext(), R.anim.rotate_animation);
         progressLogo.startAnimation(rotation);
         progressLogo.setVisibility(View.VISIBLE);
-        new Thread(() -> cargarDatos(txTitulo, txTitulo2)).start(); // Pasamos los TextViews a cargarDatos
+
+        // Ejecutar la tarea en segundo plano usando AsyncTask
+        new CargarDatosTask(txTitulo, txTitulo2).execute();
 
         // Configurar el cambio automático del carrusel
         carruselRunnable = new Runnable() {
@@ -88,42 +89,63 @@ public class HomeFragment extends Fragment {
         return view;
     }
 
-    private void cargarDatos(TextView txTitulo, TextView txTitulo2) {
-        // Cargar los juegos desde la base de datos
-        List<Juego> ofertasDestacadas = DBHelper.getOfertasDestacadas(getContext());
-        List<Juego> juegosDestacados = DBHelper.getJuegosDestacados(getContext());
+    // AsyncTask para cargar los datos en segundo plano
+    private class CargarDatosTask extends AsyncTask<Void, Void, CargarDatosTask.Resultado> {
+        private TextView txTitulo;
+        private TextView txTitulo2;
 
-        // Cargar juegos aleatorios para el carrusel (dejamos 5 por ejemplo)
-        List<Juego> juegosAleatorios = DBHelper.getJuegosAleatorios(getContext(), 5);
+        // Clase para encapsular los resultados
+        class Resultado {
+            List<Juego> ofertasDestacadas;
+            List<Juego> juegosDestacados;
+            List<Juego> juegosAleatorios;
+        }
 
-        // Ordenar los juegos destacados por contadorVistas
-        Collections.sort(juegosDestacados, (juego1, juego2) -> Integer.compare(juego2.getContadorVistas(), juego1.getContadorVistas()));
+        public CargarDatosTask(TextView txTitulo, TextView txTitulo2) {
+            this.txTitulo = txTitulo;
+            this.txTitulo2 = txTitulo2;
+        }
 
-        // Volver al hilo principal para actualizar la UI
-        getActivity().runOnUiThread(() -> {
-            // Ocultar el logo giratorio
-            progressLogo.clearAnimation();  // Detener la animación
+        @Override
+        protected Resultado doInBackground(Void... voids) {
+            Resultado resultado = new Resultado();
+
+            // Cargar datos desde la base de datos
+            resultado.ofertasDestacadas = DBHelper.getOfertasDestacadas(getContext());
+            resultado.juegosDestacados = DBHelper.getJuegosDestacados(getContext());
+            resultado.juegosAleatorios = DBHelper.getJuegosAleatorios(getContext(), 5);
+
+            // Ordenar juegos destacados por contador de vistas
+            Collections.sort(resultado.juegosDestacados, (juego1, juego2) ->
+                    Integer.compare(juego2.getContadorVistas(), juego1.getContadorVistas()));
+
+            return resultado;
+        }
+
+        @Override
+        protected void onPostExecute(Resultado resultado) {
+            // Ocultar el logo giratorio y detener la animación
+            progressLogo.clearAnimation();
             progressLogo.setVisibility(View.GONE);
 
-            // Hacer visibles los títulos una vez cargados los datos
+            // Mostrar los títulos
             txTitulo.setVisibility(View.VISIBLE);
             txTitulo2.setVisibility(View.VISIBLE);
 
-            // Actualizar los adaptadores con los datos cargados
-            juegoAdapterOfertas = new HomeJuegoAdapter(getContext(), ofertasDestacadas, this::onJuegoClick);
+            // Configurar los adaptadores con los datos cargados
+            juegoAdapterOfertas = new HomeJuegoAdapter(getContext(), resultado.ofertasDestacadas, HomeFragment.this::onJuegoClick);
             recyclerViewOfertas.setAdapter(juegoAdapterOfertas);
 
-            juegoAdapterDestacados = new HomeJuegoAdapter(getContext(), juegosDestacados, this::onJuegoClick);
+            juegoAdapterDestacados = new HomeJuegoAdapter(getContext(), resultado.juegosDestacados, HomeFragment.this::onJuegoClick);
             recyclerViewDestacados.setAdapter(juegoAdapterDestacados);
 
             // Configurar el carrusel
-            carouselAdapter = new CarouselAdapter(juegosAleatorios, this::onJuegoClick);
+            carouselAdapter = new CarouselAdapter(resultado.juegosAleatorios, HomeFragment.this::onJuegoClick);
             viewPagerCarrusel.setAdapter(carouselAdapter);
 
             // Iniciar el cambio automático del carrusel
-            handler.postDelayed(carruselRunnable, 2000);  // Inicia después de 2 segundos
-
-        });
+            handler.postDelayed(carruselRunnable, 2000);
+        }
     }
 
     // Manejar el clic en un juego
