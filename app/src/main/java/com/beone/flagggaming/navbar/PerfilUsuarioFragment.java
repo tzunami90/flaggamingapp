@@ -88,8 +88,8 @@ public class PerfilUsuarioFragment extends Fragment {
             editTextFirstNameModif.setText(firstName);
             editTextLastNameModif.setText(lastName);
             editTextEmailModif.setText(email);
-            editTextPasswordModif.setText(password);
-            editTextRepeatPasswordModif.setText(password);
+            //editTextPasswordModif.setText(password);
+            //editTextRepeatPasswordModif.setText(password);
             // Ocultar el ProgressBar
             progressBar.setVisibility(View.GONE);
         }

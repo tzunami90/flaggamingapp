@@ -49,6 +49,7 @@
             android:exported="false" />
         <activity
             android:name=".HomeAcitivity"
+            android:label=""
             android:exported="false" />
         <activity
             android:name=".steamapi.ListaJuegosSteam"
